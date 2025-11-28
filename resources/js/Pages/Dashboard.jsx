@@ -3,7 +3,6 @@ import { Head, Link } from '@inertiajs/react';
 import moment from 'moment';
 
 export default function Dashboard({ auth, games = [], now }) {
-
     return (
         <AuthenticatedLayout
             header={

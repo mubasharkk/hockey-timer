@@ -3,13 +3,21 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import moment from 'moment';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [currentTime, setCurrentTime] = useState(() => moment().format('DD.MM.YYYY HH:mm'));
+
+    useEffect(() => {
+        const id = window.setInterval(() => {
+            setCurrentTime(moment().format('DD.MM.YYYY HH:mm'));
+        }, 1000 * 60);
+        return () => window.clearInterval(id);
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -33,7 +41,10 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                        <div className="hidden sm:ms-6 sm:flex sm:items-center sm:gap-4">
+                            <span className="rounded-md bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-800">
+                                {currentTime}
+                            </span>
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
