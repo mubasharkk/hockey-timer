@@ -455,7 +455,8 @@ export default function Timer({ auth, game, config = {} }) {
         }
         const endedAt = new Date().toISOString();
         syncSessionState({ elapsed_seconds: plannedSeconds, ended_at: endedAt });
-        syncGameScores({ status: 'finished', ended_at: endedAt });
+        // Only mark finished when the final session triggers game end; keep current status here.
+        syncGameScores();
     };
 
     const handleGameEnd = (fromSessionEnd = false) => {
