@@ -23,6 +23,7 @@ export default function Summary({ auth, game }) {
     const scheduledAt = game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`) : null;
     const isFinished = game.status === 'finished';
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
+    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status);
     const sessions = game.sessions || [];
     const sessionCount = sessions.length;
     const now = new Date();
@@ -44,6 +45,7 @@ export default function Summary({ auth, game }) {
                         <p className="text-sm text-gray-600">
                             {game.venue} · {scheduledDisplay || `${game.game_date} ${game.game_time}`} ({game.timer_mode} timer)
                         </p>
+                        {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
                     </header>
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -165,4 +167,25 @@ const formatDateTime = (date, time) => {
     const value = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     if (!value.isValid()) return `${date} ${time}`;
     return value.format('DD.MM.YYYY HH:mm');
+};
+
+const formatRelativeStart = (date, time, status) => {
+    const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
+    const now = moment();
+    if (!start.isValid()) return '';
+    if (status === 'finished') return 'Finished';
+
+    const diffMinutes = start.diff(now, 'minutes', true);
+    if (diffMinutes > 1) {
+        return `${Math.round(diffMinutes)} mins to start`;
+    }
+    if (diffMinutes > 0) {
+        return 'Starting soon';
+    }
+
+    const minsAgo = now.diff(start, 'minutes', true);
+    if (minsAgo < 60) {
+        return `${Math.round(minsAgo)} mins since start`;
+    }
+    return `${Math.round(minsAgo / 60)} hrs since start`;
 };

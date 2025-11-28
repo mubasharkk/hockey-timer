@@ -184,6 +184,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const timerLockEnabled = config.timer_lock ?? true;
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
+    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status);
 
     const displaySeconds =
         game.timer_mode === 'DESC'
@@ -420,13 +421,14 @@ export default function Timer({ auth, game, config = {} }) {
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">{scheduledDisplay || 'Live Match'}</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                                {game.team_a_name} vs {game.team_b_name}
-                            </h1>
-                            <p className="text-sm text-gray-600">
-                                Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
-                                timer
-                            </p>
-                        </div>
+                            {game.team_a_name} vs {game.team_b_name}
+                        </h1>
+                        <p className="text-sm text-gray-600">
+                            Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
+                            timer
+                        </p>
+                        {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
+                    </div>
                         <Link
                             href={route('games.report', game.id)}
                             className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
@@ -702,4 +704,25 @@ const formatDateTime = (date, time) => {
     const value = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     if (!value.isValid()) return `${date} ${time}`;
     return value.format('DD.MM.YYYY HH:mm');
+};
+
+const formatRelativeStart = (date, time, status) => {
+    const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
+    const now = moment();
+    if (!start.isValid()) return '';
+    if (status === 'finished') return 'Finished';
+
+    const diffMinutes = start.diff(now, 'minutes', true);
+    if (diffMinutes > 1) {
+        return `${Math.round(diffMinutes)} mins to start`;
+    }
+    if (diffMinutes > 0) {
+        return 'Starting soon';
+    }
+
+    const minsAgo = now.diff(start, 'minutes', true);
+    if (minsAgo < 60) {
+        return `${Math.round(minsAgo)} mins since start`;
+    }
+    return `${Math.round(minsAgo / 60)} hrs since start`;
 };

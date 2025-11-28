@@ -45,6 +45,9 @@ export default function Dashboard({ auth, games = [], now }) {
                                             </div>
                                             <div className="text-xs text-gray-600">
                                                 {formatDateTime(game.game_date, game.game_time)} · {game.venue}
+                                                {formatRelativeStart(game.game_date, game.game_time, now, game.status)
+                                                    ? ` · ${formatRelativeStart(game.game_date, game.game_time, now, game.status)}`
+                                                    : ''}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -90,4 +93,25 @@ const formatDateTime = (date, time) => {
     const value = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     if (!value.isValid()) return `${date} ${time}`;
     return value.format('DD.MM.YYYY HH:mm');
+};
+
+const formatRelativeStart = (date, time, nowIso, status) => {
+    const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
+    const now = nowIso ? moment(nowIso) : moment();
+    if (!start.isValid()) return '';
+    if (status === 'finished') return 'Finished';
+
+    const diffMinutes = start.diff(now, 'minutes', true);
+    if (diffMinutes > 1) {
+        return `${Math.round(diffMinutes)} mins to start`;
+    }
+    if (diffMinutes > 0) {
+        return 'Starting soon';
+    }
+
+    const minsAgo = now.diff(start, 'minutes', true);
+    if (minsAgo < 60) {
+        return `${Math.round(minsAgo)} mins since start`;
+    }
+    return `${Math.round(minsAgo / 60)} hrs since start`;
 };

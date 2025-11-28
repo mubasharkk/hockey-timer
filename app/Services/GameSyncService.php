@@ -74,7 +74,7 @@ class GameSyncService
 
     public function syncEvents(Game $game, array $events): Collection
     {
-        return collect($events)->map(function (array $event) use ($game) {
+        $collection = collect($events)->map(function (array $event) use ($game) {
             return Event::create([
                 'game_id' => $game->id,
                 'team_id' => $event['team_id'] ?? null,
@@ -88,6 +88,15 @@ class GameSyncService
                 'note' => $event['note'] ?? null,
             ]);
         });
+
+        if ($collection->contains(fn (Event $e) => $e->event_type === 'game_end')) {
+            $game->forceFill([
+                'status' => 'finished',
+                'ended_at' => now(),
+            ])->save();
+        }
+
+        return $collection;
     }
 
     private function ensurePlannedSessions(Game $game): void
