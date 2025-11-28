@@ -21,11 +21,12 @@ export default function Summary({ auth, game }) {
     }
 
     const scheduledAt = game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`) : null;
+    const isFinished = game.status === 'finished';
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
     const sessions = game.sessions || [];
     const sessionCount = sessions.length;
     const now = new Date();
-    const canStart = scheduledAt ? now >= scheduledAt : false;
+    const canStart = !isFinished && (scheduledAt ? now >= scheduledAt : false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const { delete: destroy, processing } = useForm({});
 
@@ -78,9 +79,13 @@ export default function Summary({ auth, game }) {
                         </dl>
 
                         <div className="mt-6 flex items-center justify-between rounded-md bg-gray-50 p-4 text-sm text-gray-700">
-                            <span>Match can start when browser time reaches the scheduled start.</span>
-                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${canStart ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800'}`}>
-                                {canStart ? 'Ready' : 'Waiting for start time'}
+                            <span>{isFinished ? 'Game has ended. View the report for details.' : 'Match can start when browser time reaches the scheduled start.'}</span>
+                            <span
+                                className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                    isFinished ? 'bg-indigo-100 text-indigo-800' : canStart ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800'
+                                }`}
+                            >
+                                {isFinished ? 'Finished' : canStart ? 'Ready' : 'Waiting for start time'}
                             </span>
                         </div>
                     </div>
@@ -101,17 +106,27 @@ export default function Summary({ auth, game }) {
                         </Link>
 
                         <div className="flex items-center gap-2">
-                            <Link
-                                href={route('games.timer', game.id)}
-                                className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition ${
-                                    canStart
-                                        ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                                        : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                                }`}
-                                preserveScroll
-                            >
-                                Start Match
-                            </Link>
+                            {isFinished ? (
+                                <Link
+                                    href={route('games.report', game.id)}
+                                    className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                    preserveScroll
+                                >
+                                    View Report
+                                </Link>
+                            ) : (
+                                <Link
+                                    href={route('games.timer', game.id)}
+                                    className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition ${
+                                        canStart
+                                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                                            : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                                    }`}
+                                    preserveScroll
+                                >
+                                    Start Match
+                                </Link>
+                            )}
                             <DangerButton onClick={() => setConfirmDelete(true)} disabled={processing}>
                                 Delete
                             </DangerButton>

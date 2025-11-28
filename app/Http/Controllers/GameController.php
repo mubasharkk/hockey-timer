@@ -38,9 +38,14 @@ class GameController extends Controller
         ]);
     }
 
-    public function showTimer(Game $game): Response
+    public function showTimer(Game $game): Response|RedirectResponse
     {
         $game->load(['teams.players', 'sessions' => fn ($q) => $q->orderBy('number'), 'events' => fn ($q) => $q->orderBy('occurred_at')]);
+
+        $isFinished = $game->status === 'finished' || $game->events->contains('event_type', 'game_end');
+        if ($isFinished) {
+            return redirect()->route('games.report', $game);
+        }
 
         return Inertia::render('Game/Timer', [
             'game' => $game,

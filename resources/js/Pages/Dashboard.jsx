@@ -50,10 +50,10 @@ export default function Dashboard({ auth, games = [], now }) {
                                         <div className="flex items-center gap-3">
                                             <StatusBadge status={game.status} />
                                             <Link
-                                                href={route('games.summary', game.id)}
+                                                href={route(game.status === 'finished' ? 'games.report' : 'games.summary', game.id)}
                                                 className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
                                             >
-                                                View
+                                                {game.status === 'finished' ? 'Report' : 'View'}
                                             </Link>
                                         </div>
                                     </div>
