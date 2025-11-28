@@ -54,22 +54,24 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                             <div key={event.id || idx} className="relative flex w-full items-center justify-center">
                                 <span
                                     className={`absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full ring-4 ring-white shadow ${
-                                        isGameEnd ? 'bg-red-500' : 'bg-gray-800'
+                                        isGameEnd ? 'bg-red-500' : isBreak ? 'bg-emerald-500' : 'bg-gray-800'
                                     }`}
                                 />
                                 <div
                                     className={`relative z-20 mx-auto flex max-w-md flex-col items-center rounded-md border px-4 py-2 text-center shadow-sm ${
                                         isGameEnd
                                             ? 'border-red-200 bg-red-50 text-red-700'
-                                            : 'border-gray-200 bg-gray-50 text-gray-700'
+                                            : isBreak
+                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                : 'border-gray-200 bg-gray-50 text-gray-700'
                                     }`}
                                 >
                                     <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
-                                    {event.timer_value_seconds != null && (
-                                        <p className="text-[11px] font-medium text-gray-500">
-                                            {formatSeconds(event.timer_value_seconds)}
-                                        </p>
-                                    )}
+                                    {/*{event.timer_value_seconds != null && (*/}
+                                    {/*    <p className="text-[11px] font-medium text-gray-500">*/}
+                                    {/*        {formatSeconds(event.timer_value_seconds)}*/}
+                                    {/*    </p>*/}
+                                    {/*)}*/}
                                     {event.occurred_at && (
                                         <p className="text-[11px] text-gray-500">
                                             {new Date(event.occurred_at).toLocaleString()}
