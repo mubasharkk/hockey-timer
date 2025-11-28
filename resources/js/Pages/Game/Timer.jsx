@@ -281,9 +281,12 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const persistEvents = async (newEvents) => {
+        const payloadEvents = newEvents.map((e) =>
+            e.event_type === 'game_start' ? { ...e, event_type: 'highlight' } : e
+        );
         try {
             await axios.post(`/api/sync/game/${game.id}/events`, {
-                events: newEvents,
+                events: payloadEvents,
             });
         } catch (e) {
             console.error('Failed to sync events', e);
@@ -291,7 +294,9 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     useEffect(() => {
-        const hasGameStart = (events || []).some((e) => e.event_type === 'game_start');
+        const hasGameStart = (events || []).some(
+            (e) => e.event_type === 'game_start' || (e.event_type === 'highlight' && (e.note || '').toLowerCase().includes('game start'))
+        );
         if (hasGameStart) return;
 
         const occurred_at =
@@ -722,8 +727,6 @@ const QuickEventButton = ({ label, onClick, disabled }) => (
 
 const eventBadge = (event) => {
     switch (event.event_type) {
-        case 'game_start':
-            return { icon: '/icons/half-time.png', label: 'Game Start' };
         case 'goal':
             return { icon: '/icons/goal.png', label: event.goal_type ? `${event.goal_type} Goal` : 'Goal' };
         case 'penalty_corner':
@@ -736,7 +739,13 @@ const eventBadge = (event) => {
             return { icon: '/icons/half-time.png', label: 'Session End' };
         case 'game_end':
             return { icon: '/icons/full-time.png', label: 'Game End' };
-        case 'highlight':
+        case 'highlight': {
+            const note = (event.note || '').toLowerCase();
+            if (note.includes('game start')) {
+                return { icon: '/icons/half-time.png', label: 'Game Start' };
+            }
+            return { icon: '/icons/foul.png', label: 'Highlight' };
+        }
         default:
             return { icon: '/icons/foul.png', label: 'Highlight' };
     }
