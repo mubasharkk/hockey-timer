@@ -124,6 +124,7 @@ export default function Timer({ auth, game, config = {} }) {
     }, [scores, scoreStorageKey]);
 
     const [confirmModal, setConfirmModal] = useState(null); // { type: 'session' | 'game' }
+    const [goalModal, setGoalModal] = useState(null); // { team, goalType, shirtNumber }
 
     const syncSessionState = async (overrides = {}) => {
         const payload = {
@@ -256,16 +257,45 @@ export default function Timer({ auth, game, config = {} }) {
         }
     };
 
-    const handleAddGoal = (team) => {
+    const findPlayerName = (team, shirtNumber) => {
+        if (!team || !shirtNumber) return null;
+        const player = (team.players || []).find((p) => `${p.shirt_number}` === `${shirtNumber}`);
+        return player?.name || null;
+    };
+
+    const openGoalDialog = (team) => {
+        if (!team || isGameOver) return;
+        setStatus('paused');
+        setLastTick(null);
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                status: 'paused',
+                elapsedSeconds,
+                sessionIndex,
+            })
+        );
+        setGoalModal({
+            team,
+            goalType: 'FG',
+            shirtNumber: '',
+        });
+    };
+
+    const handleAddGoal = ({ team, goalType, shirtNumber }) => {
         if (!team || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: (prev[team.id] ?? 0) + 1 }));
+        const playerName = findPlayerName(team, shirtNumber);
         const newEvent = {
             id: `temp-${Date.now()}`,
             team_id: team.id,
             session_number: sessionIndex + 1,
             event_type: 'goal',
+            goal_type: goalType || null,
+            player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
             timer_value_seconds: displaySeconds,
             occurred_at: new Date().toISOString(),
+            note: playerName || null,
         };
         setEvents((prev) => [
             ...prev,
@@ -274,6 +304,7 @@ export default function Timer({ auth, game, config = {} }) {
         persistEvents([newEvent]);
         syncSessionState();
         syncGameScores();
+        setGoalModal(null);
     };
 
     const handleRemoveGoal = (team) => {
@@ -485,14 +516,14 @@ export default function Timer({ auth, game, config = {} }) {
                                     <TeamScoreCard
                                         team={home}
                                         score={scores[home?.id] ?? 0}
-                                        onAdd={() => handleAddGoal(home)}
+                                        onAdd={() => openGoalDialog(home)}
                                         onRemove={() => handleRemoveGoal(home)}
                                         disabled={isGameOver}
                                     />
                                     <TeamScoreCard
                                         team={away}
                                         score={scores[away?.id] ?? 0}
-                                        onAdd={() => handleAddGoal(away)}
+                                        onAdd={() => openGoalDialog(away)}
                                         onRemove={() => handleRemoveGoal(away)}
                                         disabled={isGameOver}
                                     />
@@ -515,26 +546,47 @@ export default function Timer({ auth, game, config = {} }) {
                                 <p className="text-sm font-semibold text-gray-800">Event Timeline</p>
                                 <span className="text-xs text-gray-500">{events.length} events</span>
                             </div>
-                            <div className="space-y-3">
-                                {events.length === 0 && <p className="text-sm text-gray-500">No events yet.</p>}
-                                {events.map((event) => (
-                                    <div key={event.id} className="rounded-md border border-gray-100 bg-gray-50 p-3">
-                                        <p className="text-xs uppercase tracking-wide text-gray-500">
-                                            Session {event.session_number} · {event.event_type}
-                                        </p>
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {event.goal_type ? `${event.goal_type} · ` : ''}
-                                            {event.card_type ? `${event.card_type} card · ` : ''}
-                                            {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
-                                        </p>
-                                        <p className="text-xs text-gray-600">
-                                            {event.team_id
-                                                ? teams.find((t) => t.id === event.team_id)?.name || 'Team'
-                                                : ''}
-                                        </p>
-                                        {event.note && <p className="text-sm text-gray-600">{event.note}</p>}
-                                    </div>
-                                ))}
+                            <div className="relative">
+                                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
+                                <div className="space-y-4">
+                                    {events.length === 0 && <p className="text-sm text-gray-500">No events yet.</p>}
+                                    {events.map((event, idx) => {
+                                        const team = event.team_id ? teams.find((t) => t.id === event.team_id) : null;
+                                        const side = team?.side === 'away' ? 'away' : 'home';
+                                        const align = side === 'away' ? 'justify-end' : 'justify-start';
+                                        const badge = eventBadge(event);
+                                        const playerLabel =
+                                            event.player_shirt_number != null
+                                                ? `#${event.player_shirt_number}${event.note ? ` ${event.note}` : ''}`
+                                                : event.note || '';
+
+                                        return (
+                                            <div key={event.id || idx} className={`relative flex ${align}`}>
+                                                <span className="absolute left-1/2 top-3 z-10 -translate-x-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
+                                                <div
+                                                    className={`flex max-w-[70%] items-center gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm ${
+                                                        side === 'away' ? 'flex-row-reverse text-right' : ''
+                                                    }`}
+                                                >
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
+                                                        <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <p className="text-xs uppercase tracking-wide text-gray-500">
+                                                            Session {event.session_number} · {badge.label}
+                                                        </p>
+                                                        <p className="text-sm font-semibold text-gray-800">
+                                                            {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
+                                                        </p>
+                                                        <p className="text-xs text-gray-600">
+                                                            {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </aside>
                     </div>
@@ -553,6 +605,50 @@ export default function Timer({ auth, game, config = {} }) {
                     <div className="mt-6 flex justify-end gap-3">
                         <SecondaryButton onClick={() => setConfirmModal(null)}>Cancel</SecondaryButton>
                         <DangerButton onClick={performConfirm}>Confirm</DangerButton>
+                    </div>
+                </div>
+            </Modal>
+            <Modal show={!!goalModal} onClose={() => setGoalModal(null)} maxWidth="sm">
+                <div className="p-6 space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Record Goal</h2>
+                    <p className="text-sm text-gray-700">
+                        {goalModal?.team?.name ? `${goalModal.team.name} goal details` : 'Enter goal details'}
+                    </p>
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Goal Type</label>
+                        <select
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            value={goalModal?.goalType || 'FG'}
+                            onChange={(e) => setGoalModal((prev) => ({ ...prev, goalType: e.target.value }))}
+                        >
+                            <option value="FG">Field Goal</option>
+                            <option value="PG">Penalty Goal</option>
+                            <option value="">Unspecified</option>
+                        </select>
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Player Shirt Number</label>
+                        <input
+                            type="number"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            value={goalModal?.shirtNumber || ''}
+                            onChange={(e) => setGoalModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
+                            placeholder="Optional"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setGoalModal(null)}>Cancel</SecondaryButton>
+                        <DangerButton
+                            onClick={() =>
+                                handleAddGoal({
+                                    team: goalModal?.team,
+                                    goalType: goalModal?.goalType,
+                                    shirtNumber: goalModal?.shirtNumber,
+                                })
+                            }
+                        >
+                            Save Goal
+                        </DangerButton>
                     </div>
                 </div>
             </Modal>
@@ -605,6 +701,33 @@ const QuickEventButton = ({ label, onClick, disabled }) => (
         {label}
     </button>
 );
+
+const eventBadge = (event) => {
+    switch (event.event_type) {
+        case 'goal':
+            return { icon: '/icons/goal.png', label: event.goal_type ? `${event.goal_type} Goal` : 'Goal' };
+        case 'penalty_corner':
+            return { icon: '/icons/foul.png', label: 'Penalty Corner' };
+        case 'penalty_stroke':
+            return { icon: '/icons/foul.png', label: 'Penalty Stroke' };
+        case 'card':
+            return { icon: cardIcon(event.card_type), label: `${event.card_type || ''} Card`.trim() };
+        case 'session_end':
+            return { icon: '/icons/half-time.png', label: 'Session End' };
+        case 'game_end':
+            return { icon: '/icons/full-time.png', label: 'Game End' };
+        case 'highlight':
+        default:
+            return { icon: '/icons/foul.png', label: 'Highlight' };
+    }
+};
+
+const cardIcon = (type) => {
+    if (type === 'red') return '/icons/red-card.png';
+    if (type === 'yellow') return '/icons/red-card.png';
+    if (type === 'green') return '/icons/red-card.png';
+    return '/icons/red-card.png';
+};
 
 const formatSeconds = (seconds) => {
     const mins = Math.floor(seconds / 60)
