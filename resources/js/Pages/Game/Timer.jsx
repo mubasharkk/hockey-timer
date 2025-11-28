@@ -223,8 +223,30 @@ export default function Timer({ auth, game, config = {} }) {
                 break_ended_at: breakEndIso,
                 elapsed_seconds: plannedSecondsFor(sessionIndex - 1),
             });
+            const breakEvent = {
+                id: `break-${Date.now()}`,
+                session_number: sessionIndex,
+                event_type: 'highlight',
+                timer_value_seconds: 0,
+                occurred_at: breakEndIso,
+                note: `Break ${formatSeconds(duration)}`,
+            };
+            setEvents((prev) => [...prev, breakEvent]);
+            persistEvents([breakEvent]);
             setBreakStartAt(null);
             localStorage.removeItem(breakStorageKey);
+        }
+        if (status === 'ready') {
+            const sessionStartEvent = {
+                id: `session-start-${sessionIndex + 1}-${Date.now()}`,
+                session_number: sessionIndex + 1,
+                event_type: 'highlight',
+                timer_value_seconds: 0,
+                occurred_at: new Date(now).toISOString(),
+                note: `Session ${sessionIndex + 1} start`,
+            };
+            setEvents((prev) => [...prev, sessionStartEvent]);
+            persistEvents([sessionStartEvent]);
         }
         setLastTick(now);
         setStatus('running');
@@ -299,12 +321,17 @@ export default function Timer({ auth, game, config = {} }) {
         );
         if (hasGameStart) return;
 
-        const occurred_at =
-            game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`).toISOString() : new Date().toISOString();
+        let occurred_at = new Date().toISOString();
+        if (game.game_date && game.game_time) {
+            const parsed = new Date(`${game.game_date}T${game.game_time}`);
+            if (!Number.isNaN(parsed.getTime())) {
+                occurred_at = parsed.toISOString();
+            }
+        }
         const startEvent = {
             id: `game-start-${game.id}`,
             session_number: 1,
-            event_type: 'game_start',
+            event_type: 'highlight',
             timer_value_seconds: 0,
             occurred_at,
             note: 'Game start',
@@ -743,6 +770,12 @@ const eventBadge = (event) => {
             const note = (event.note || '').toLowerCase();
             if (note.includes('game start')) {
                 return { icon: '/icons/half-time.png', label: 'Game Start' };
+            }
+            if (note.includes('session') && note.includes('start')) {
+                return { icon: '/icons/half-time.png', label: 'Session Start' };
+            }
+            if (note.includes('break')) {
+                return { icon: '/icons/half-time.png', label: 'Break' };
             }
             return { icon: '/icons/foul.png', label: 'Highlight' };
         }

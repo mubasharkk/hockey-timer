@@ -26,8 +26,28 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                             ? `#${event.player_shirt_number}${event.note ? ` ${event.note}` : ''}`
                             : event.note || '';
 
-                    if (event.event_type === 'session_end' || event.event_type === 'game_end') {
+                    const noteLower = (event.note || '').toLowerCase();
+                    const isGameStart = event.event_type === 'highlight' && noteLower.includes('game start');
+                    const isSessionStart = event.event_type === 'highlight' && noteLower.includes('session') && noteLower.includes('start');
+                    const isBreak = event.event_type === 'highlight' && noteLower.includes('break');
+                    const isCenter =
+                        event.event_type === 'session_end' ||
+                        event.event_type === 'game_end' ||
+                        isGameStart ||
+                        isSessionStart ||
+                        isBreak;
+
+                    if (isCenter) {
                         const isGameEnd = event.event_type === 'game_end';
+                        const label = isGameEnd
+                            ? 'Game End'
+                            : isGameStart
+                                ? 'Game Start'
+                                : isSessionStart
+                                    ? `Session ${event.session_number} Start`
+                                    : isBreak
+                                        ? event.note || 'Break'
+                                        : `Session ${event.session_number} End`;
                         return (
                             <div key={event.id || idx} className="relative flex w-full items-center justify-center">
                                 <span
@@ -42,14 +62,17 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                                             : 'border-gray-200 bg-gray-50 text-gray-700'
                                     }`}
                                 >
-                                    <p className="text-xs font-semibold uppercase tracking-wide">
-                                        {isGameEnd ? 'Game End' : `Session ${event.session_number} End`}
-                                    </p>
-                                    {/*{event.timer_value_seconds != null && (*/}
-                                    {/*    <p className="text-[11px] font-medium text-gray-500">*/}
-                                    {/*        {formatSeconds(event.timer_value_seconds)}*/}
-                                    {/*    </p>*/}
-                                    {/*)}*/}
+                                    <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
+                                    {event.timer_value_seconds != null && (
+                                        <p className="text-[11px] font-medium text-gray-500">
+                                            {formatSeconds(event.timer_value_seconds)}
+                                        </p>
+                                    )}
+                                    {event.occurred_at && (
+                                        <p className="text-[11px] text-gray-500">
+                                            {new Date(event.occurred_at).toLocaleString()}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         );
