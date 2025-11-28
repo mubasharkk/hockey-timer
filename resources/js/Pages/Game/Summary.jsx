@@ -63,19 +63,13 @@ export default function Summary({ auth, game }) {
                             <div>
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Home Players</dt>
                                 <dd className="text-sm text-gray-900">
-                                    {(game.teams || [])
-                                        .find((t) => t.side === 'home')
-                                        ?.players?.map((p) => (p.shirt_number ? `#${p.shirt_number} ${p.name}` : p.name))
-                                        ?.join(', ') || '—'}
+                                    <PlayerList team={(game.teams || []).find((t) => t.side === 'home')} />
                                 </dd>
                             </div>
                             <div>
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Away Players</dt>
                                 <dd className="text-sm text-gray-900">
-                                    {(game.teams || [])
-                                        .find((t) => t.side === 'away')
-                                        ?.players?.map((p) => (p.shirt_number ? `#${p.shirt_number} ${p.name}` : p.name))
-                                        ?.join(', ') || '—'}
+                                    <PlayerList team={(game.teams || []).find((t) => t.side === 'away')} />
                                 </dd>
                             </div>
                         </dl>
@@ -154,6 +148,22 @@ export default function Summary({ auth, game }) {
         </AuthenticatedLayout>
     );
 }
+
+const PlayerList = ({ team }) => {
+    if (!team || !team.players || team.players.length === 0) {
+        return <span>—</span>;
+    }
+    return (
+        <ul className="list-inside list-disc space-y-1">
+            {team.players.map((p) => (
+                <li key={p.id || p.name} className="text-sm text-gray-800">
+                    {p.shirt_number ? `#${p.shirt_number} ` : ''}
+                    {p.name}
+                </li>
+            ))}
+        </ul>
+    );
+};
 
 const formatDateTime = (date, time) => {
     if (!date || !time) return null;
