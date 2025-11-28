@@ -88,7 +88,7 @@ export default function Report({ auth, game }) {
                     </section>
 
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <h3 className="text-base font-semibold text-gray-900">Event Timeline</h3>
+                        <h3 className="text-base font-semibold text-gray-900">Game Timeline</h3>
                         <div className="mt-4">
                             <EventTimeline events={events} teams={game.teams || []} />
                         </div>
