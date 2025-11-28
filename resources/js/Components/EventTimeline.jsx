@@ -85,20 +85,20 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                             <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
                             <div
                                 className={`relative flex w-1/2 ${
-                                    side === 'teamA' ? 'ml-auto justify-start pl-12' : 'mr-auto justify-end pr-12'
+                                    side === 'teamA' ? 'mr-auto justify-end pr-12' : 'ml-auto justify-start pl-12'
                                 }`}
                             >
                                 <div className="relative flex max-w-[85%] items-start gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm">
                                     <span
                                         className={`absolute top-1/2 -translate-y-1/2 h-px bg-gray-200 ${
-                                            side === 'teamA' ? 'right-full w-10' : 'left-full w-10'
+                                            side === 'teamA' ? 'left-full w-10' : 'right-full w-10'
                                         }`}
                                     />
                                     <span
                                         className={`absolute top-1/2 h-0 w-0 -translate-y-1/2 ${
                                             side === 'teamA'
-                                                ? '-left-2 border-y-8 border-y-transparent border-r-8 border-r-gray-50'
-                                                : '-right-2 border-y-8 border-y-transparent border-l-8 border-l-gray-50'
+                                                ? '-right-2 border-y-8 border-y-transparent border-l-8 border-l-gray-50'
+                                                : '-left-2 border-y-8 border-y-transparent border-r-8 border-r-gray-50'
                                         }`}
                                     />
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
