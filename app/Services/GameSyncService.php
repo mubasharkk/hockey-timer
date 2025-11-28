@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Event;
+use App\Models\Game;
+use App\Models\MatchSession;
+use App\Models\Team;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+
+class GameSyncService
+{
+    public function syncGame(array $data): Game
+    {
+        return DB::transaction(function () use ($data) {
+            $game = Game::updateOrCreate(
+                ['id' => $data['id'] ?? null],
+                [
+                    'team_a_name' => $data['team_a_name'],
+                    'team_b_name' => $data['team_b_name'],
+                    'venue' => $data['venue'],
+                    'game_date' => $data['game_date'],
+                    'game_time' => $data['game_time'],
+                    'sessions' => $data['sessions'],
+                    'session_duration_minutes' => $data['session_duration_minutes'],
+                    'timer_mode' => $data['timer_mode'],
+                    'status' => $data['status'] ?? 'scheduled',
+                ]
+            );
+
+            if (!empty($data['teams'])) {
+                collect($data['teams'])->each(function (array $team) use ($game) {
+                    Team::updateOrCreate(
+                        ['id' => $team['id'] ?? null],
+                        [
+                            'game_id' => $game->id,
+                            'name' => $team['name'],
+                            'side' => $team['side'],
+                            'score' => $team['score'] ?? 0,
+                        ]
+                    );
+                });
+            }
+
+            $this->ensurePlannedSessions($game);
+
+            return $game;
+        });
+    }
+
+    public function syncSessions(Game $game, array $sessions): Collection
+    {
+        return collect($sessions)->map(function (array $session) use ($game) {
+            $record = MatchSession::updateOrCreate(
+                ['id' => $session['id'] ?? null],
+                [
+                    'game_id' => $game->id,
+                    'number' => $session['number'],
+                    'planned_duration_seconds' => $session['planned_duration_seconds'],
+                    'actual_duration_seconds' => $session['actual_duration_seconds'] ?? null,
+                    'overrun_seconds' => $session['overrun_seconds'] ?? null,
+                    'break_duration_seconds' => $session['break_duration_seconds'] ?? null,
+                    'started_at' => $session['started_at'] ?? null,
+                    'ended_at' => $session['ended_at'] ?? null,
+                    'break_started_at' => $session['break_started_at'] ?? null,
+                    'break_ended_at' => $session['break_ended_at'] ?? null,
+                ]
+            );
+
+            return $record->id;
+        });
+    }
+
+    public function syncEvents(Game $game, array $events): Collection
+    {
+        return collect($events)->map(function (array $event) use ($game) {
+            return Event::create([
+                'game_id' => $game->id,
+                'team_id' => $event['team_id'] ?? null,
+                'session_number' => $event['session_number'],
+                'event_type' => $event['event_type'],
+                'goal_type' => $event['goal_type'] ?? null,
+                'card_type' => $event['card_type'] ?? null,
+                'player_shirt_number' => $event['player_shirt_number'] ?? null,
+                'timer_value_seconds' => $event['timer_value_seconds'] ?? null,
+                'occurred_at' => $event['occurred_at'] ?? now(),
+                'note' => $event['note'] ?? null,
+            ]);
+        });
+    }
+
+    private function ensurePlannedSessions(Game $game): void
+    {
+        for ($i = 1; $i <= $game->sessions; $i++) {
+            MatchSession::firstOrCreate(
+                ['game_id' => $game->id, 'number' => $i],
+                ['planned_duration_seconds' => $game->session_duration_minutes * 60]
+            );
+        }
+    }
+}
