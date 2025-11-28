@@ -290,6 +290,24 @@ export default function Timer({ auth, game, config = {} }) {
         }
     };
 
+    useEffect(() => {
+        const hasGameStart = (events || []).some((e) => e.event_type === 'game_start');
+        if (hasGameStart) return;
+
+        const occurred_at =
+            game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`).toISOString() : new Date().toISOString();
+        const startEvent = {
+            id: `game-start-${game.id}`,
+            session_number: 1,
+            event_type: 'game_start',
+            timer_value_seconds: 0,
+            occurred_at,
+            note: 'Game start',
+        };
+        setEvents((prev) => [startEvent, ...prev]);
+        persistEvents([startEvent]);
+    }, [events, game.game_date, game.game_time, game.id]);
+
     const findPlayerName = (team, shirtNumber) => {
         if (!team || !shirtNumber) return null;
         const player = (team.players || []).find((p) => `${p.shirt_number}` === `${shirtNumber}`);
@@ -704,6 +722,8 @@ const QuickEventButton = ({ label, onClick, disabled }) => (
 
 const eventBadge = (event) => {
     switch (event.event_type) {
+        case 'game_start':
+            return { icon: '/icons/half-time.png', label: 'Game Start' };
         case 'goal':
             return { icon: '/icons/goal.png', label: event.goal_type ? `${event.goal_type} Goal` : 'Goal' };
         case 'penalty_corner':
