@@ -144,7 +144,7 @@ export default function Timer({ auth, game, config = {} }) {
         }
     };
 
-    const syncGameScores = async () => {
+    const syncGameScores = async (overrides = {}) => {
         const teamsPayload = [];
         if (home) {
             teamsPayload.push({
@@ -174,7 +174,8 @@ export default function Timer({ auth, game, config = {} }) {
                 sessions: sessionCount,
                 session_duration_minutes: game.session_duration_minutes,
                 timer_mode: game.timer_mode,
-                status: isGameOver ? 'finished' : game.status,
+                status: overrides.status ?? (isGameOver ? 'finished' : game.status),
+                ended_at: overrides.ended_at ?? (isGameOver ? new Date().toISOString() : game.ended_at ?? null),
                 teams: teamsPayload,
             });
         } catch (e) {
@@ -369,8 +370,9 @@ export default function Timer({ auth, game, config = {} }) {
         } else {
             handleGameEnd(true);
         }
-        syncSessionState({ elapsed_seconds: plannedSeconds, ended_at: new Date().toISOString() });
-        syncGameScores();
+        const endedAt = new Date().toISOString();
+        syncSessionState({ elapsed_seconds: plannedSeconds, ended_at: endedAt });
+        syncGameScores({ status: 'finished', ended_at: endedAt });
     };
 
     const handleGameEnd = (fromSessionEnd = false) => {
