@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import EventTimeline from '@/Components/EventTimeline';
 
 export default function Report({ auth, game }) {
     if (!game) {
@@ -88,22 +89,8 @@ export default function Report({ auth, game }) {
 
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <h3 className="text-base font-semibold text-gray-900">Event Timeline</h3>
-                        <div className="mt-4 space-y-3">
-                            {events.length === 0 && <p className="text-sm text-gray-600">No events recorded.</p>}
-                            {events.map((event) => (
-                                <div key={event.id} className="rounded-md border border-gray-100 bg-gray-50 p-3">
-                                    <p className="text-xs uppercase tracking-wide text-gray-500">
-                                        Session {event.session_number} · {event.event_type}
-                                    </p>
-                                    <div className="flex flex-wrap items-center gap-2 text-sm text-gray-800">
-                                        {event.goal_type && <Badge>{event.goal_type}</Badge>}
-                                        {event.card_type && <Badge>{event.card_type} card</Badge>}
-                                        {event.timer_value_seconds != null && <Badge>{formatSeconds(event.timer_value_seconds)}</Badge>}
-                                        {event.player_shirt_number && <Badge>#{event.player_shirt_number}</Badge>}
-                                        {event.note && <span className="text-gray-700">{event.note}</span>}
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="mt-4">
+                            <EventTimeline events={events} teams={game.teams || []} />
                         </div>
                     </section>
                 </div>
@@ -111,10 +98,6 @@ export default function Report({ auth, game }) {
         </AuthenticatedLayout>
     );
 }
-
-const Badge = ({ children }) => (
-    <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-semibold text-gray-700">{children}</span>
-);
 
 const formatSeconds = (seconds) => {
     if (seconds == null) return '--:--';

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import EventTimeline from '@/Components/EventTimeline';
 
 export default function Timer({ auth, game, config = {} }) {
     if (!game) {
@@ -435,7 +436,7 @@ export default function Timer({ auth, game, config = {} }) {
                         </Link>
                     </header>
 
-                    <div className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+                    <div className="space-y-4">
                         <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <div className="text-sm font-semibold text-gray-700">
@@ -541,54 +542,13 @@ export default function Timer({ auth, game, config = {} }) {
                             </div>
                         </section>
 
-                        <aside className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-semibold text-gray-800">Event Timeline</p>
                                 <span className="text-xs text-gray-500">{events.length} events</span>
                             </div>
-                            <div className="relative">
-                                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
-                                <div className="space-y-4">
-                                    {events.length === 0 && <p className="text-sm text-gray-500">No events yet.</p>}
-                                    {events.map((event, idx) => {
-                                        const team = event.team_id ? teams.find((t) => t.id === event.team_id) : null;
-                                        const side = team?.side === 'away' ? 'away' : 'home';
-                                        const align = side === 'away' ? 'justify-end' : 'justify-start';
-                                        const badge = eventBadge(event);
-                                        const playerLabel =
-                                            event.player_shirt_number != null
-                                                ? `#${event.player_shirt_number}${event.note ? ` ${event.note}` : ''}`
-                                                : event.note || '';
-
-                                        return (
-                                            <div key={event.id || idx} className={`relative flex ${align}`}>
-                                                <span className="absolute left-1/2 top-3 z-10 -translate-x-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
-                                                <div
-                                                    className={`flex max-w-[70%] items-center gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm ${
-                                                        side === 'away' ? 'flex-row-reverse text-right' : ''
-                                                    }`}
-                                                >
-                                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
-                                                        <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <p className="text-xs uppercase tracking-wide text-gray-500">
-                                                            Session {event.session_number} · {badge.label}
-                                                        </p>
-                                                        <p className="text-sm font-semibold text-gray-800">
-                                                            {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
-                                                        </p>
-                                                        <p className="text-xs text-gray-600">
-                                                            {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        </aside>
+                            <EventTimeline events={events} teams={teams} />
+                        </section>
                     </div>
                 </div>
             </div>
