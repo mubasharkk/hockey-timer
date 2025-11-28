@@ -5,21 +5,23 @@ const EventTimeline = ({ events = [], teams = [] }) => {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
 
-    const teamAId = teams[0]?.id ?? null;
-    const teamBId = teams[1]?.id ?? null;
+    const teamA = teams.find((t) => t.side === 'home') ?? teams[0] ?? null;
+    const teamB = teams.find((t) => t.side === 'away') ?? teams[1] ?? null;
+    const teamAId = teamA?.id ?? null;
+    const teamBId = teamB?.id ?? null;
     const teamById = (id) => teams.find((t) => t.id === id);
 
     return (
         <div className="relative">
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
             <div className="mb-4 grid grid-cols-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                <span className="text-right text-xl text-black pr-4">{teamAId ? teamById(teamAId)?.name || 'Team A' : 'Team A'}</span>
-                <span className="text-left  text-xl text-black pl-4">{teamBId ? teamById(teamBId)?.name || 'Team B' : 'Team B'}</span>
+                <span className="text-right text-xl text-black pr-4">{teamA?.name || 'Team A'}</span>
+                <span className="text-left text-xl text-black pl-4">{teamB?.name || 'Team B'}</span>
             </div>
             <div className="space-y-6">
                 {events.map((event, idx) => {
                     const team = event.team_id ? teamById(event.team_id) : null;
-                    const side = event.team_id === teamAId ? 'teamA' : 'teamB';
+                    const side = event.team_id === teamBId ? 'teamB' : 'teamA';
                     const badge = eventBadge(event);
                     const playerLabel =
                         event.player_shirt_number != null
