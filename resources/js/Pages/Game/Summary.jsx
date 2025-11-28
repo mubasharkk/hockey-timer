@@ -21,9 +21,9 @@ export default function Summary({ auth, game }) {
     }
 
     const scheduledAt = game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`) : null;
-    const isFinished = game.status === 'finished';
+    const isFinished = game.status === 'finished' || !!game.ended_at;
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
-    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status);
+    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status, game.ended_at);
     const sessions = game.sessions || [];
     const sessionCount = sessions.length;
     const now = new Date();
@@ -94,13 +94,6 @@ export default function Summary({ auth, game }) {
 
                     <div className="flex items-center justify-between">
                         <Link
-                            href={route('games.create')}
-                            className="text-sm font-medium text-gray-600 transition hover:text-gray-900"
-                        >
-                            ← Edit setup
-                        </Link>
-
-                        <Link
                             href={route('games.edit', game.id)}
                             className="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-400"
                         >
@@ -169,11 +162,11 @@ const formatDateTime = (date, time) => {
     return value.format('DD.MM.YYYY HH:mm');
 };
 
-const formatRelativeStart = (date, time, status) => {
+const formatRelativeStart = (date, time, status, endedAt) => {
     const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     const now = moment();
     if (!start.isValid()) return '';
-    if (status === 'finished') return 'Finished';
+    if (status === 'finished' || endedAt) return 'Finished';
 
     const diffMinutes = start.diff(now, 'minutes', true);
     if (diffMinutes > 1) {

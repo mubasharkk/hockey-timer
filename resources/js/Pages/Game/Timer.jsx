@@ -184,7 +184,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const timerLockEnabled = config.timer_lock ?? true;
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
-    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status);
+    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status, game.ended_at);
 
     const displaySeconds =
         game.timer_mode === 'DESC'
@@ -706,11 +706,11 @@ const formatDateTime = (date, time) => {
     return value.format('DD.MM.YYYY HH:mm');
 };
 
-const formatRelativeStart = (date, time, status) => {
+const formatRelativeStart = (date, time, status, endedAt) => {
     const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     const now = moment();
     if (!start.isValid()) return '';
-    if (status === 'finished') return 'Finished';
+    if (status === 'finished' || endedAt) return 'Finished';
 
     const diffMinutes = start.diff(now, 'minutes', true);
     if (diffMinutes > 1) {

@@ -23,6 +23,7 @@ class DashboardController extends Controller
                 'game_date',
                 'game_time',
                 'status',
+                'ended_at',
             ]);
 
         return Inertia::render('Dashboard', [

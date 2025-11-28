@@ -3,7 +3,6 @@ import { Head, Link } from '@inertiajs/react';
 import moment from 'moment';
 
 export default function Dashboard({ auth, games = [], now }) {
-    const formattedNow = now ? moment(now).format('DD.MM.YYYY HH:mm') : '';
 
     return (
         <AuthenticatedLayout
@@ -11,7 +10,6 @@ export default function Dashboard({ auth, games = [], now }) {
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                        {formattedNow && <span className="rounded-md bg-gray-100 px-3 py-1 font-semibold text-gray-800">{formattedNow}</span>}
                         <Link
                             href={route('games.create')}
                             className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
