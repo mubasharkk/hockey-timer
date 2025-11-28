@@ -25,18 +25,29 @@ export default function Timer({ auth, game, config = {} }) {
     const sessions = game.sessions || [];
     const sessionCount = sessions.length || 1;
     const [sessionIndex, setSessionIndex] = useState(0);
-    const plannedSeconds = useMemo(() => {
+    const plannedSecondsFor = (index) => {
         if (sessions.length > 0) {
-            const current = sessions[sessionIndex] ?? sessions[0];
+            const current = sessions[index] ?? sessions[0];
             return current?.planned_duration_seconds ?? game.session_duration_minutes * 60;
         }
         return game.session_duration_minutes * 60;
-    }, [sessions, sessionIndex, game.session_duration_minutes]);
+    };
+
+    const plannedSeconds = useMemo(() => plannedSecondsFor(sessionIndex), [sessions, sessionIndex, game.session_duration_minutes]);
 
     const storageKey = `game_timer_${game.id}`;
     const [status, setStatus] = useState('ready'); // ready | running | paused | finished
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [lastTick, setLastTick] = useState(null);
+    const breakStorageKey = `game_break_${game.id}`;
+    const [breakStartAt, setBreakStartAt] = useState(() => {
+        try {
+            const saved = localStorage.getItem(breakStorageKey);
+            return saved ? JSON.parse(saved) : null;
+        } catch (e) {
+            return null;
+        }
+    });
 
     // Restore persisted timer on load
     useEffect(() => {
@@ -135,6 +146,9 @@ export default function Timer({ auth, game, config = {} }) {
             overrun_seconds: Math.max(Math.round((overrides.elapsed_seconds ?? elapsedSeconds) - plannedSeconds), 0),
             started_at: overrides.started_at ?? null,
             ended_at: overrides.ended_at ?? null,
+            break_duration_seconds: overrides.break_duration_seconds ?? null,
+            break_started_at: overrides.break_started_at ?? null,
+            break_ended_at: overrides.break_ended_at ?? null,
         };
 
         try {
@@ -198,6 +212,20 @@ export default function Timer({ auth, game, config = {} }) {
             setElapsedSeconds(0);
         }
         const now = Date.now();
+        if (sessionIndex > 0 && breakStartAt) {
+            const breakEndIso = new Date(now).toISOString();
+            const duration = Math.max(Math.round((now - new Date(breakStartAt).getTime()) / 1000), 0);
+            syncSessionState({
+                number: sessionIndex,
+                planned_duration_seconds: plannedSecondsFor(sessionIndex - 1),
+                break_duration_seconds: duration,
+                break_started_at: breakStartAt,
+                break_ended_at: breakEndIso,
+                elapsed_seconds: plannedSecondsFor(sessionIndex - 1),
+            });
+            setBreakStartAt(null);
+            localStorage.removeItem(breakStorageKey);
+        }
         setLastTick(now);
         setStatus('running');
         localStorage.setItem(
@@ -247,6 +275,8 @@ export default function Timer({ auth, game, config = {} }) {
         setStatus('ready');
         setLastTick(null);
         localStorage.removeItem(storageKey);
+        localStorage.removeItem(breakStorageKey);
+        setBreakStartAt(null);
         syncSessionState({ elapsed_seconds: 0 });
     };
 
@@ -359,6 +389,9 @@ export default function Timer({ auth, game, config = {} }) {
 
         if (sessionIndex + 1 < sessionCount) {
             setSessionIndex(sessionIndex + 1);
+            const nowIso = new Date().toISOString();
+            setBreakStartAt(nowIso);
+            localStorage.setItem(breakStorageKey, JSON.stringify(nowIso));
             localStorage.setItem(
                 storageKey,
                 JSON.stringify({
@@ -388,11 +421,14 @@ export default function Timer({ auth, game, config = {} }) {
         setEvents((prev) => [...prev, event]);
         persistEvents([event]);
         localStorage.removeItem(storageKey);
+        localStorage.removeItem(breakStorageKey);
+        setBreakStartAt(null);
         if (!fromSessionEnd) {
             setElapsedSeconds(plannedSeconds);
         }
-        syncSessionState({ elapsed_seconds: plannedSeconds, ended_at: new Date().toISOString() });
-        syncGameScores();
+        const endedAt = new Date().toISOString();
+        syncSessionState({ elapsed_seconds: plannedSeconds, ended_at: endedAt });
+        syncGameScores({ status: 'finished', ended_at: endedAt });
     };
 
     const confirmAnd = (action) => {
