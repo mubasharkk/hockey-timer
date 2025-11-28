@@ -37,9 +37,11 @@ export default function Report({ auth, game }) {
                                 {game.venue} · {game.game_date} {game.game_time}
                             </p>
                         </div>
+                        { game.status !== 'finished' ?
                         <Link href={route('games.timer', game.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                             Back to Timer
                         </Link>
+                        : null}
                     </div>
 
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
