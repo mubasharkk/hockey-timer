@@ -5,43 +5,91 @@ const EventTimeline = ({ events = [], teams = [] }) => {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
 
+    const teamAId = teams[0]?.id ?? null;
+    const teamBId = teams[1]?.id ?? null;
     const teamById = (id) => teams.find((t) => t.id === id);
 
     return (
         <div className="relative">
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-200" />
-            <div className="space-y-4">
+            <div className="mb-4 grid grid-cols-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                <span className="text-right text-xl text-black pr-4">{teamAId ? teamById(teamAId)?.name || 'Team A' : 'Team A'}</span>
+                <span className="text-left  text-xl text-black pl-4">{teamBId ? teamById(teamBId)?.name || 'Team B' : 'Team B'}</span>
+            </div>
+            <div className="space-y-6">
                 {events.map((event, idx) => {
                     const team = event.team_id ? teamById(event.team_id) : null;
-                    const side = team?.side === 'away' ? 'away' : 'home';
-                    const align = side === 'away' ? 'justify-end' : 'justify-start';
+                    const side = event.team_id === teamAId ? 'teamA' : 'teamB';
                     const badge = eventBadge(event);
                     const playerLabel =
                         event.player_shirt_number != null
                             ? `#${event.player_shirt_number}${event.note ? ` ${event.note}` : ''}`
                             : event.note || '';
 
+                    if (event.event_type === 'session_end' || event.event_type === 'game_end') {
+                        const isGameEnd = event.event_type === 'game_end';
+                        return (
+                            <div key={event.id || idx} className="relative flex w-full items-center justify-center">
+                                <span
+                                    className={`absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full ring-4 ring-white shadow ${
+                                        isGameEnd ? 'bg-red-500' : 'bg-gray-800'
+                                    }`}
+                                />
+                                <div
+                                    className={`relative z-20 mx-auto flex max-w-md flex-col items-center rounded-md border px-4 py-2 text-center shadow-sm ${
+                                        isGameEnd
+                                            ? 'border-red-200 bg-red-50 text-red-700'
+                                            : 'border-gray-200 bg-gray-50 text-gray-700'
+                                    }`}
+                                >
+                                    <p className="text-xs font-semibold uppercase tracking-wide">
+                                        {isGameEnd ? 'Game End' : `Session ${event.session_number} End`}
+                                    </p>
+                                    {/*{event.timer_value_seconds != null && (*/}
+                                    {/*    <p className="text-[11px] font-medium text-gray-500">*/}
+                                    {/*        {formatSeconds(event.timer_value_seconds)}*/}
+                                    {/*    </p>*/}
+                                    {/*)}*/}
+                                </div>
+                            </div>
+                        );
+                    }
+
                     return (
-                        <div key={event.id || idx} className={`relative flex ${align}`}>
-                            <span className="absolute left-1/2 top-3 z-10 -translate-x-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
+                        <div key={event.id || idx} className="relative flex w-full items-center">
+                            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
                             <div
-                                className={`flex max-w-[70%] items-start gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm ${
-                                    side === 'away' ? 'flex-row-reverse' : ''
+                                className={`relative flex w-1/2 ${
+                                    side === 'teamA' ? 'ml-auto justify-start pl-12' : 'mr-auto justify-end pr-12'
                                 }`}
                             >
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
-                                    <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
-                                </div>
-                                <div className="space-y-1 text-left">
-                                    <p className="text-xs uppercase tracking-wide text-gray-500">
-                                        Session {event.session_number} · {badge.label}
-                                    </p>
-                                    <p className="text-sm font-semibold text-gray-800">
-                                        {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
-                                    </p>
-                                    <p className="text-xs text-gray-600">
-                                        {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
-                                    </p>
+                                <div className="relative flex max-w-[85%] items-start gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm">
+                                    <span
+                                        className={`absolute top-1/2 -translate-y-1/2 h-px bg-gray-200 ${
+                                            side === 'teamA' ? 'right-full w-10' : 'left-full w-10'
+                                        }`}
+                                    />
+                                    <span
+                                        className={`absolute top-1/2 h-0 w-0 -translate-y-1/2 ${
+                                            side === 'teamA'
+                                                ? '-left-2 border-y-8 border-y-transparent border-r-8 border-r-gray-50'
+                                                : '-right-2 border-y-8 border-y-transparent border-l-8 border-l-gray-50'
+                                        }`}
+                                    />
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
+                                        <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
+                                    </div>
+                                    <div className="space-y-1 text-left">
+                                        <p className="text-xs uppercase tracking-wide text-gray-500">
+                                            Session {event.session_number} · {badge.label}
+                                        </p>
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
+                                        </p>
+                                        <p className="text-xs text-gray-600">
+                                            {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
