@@ -144,7 +144,7 @@ export default function Create({ auth }) {
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <div className="flex items-center justify-between">
+                                <div className=" items-center justify-between">
                                     <label className="block text-sm font-medium text-gray-700">Team A Players (optional)</label>
                                     <span className="text-xs text-gray-500">One per line. Prefix number to capture shirt #.</span>
                                 </div>
@@ -159,7 +159,7 @@ export default function Create({ auth }) {
                                 )}
                             </div>
                             <div>
-                                <div className="flex items-center justify-between">
+                                <div className=" items-center justify-between">
                                     <label className="block text-sm font-medium text-gray-700">Team B Players (optional)</label>
                                     <span className="text-xs text-gray-500">Example: “12 Alex Smith”.</span>
                                 </div>
