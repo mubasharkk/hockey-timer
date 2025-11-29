@@ -24,6 +24,7 @@ export default function Summary({ auth, game }) {
     const isFinished = game.status === 'finished' || !!game.ended_at;
     const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
     const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status, game.ended_at);
+    const gameCode = game.code;
     const sessions = game.sessions || [];
     const sessionCount = sessions.length;
     const now = new Date();
@@ -42,6 +43,7 @@ export default function Summary({ auth, game }) {
                         <h1 className="text-2xl font-semibold text-gray-900">
                             {game.team_a_name} vs {game.team_b_name}
                         </h1>
+                        {gameCode && <p className="text-xs font-semibold text-gray-500">Code: {gameCode}</p>}
                         <p className="text-sm text-gray-600">
                             {game.venue} · {scheduledDisplay || `${game.game_date} ${game.game_time}`} ({game.timer_mode} timer)
                         </p>

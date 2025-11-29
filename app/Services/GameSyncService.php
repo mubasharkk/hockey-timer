@@ -8,18 +8,23 @@ use App\Models\MatchSession;
 use App\Models\Team;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class GameSyncService
 {
     public function syncGame(array $data): Game
     {
         return DB::transaction(function () use ($data) {
+            $existing = isset($data['id']) ? Game::find($data['id']) : null;
+            $code = $data['code'] ?? $existing?->code ?? $this->generateGameCode();
+
             $game = Game::updateOrCreate(
                 ['id' => $data['id'] ?? null],
                 [
                     'team_a_name' => $data['team_a_name'],
                     'team_b_name' => $data['team_b_name'],
                     'venue' => $data['venue'],
+                    'code' => $code,
                     'game_date' => $data['game_date'],
                     'game_time' => $data['game_time'],
                     'sessions' => $data['sessions'],
@@ -107,5 +112,14 @@ class GameSyncService
                 ['planned_duration_seconds' => $game->session_duration_minutes * 60]
             );
         }
+    }
+
+    private function generateGameCode(): string
+    {
+        do {
+            $code = Str::upper(Str::random(6));
+        } while (Game::where('code', $code)->exists());
+
+        return $code;
     }
 }

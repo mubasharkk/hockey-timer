@@ -20,6 +20,7 @@ class DashboardController extends Controller
                 'team_a_name',
                 'team_b_name',
                 'venue',
+                'code',
                 'game_date',
                 'game_time',
                 'status',

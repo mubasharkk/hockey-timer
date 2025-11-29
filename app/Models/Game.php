@@ -17,6 +17,7 @@ class Game extends Model
         'team_a_name',
         'team_b_name',
         'venue',
+        'code',
         'game_date',
         'game_time',
         'sessions',

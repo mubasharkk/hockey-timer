@@ -7,6 +7,7 @@ use App\Models\MatchSession;
 use App\Models\Team;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\User;
 
 class GameService
@@ -25,6 +26,7 @@ class GameService
                 'team_a_name' => $data['team_a_name'],
                 'team_b_name' => $data['team_b_name'],
                 'venue' => $data['venue'],
+                'code' => $this->generateGameCode(),
                 'game_date' => $data['game_date'],
                 'game_time' => $data['game_time'],
                 'sessions' => $data['sessions'],
@@ -112,5 +114,14 @@ class GameService
         }
 
         return $players;
+    }
+
+    private function generateGameCode(): string
+    {
+        do {
+            $code = Str::upper(Str::random(6));
+        } while (Game::where('code', $code)->exists());
+
+        return $code;
     }
 }

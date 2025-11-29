@@ -40,6 +40,7 @@ export default function Dashboard({ auth, games = [], now }) {
                                             <div className="text-sm font-semibold text-gray-900">
                                                 {game.team_a_name} vs {game.team_b_name}
                                             </div>
+                                            {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
                                             <div className="text-xs text-gray-600">
                                                 {formatDateTime(game.game_date, game.game_time)} · {game.venue}
                                                 {formatRelativeStart(game.game_date, game.game_time, now, game.status)
