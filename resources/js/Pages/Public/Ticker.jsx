@@ -9,10 +9,20 @@ export default function Ticker({ game, gameId }) {
         if (typeof raw === 'number') return raw;
         if (raw && typeof raw === 'object' && raw.number) return raw.number;
         const ended = events.filter((e) => e.event_type === 'session_end').length;
-        const total = typeof game?.sessions === 'number' ? game.sessions : ended + 1;
+        const total = Array.isArray(game?.sessions)
+            ? game.sessions.length
+            : typeof game?.sessions === 'number'
+                ? game.sessions
+                : ended + 1;
         return Math.min(total, ended + 1) || 1;
     };
+    const resolveSessionTotal = () => {
+        if (Array.isArray(game?.sessions)) return game.sessions.length;
+        if (typeof game?.sessions === 'number') return game.sessions;
+        return null;
+    };
     const currentSession = resolveSessionNumber();
+    const totalSessions = resolveSessionTotal();
     const recentEvents = [...events]
         .sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0))
         .slice(0, 3);
@@ -90,7 +100,8 @@ export default function Ticker({ game, gameId }) {
                                         {formatSeconds(game.current_seconds ?? 0)}
                                     </p>
                                     <p className="text-xs text-gray-600">
-                                        Session {currentSession} of {game.sessions} · {game.timer_mode} mode
+                                        Session {currentSession}
+                                        {totalSessions ? ` of ${totalSessions}` : ''} · {game.timer_mode} mode
                                     </p>
                                 </div>
                                 <div className="flex flex-col justify-center gap-2 text-sm text-gray-700">
