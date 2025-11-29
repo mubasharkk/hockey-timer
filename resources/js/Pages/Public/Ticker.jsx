@@ -3,6 +3,19 @@ import moment from 'moment';
 
 export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
+    const events = game?.events || [];
+    const resolveSessionNumber = () => {
+        const raw = game?.current_session;
+        if (typeof raw === 'number') return raw;
+        if (raw && typeof raw === 'object' && raw.number) return raw.number;
+        const ended = events.filter((e) => e.event_type === 'session_end').length;
+        const total = typeof game?.sessions === 'number' ? game.sessions : ended + 1;
+        return Math.min(total, ended + 1) || 1;
+    };
+    const currentSession = resolveSessionNumber();
+    const recentEvents = [...events]
+        .sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0))
+        .slice(0, 3);
 
     const submit = (e) => {
         e.preventDefault();
@@ -77,7 +90,7 @@ export default function Ticker({ game, gameId }) {
                                         {formatSeconds(game.current_seconds ?? 0)}
                                     </p>
                                     <p className="text-xs text-gray-600">
-                                        Session {game.current_session ?? 1} of {game.sessions} · {game.timer_mode} mode
+                                        Session {currentSession} of {game.sessions} · {game.timer_mode} mode
                                     </p>
                                 </div>
                                 <div className="flex flex-col justify-center gap-2 text-sm text-gray-700">
@@ -90,6 +103,27 @@ export default function Ticker({ game, gameId }) {
                                         <span className="text-lg font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-base font-semibold text-gray-900">Recent Events</h3>
+                                <span className="text-xs text-gray-500">{recentEvents.length} shown</span>
+                            </div>
+                            <div className="mt-3 space-y-2 text-sm text-gray-800">
+                                {recentEvents.map((e) => (
+                                    <div key={e.id || e.occurred_at || Math.random()} className="flex items-center justify-between rounded-md border border-gray-100 bg-gray-50 px-3 py-2">
+                                        <div>
+                                            <p className="font-semibold capitalize">{e.event_type.replace('_', ' ')}</p>
+                                            <p className="text-xs text-gray-600">
+                                                Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs text-gray-500">{e.occurred_at ? moment(e.occurred_at).format('HH:mm') : ''}</p>
+                                    </div>
+                                ))}
+                                {recentEvents.length === 0 && <p className="text-xs text-gray-500">No events yet.</p>}
                             </div>
                         </div>
 
