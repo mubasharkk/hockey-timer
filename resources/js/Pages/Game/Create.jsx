@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { Combobox } from '@headlessui/react';
 
 const sessionOptions = [2, 4, 6, 8];
 const durationOptions = [15, 20, 30, 45];
@@ -46,7 +47,7 @@ export default function Create({ auth }) {
         team_b_players_text: '',
     });
 
-    const handleTeamNameChange = (side, value) => {
+    const handleTeamSelection = (side, value) => {
         setData(side === 'A' ? 'team_a_name' : 'team_b_name', value);
         const preset = teamPresets.find((p) => p.name.toLowerCase() === value.toLowerCase());
         if (preset) {
@@ -78,28 +79,18 @@ export default function Create({ auth }) {
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Team A Name</label>
-                                <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_a_name}
-                                    onChange={(e) => handleTeamNameChange('A', e.target.value)}
-                                    list="team-presets"
-                                    required
-                                />
-                                {errors.team_a_name && <p className="mt-1 text-xs text-red-600">{errors.team_a_name}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Team B Name</label>
-                                <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_b_name}
-                                    onChange={(e) => handleTeamNameChange('B', e.target.value)}
-                                    list="team-presets"
-                                    required
-                                />
-                                {errors.team_b_name && <p className="mt-1 text-xs text-red-600">{errors.team_b_name}</p>}
-                            </div>
+                            <TeamCombobox
+                                label="Team A Name"
+                                value={data.team_a_name}
+                                onChange={(val) => handleTeamSelection('A', val)}
+                                error={errors.team_a_name}
+                            />
+                            <TeamCombobox
+                                label="Team B Name"
+                                value={data.team_b_name}
+                                onChange={(val) => handleTeamSelection('B', val)}
+                                error={errors.team_b_name}
+                            />
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -242,3 +233,42 @@ export default function Create({ auth }) {
         </AuthenticatedLayout>
     );
 }
+
+const TeamCombobox = ({ label, value, onChange, error }) => {
+    const filtered =
+        value.trim() === ''
+            ? teamPresets
+            : teamPresets.filter((preset) => preset.name.toLowerCase().includes(value.toLowerCase()));
+
+    return (
+        <div className="space-y-1">
+            <label className="block text-sm font-medium text-gray-700">{label}</label>
+            <Combobox value={value} onChange={onChange}>
+                <div className="relative">
+                    <Combobox.Input
+                        className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                        onChange={(event) => onChange(event.target.value)}
+                        displayValue={(val) => val}
+                        required
+                    />
+                    {filtered.length > 0 && (
+                        <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
+                            {filtered.map((preset) => (
+                                <Combobox.Option
+                                    key={preset.name}
+                                    value={preset.name}
+                                    className={({ active }) =>
+                                        `cursor-pointer px-3 py-2 text-sm ${active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-800'}`
+                                    }
+                                >
+                                    {preset.name}
+                                </Combobox.Option>
+                            ))}
+                        </Combobox.Options>
+                    )}
+                </div>
+            </Combobox>
+            {error && <p className="text-xs text-red-600">{error}</p>}
+        </div>
+    );
+};
