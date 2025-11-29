@@ -9,7 +9,7 @@ use Inertia\Response;
 
 class PublicTickerController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function index(Request $request): Response
     {
         $gameId = $request->query('game');
         $game = null;
