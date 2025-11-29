@@ -3,13 +3,41 @@ import { Head, useForm } from '@inertiajs/react';
 
 const sessionOptions = [2, 4, 6, 8];
 const durationOptions = [15, 20, 30, 45];
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+const teamPresets = [
+    {
+        name: 'Lions',
+        players: `1 Alex Keeper
+2 Ben Stone
+3 Chris Field
+4 Daniel Swift
+5 Ethan Hart`,
+    },
+    {
+        name: 'Tigers',
+        players: `7 Omar Khan
+8 Priya Das
+9 Quinn Lee
+10 Raj Patel
+11 Sara King`,
+    },
+    {
+        name: 'Wolves',
+        players: `4 Jamie Cole
+6 Leo Park
+12 Mia Grant
+14 Noah Reed
+18 Zoe Kim`,
+    },
+];
 
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         team_a_name: '',
         team_b_name: '',
         venue: '',
-        game_date: '',
+        game_date: todayStr(),
         game_time: '',
         sessions: 4,
         session_duration_minutes: 15,
@@ -17,6 +45,14 @@ export default function Create({ auth }) {
         team_a_players_text: '',
         team_b_players_text: '',
     });
+
+    const handleTeamNameChange = (side, value) => {
+        setData(side === 'A' ? 'team_a_name' : 'team_b_name', value);
+        const preset = teamPresets.find((p) => p.name.toLowerCase() === value.toLowerCase());
+        if (preset) {
+            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', preset.players);
+        }
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -34,6 +70,12 @@ export default function Create({ auth }) {
                         <p className="text-sm text-gray-600">Capture match details, sessions, and optional player lists.</p>
                     </header>
 
+                    <datalist id="team-presets">
+                        {teamPresets.map((preset) => (
+                            <option key={preset.name} value={preset.name} />
+                        ))}
+                    </datalist>
+
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -41,7 +83,8 @@ export default function Create({ auth }) {
                                 <input
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     value={data.team_a_name}
-                                    onChange={(e) => setData('team_a_name', e.target.value)}
+                                    onChange={(e) => handleTeamNameChange('A', e.target.value)}
+                                    list="team-presets"
                                     required
                                 />
                                 {errors.team_a_name && <p className="mt-1 text-xs text-red-600">{errors.team_a_name}</p>}
@@ -51,7 +94,8 @@ export default function Create({ auth }) {
                                 <input
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     value={data.team_b_name}
-                                    onChange={(e) => setData('team_b_name', e.target.value)}
+                                    onChange={(e) => handleTeamNameChange('B', e.target.value)}
+                                    list="team-presets"
                                     required
                                 />
                                 {errors.team_b_name && <p className="mt-1 text-xs text-red-600">{errors.team_b_name}</p>}
@@ -70,17 +114,22 @@ export default function Create({ auth }) {
                                 {errors.venue && <p className="mt-1 text-xs text-red-600">{errors.venue}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Match Date</label>
-                                    <input
-                                        type="date"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.game_date}
-                                        onChange={(e) => setData('game_date', e.target.value)}
-                                        required
-                                    />
-                                    {errors.game_date && <p className="mt-1 text-xs text-red-600">{errors.game_date}</p>}
-                                </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Match Date</label>
+                                <input
+                                    type="date"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.game_date}
+                                    min={todayStr()}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        const min = todayStr();
+                                        setData('game_date', val && val >= min ? val : min);
+                                    }}
+                                    required
+                                />
+                                {errors.game_date && <p className="mt-1 text-xs text-red-600">{errors.game_date}</p>}
+                            </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Match Time</label>
                                     <input
