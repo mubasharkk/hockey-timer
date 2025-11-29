@@ -1,4 +1,3 @@
-import EventTimeline from '@/Components/EventTimeline';
 import { Head, Link, useForm } from '@inertiajs/react';
 import moment from 'moment';
 
@@ -94,15 +93,6 @@ export default function Ticker({ game, gameId }) {
                             </div>
                         </div>
 
-                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-base font-semibold text-gray-900">Timeline</h3>
-                                <span className="text-xs text-gray-500">{(game.events || []).length} events</span>
-                            </div>
-                            <div className="mt-4">
-                                <EventTimeline events={game.events || []} teams={game.teams || []} />
-                            </div>
-                        </div>
                     </div>
                 )}
             </main>
