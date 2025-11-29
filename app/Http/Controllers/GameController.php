@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Team;
 use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
@@ -19,7 +20,26 @@ class GameController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Game/Create');
+        $teamSuggestions = Team::with('players')
+            ->orderByDesc('id')
+            ->get()
+            ->unique('name')
+            ->take(20)
+            ->map(function (Team $team) {
+                $playersText = $team->players
+                    ->map(fn ($p) => ($p->shirt_number ? "#{$p->shirt_number} " : '') . $p->name)
+                    ->implode("\n");
+
+                return [
+                    'name' => $team->name,
+                    'players_text' => $playersText,
+                ];
+            })
+            ->values();
+
+        return Inertia::render('Game/Create', [
+            'teamSuggestions' => $teamSuggestions,
+        ]);
     }
 
     public function store(StoreGameRequest $request): RedirectResponse

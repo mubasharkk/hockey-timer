@@ -6,34 +6,9 @@ const sessionOptions = [2, 4, 6, 8];
 const durationOptions = [15, 20, 30, 45];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-const teamPresets = [
-    {
-        name: 'Lions',
-        players: `1 Alex Keeper
-2 Ben Stone
-3 Chris Field
-4 Daniel Swift
-5 Ethan Hart`,
-    },
-    {
-        name: 'Tigers',
-        players: `7 Omar Khan
-8 Priya Das
-9 Quinn Lee
-10 Raj Patel
-11 Sara King`,
-    },
-    {
-        name: 'Wolves',
-        players: `4 Jamie Cole
-6 Leo Park
-12 Mia Grant
-14 Noah Reed
-18 Zoe Kim`,
-    },
-];
+const fallbackPresets = [];
 
-export default function Create({ auth }) {
+export default function Create({ auth, teamSuggestions = [] }) {
     const { data, setData, post, processing, errors } = useForm({
         team_a_name: '',
         team_b_name: '',
@@ -49,7 +24,9 @@ export default function Create({ auth }) {
 
     const handleTeamSelection = (side, value) => {
         setData(side === 'A' ? 'team_a_name' : 'team_b_name', value);
-        const preset = teamPresets.find((p) => p.name.toLowerCase() === value.toLowerCase());
+        const preset = (teamSuggestions.length ? teamSuggestions : fallbackPresets).find(
+            (p) => p.name.toLowerCase() === value.toLowerCase()
+        );
         if (preset) {
             setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', preset.players);
         }
@@ -71,24 +48,20 @@ export default function Create({ auth }) {
                         <p className="text-sm text-gray-600">Capture match details, sessions, and optional player lists.</p>
                     </header>
 
-                    <datalist id="team-presets">
-                        {teamPresets.map((preset) => (
-                            <option key={preset.name} value={preset.name} />
-                        ))}
-                    </datalist>
-
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <TeamCombobox
                                 label="Team A Name"
                                 value={data.team_a_name}
                                 onChange={(val) => handleTeamSelection('A', val)}
+                                teamSuggestions={teamSuggestions}
                                 error={errors.team_a_name}
                             />
                             <TeamCombobox
                                 label="Team B Name"
                                 value={data.team_b_name}
                                 onChange={(val) => handleTeamSelection('B', val)}
+                                teamSuggestions={teamSuggestions}
                                 error={errors.team_b_name}
                             />
                         </div>
@@ -234,11 +207,11 @@ export default function Create({ auth }) {
     );
 }
 
-const TeamCombobox = ({ label, value, onChange, error }) => {
+const TeamCombobox = ({ label, value, onChange, error, teamSuggestions }) => {
     const filtered =
         value.trim() === ''
-            ? teamPresets
-            : teamPresets.filter((preset) => preset.name.toLowerCase().includes(value.toLowerCase()));
+            ? teamSuggestions
+            : teamSuggestions.filter((preset) => preset.name.toLowerCase().includes(value.toLowerCase()));
 
     return (
         <div className="space-y-1">
