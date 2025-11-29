@@ -57,20 +57,31 @@ class GameSyncService
     public function syncSessions(Game $game, array $sessions): Collection
     {
         return collect($sessions)->map(function (array $session) use ($game) {
+            $attrs = [
+                'planned_duration_seconds' => $session['planned_duration_seconds'],
+                'actual_duration_seconds' => $session['actual_duration_seconds'] ?? null,
+                'overrun_seconds' => $session['overrun_seconds'] ?? null,
+                'break_duration_seconds' => $session['break_duration_seconds'] ?? null,
+                'started_at' => $session['started_at'] ?? null,
+                'ended_at' => $session['ended_at'] ?? null,
+                'break_started_at' => $session['break_started_at'] ?? null,
+                'break_ended_at' => $session['break_ended_at'] ?? null,
+            ];
+
+            if (!empty($session['id'])) {
+                $record = MatchSession::where('game_id', $game->id)
+                    ->where('id', $session['id'])
+                    ->first();
+
+                if ($record) {
+                    $record->update($attrs);
+                    return $record->id;
+                }
+            }
+
             $record = MatchSession::updateOrCreate(
-                ['id' => $session['id'] ?? null],
-                [
-                    'game_id' => $game->id,
-                    'number' => $session['number'],
-                    'planned_duration_seconds' => $session['planned_duration_seconds'],
-                    'actual_duration_seconds' => $session['actual_duration_seconds'] ?? null,
-                    'overrun_seconds' => $session['overrun_seconds'] ?? null,
-                    'break_duration_seconds' => $session['break_duration_seconds'] ?? null,
-                    'started_at' => $session['started_at'] ?? null,
-                    'ended_at' => $session['ended_at'] ?? null,
-                    'break_started_at' => $session['break_started_at'] ?? null,
-                    'break_ended_at' => $session['break_ended_at'] ?? null,
-                ]
+                ['game_id' => $game->id, 'number' => $session['number']],
+                $attrs
             );
 
             return $record->id;
