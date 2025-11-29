@@ -1,5 +1,6 @@
 import EventTimeline from '@/Components/EventTimeline';
 import { Head, Link, useForm } from '@inertiajs/react';
+import moment from 'moment';
 
 export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
@@ -69,6 +70,28 @@ export default function Ticker({ game, gameId }) {
                                     <span>{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                 </div>
                             </div>
+
+                            <div className="mt-4 grid gap-4 rounded-lg bg-gray-50 p-4 sm:grid-cols-3">
+                                <div className="col-span-2">
+                                    <p className="text-xs uppercase tracking-wide text-gray-500">Timer</p>
+                                    <p className="text-4xl font-bold text-gray-900 tabular-nums">
+                                        {formatSeconds(game.current_seconds ?? 0)}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                        Session {game.current_session ?? 1} of {game.sessions} · {game.timer_mode} mode
+                                    </p>
+                                </div>
+                                <div className="flex flex-col justify-center gap-2 text-sm text-gray-700">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold">{game.team_a_name}</span>
+                                        <span className="text-lg font-bold">{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold">{game.team_b_name}</span>
+                                        <span className="text-lg font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
@@ -86,3 +109,11 @@ export default function Ticker({ game, gameId }) {
         </div>
     );
 }
+
+const formatSeconds = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+        .toString()
+        .padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+};
