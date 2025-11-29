@@ -28,7 +28,7 @@ export default function Create({ auth, teamSuggestions = [] }) {
             (p) => p.name.toLowerCase() === value.toLowerCase()
         );
         if (preset) {
-            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', preset.players);
+            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', preset.players_text || preset.players || '');
         }
     };
 
