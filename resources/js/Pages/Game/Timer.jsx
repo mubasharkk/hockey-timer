@@ -139,11 +139,13 @@ export default function Timer({ auth, game, config = {} }) {
     const [goalModal, setGoalModal] = useState(null); // { team, goalType, shirtNumber }
 
     const syncSessionState = async (overrides = {}) => {
+        const targetNumber = Math.max(1, overrides.number ?? sessionIndex + 1);
+        const plannedForTarget = overrides.planned_duration_seconds ?? plannedSecondsFor(targetNumber - 1);
         const payload = {
-            number: overrides.number ?? sessionIndex + 1,
-            planned_duration_seconds: overrides.planned_duration_seconds ?? plannedSeconds,
+            number: targetNumber,
+            planned_duration_seconds: plannedForTarget,
             actual_duration_seconds: Math.round(overrides.elapsed_seconds ?? elapsedSeconds),
-            overrun_seconds: Math.max(Math.round((overrides.elapsed_seconds ?? elapsedSeconds) - plannedSeconds), 0),
+            overrun_seconds: Math.max(Math.round((overrides.elapsed_seconds ?? elapsedSeconds) - plannedForTarget), 0),
             started_at: overrides.started_at ?? null,
             ended_at: overrides.ended_at ?? null,
             break_duration_seconds: overrides.break_duration_seconds ?? null,
