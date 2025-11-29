@@ -48,26 +48,28 @@ export default function Ticker({ game, gameId }) {
             </header>
 
             <main className="mx-auto max-w-6xl px-4 py-6">
-                <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                    <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-gray-700">Enter Game ID</label>
-                            <input
-                                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                                value={form.data.game}
-                                onChange={(e) => form.setData('game', e.target.value)}
-                                placeholder="e.g., 5"
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-                        >
-                            Load
-                        </button>
-                    </form>
-                </div>
+                {!game && (
+                    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                        <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-gray-700">Enter Game ID</label>
+                                <input
+                                    className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                    value={form.data.game}
+                                    onChange={(e) => form.setData('game', e.target.value)}
+                                    placeholder="e.g., 5"
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
+                            >
+                                Load
+                            </button>
+                        </form>
+                    </div>
+                )}
 
                 {gameId && !game && (
                     <div className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">Game not found.</div>
