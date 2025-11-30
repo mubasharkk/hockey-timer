@@ -97,6 +97,13 @@ export default function Summary({ auth, game }) {
                         </Link>
 
                         <div className="flex items-center gap-2">
+                            <Link
+                                href={route('public.ticker.code', game.code)}
+                                className="inline-flex items-center rounded-md border border-indigo-300 px-3 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-400"
+                                preserveScroll
+                            >
+                                Public Ticker
+                            </Link>
                             {isFinished ? (
                                 <Link
                                     href={route('games.report', game.id)}

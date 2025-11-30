@@ -514,7 +514,14 @@ export default function Timer({ auth, game, config = {} }) {
                             <h1 className="text-2xl font-semibold text-gray-900">
                             {game.team_a_name} vs {game.team_b_name}
                         </h1>
-                        {game.code && <p className="text-xs font-semibold text-gray-500">Code: {game.code}</p>}
+                        {game.code && (
+                            <p className="text-xs font-semibold text-gray-500">
+                                Code: {game.code} · Public:{' '}
+                                <Link href={route('public.ticker.code', game.code)} className="text-indigo-600 hover:text-indigo-500">
+                                    {route('public.ticker.code', game.code)}
+                                </Link>
+                            </p>
+                        )}
                         <p className="text-sm text-gray-600">
                             Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
                             timer

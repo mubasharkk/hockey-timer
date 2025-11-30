@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Public ticker view (no auth required)
-Route::get('/ticker', PublicTickerController::class)->name('public.ticker');
+Route::get('/ticker', [PublicTickerController::class, 'index'])->name('public.ticker');
+Route::get('/ticker/{code}', [PublicTickerController::class, 'index'])->name('public.ticker.code');
 
 require __DIR__.'/auth.php';
