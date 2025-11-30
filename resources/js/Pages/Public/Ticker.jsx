@@ -81,57 +81,43 @@ export default function Ticker({ game, gameId }) {
                 {game && (
                     <div className="mt-6 space-y-6">
                         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">
-                            <div className="flex flex-wrap items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Live Scoreboard</p>
-                                    <h2 className="text-2xl font-semibold text-white">
-                                        {game.team_a_name} vs {game.team_b_name}
-                                    </h2>
-                                    <p className="text-xs text-slate-400">
-                                        {game.venue} · {game.game_date} {game.game_time} · Code {game.code || '—'}
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 text-4xl font-bold text-white">
-                                    <span>{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
-                                    <span className="text-base font-semibold text-slate-400">–</span>
-                                    <span>{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
-                                </div>
-                            </div>
-
-                            <div className="mt-5 grid gap-4 rounded-xl border border-slate-800 bg-slate-900/70 p-4 sm:grid-cols-3">
-                                <div className="col-span-2">
+                            <div className="my-5">
+                                <div className="text-center">
                                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
-                                    <p className="text-5xl font-bold text-white tabular-nums">
+                                    <p className="text-[6rem] font-bold text-white tabular-nums">
                                         {formatSeconds(game.current_seconds ?? 0)}
                                     </p>
-                                    <p className="text-xs text-slate-300">
-                                        Session {currentSession}
-                                        {totalSessions ? ` of ${totalSessions}` : ''} · {game.timer_mode} mode
+                                    <p className="mx-auto text-xl font-bold text-slate-300">
+                                        <span>{totalSessions === 4 ? 'Q' : 'Sessions'} {currentSession}</span>
+                                        <span className={'mx-3'}>of</span>
+                                        <span>{totalSessions ?? ''}</span>
+                                        {/*{game.timer_mode} mode*/}
                                     </p>
                                 </div>
-                                <div className="flex flex-col justify-center gap-3 rounded-lg bg-slate-800/60 p-3 text-sm text-slate-100">
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold">{game.team_a_name}</span>
-                                        <span className="text-lg font-bold">{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
+                                <div className="mt-5 flex justify-center gap-3p-3 text-sm text-slate-100 border-t border-slate-200 pt-10">
+                                    <div className="flex flex-col items-center justify-center">
+                                        <span className="text-3xl mb-5 font-semibold">{game.team_a_name}</span>
+                                        <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold">{game.team_b_name}</span>
-                                        <span className="text-lg font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
+                                    <div className={'flex-full'}>X</div>
+                                    <div className="flex flex-col items-center justify-between">
+                                        <span className="text-3xl mb-5 font-semibold">{game.team_b_name}</span>
+                                        <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-5 shadow-xl shadow-indigo-900/20">
+                        <div>
                             <div className="flex items-center justify-between">
                                 <h3 className="text-base font-semibold text-white">Recent Events</h3>
                                 <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
                             </div>
-                            <div className="mt-3 space-y-2 text-sm text-slate-100">
+                            <div className="grid grid-cols-3 mt-3 space-y-2 text-sm text-slate-100">
                                 {recentEvents.map((e) => (
                                     <div
                                         key={e.id || e.occurred_at || Math.random()}
-                                        className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
+                                        className="m-3 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
                                     >
                                         <div>
                                             <p className="font-semibold capitalize text-white">{e.event_type.replace('_', ' ')}</p>
