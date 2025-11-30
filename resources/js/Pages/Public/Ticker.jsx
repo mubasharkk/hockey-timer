@@ -44,14 +44,14 @@ export default function Ticker({ game, gameId }) {
     };
 
     useEffect(() => {
-        const id = gameId || form.data.game;
+        const id = liveData?.game_id || gameId || form.data.game;
         if (!id) return;
         let isMounted = true;
         const fetchTicker = async () => {
             setLoading(true);
             try {
                 const res = await axios.get(`/api/public/ticker/${id}`);
-                if (isMounted) setLiveData(res.data);
+                if (isMounted) setLiveData((prev) => ({ ...(prev || {}), ...res.data }));
             } catch (e) {
                 // ignore errors; keep last good data
             } finally {
