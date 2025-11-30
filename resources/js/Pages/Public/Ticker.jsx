@@ -1,37 +1,70 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import moment from 'moment';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
-    const events = game?.events || [];
+    const [liveData, setLiveData] = useState(game || null);
+    const [loading, setLoading] = useState(false);
+
+    const events = liveData?.events || [];
 
     const resolveSessionNumber = () => {
-        const raw = game?.current_session;
+        const raw = liveData?.current_session ?? liveData?.current_period;
         if (typeof raw === 'number') return raw;
         if (raw && typeof raw === 'object' && raw.number) return raw.number;
         const ended = events.filter((e) => e.event_type === 'session_end').length;
-        const total = Array.isArray(game?.sessions)
-            ? game.sessions.length
-            : typeof game?.sessions === 'number'
-                ? game.sessions
+        const total = Array.isArray(liveData?.sessions)
+            ? liveData.sessions.length
+            : typeof liveData?.sessions === 'number'
+                ? liveData.sessions
                 : ended + 1;
         return Math.min(total || 1, ended + 1) || 1;
     };
     const resolveSessionTotal = () => {
-        if (Array.isArray(game?.sessions)) return game.sessions.length;
-        if (typeof game?.sessions === 'number') return game.sessions;
+        if (Array.isArray(liveData?.sessions)) return liveData.sessions.length;
+        if (typeof liveData?.sessions === 'number') return liveData.sessions;
+        if (typeof liveData?.session_count === 'number') return liveData.session_count;
         return null;
     };
     const currentSession = resolveSessionNumber();
     const totalSessions = resolveSessionTotal();
-    const recentEvents = [...events]
-        .sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0))
-        .slice(0, 3);
+    const recentEvents = useMemo(
+        () =>
+            [...events]
+                .sort((a, b) => new Date(b.occurred_at || 0) - new Date(a.occurred_at || 0))
+                .slice(0, 3),
+        [events]
+    );
 
     const submit = (e) => {
         e.preventDefault();
         form.get(route('public.ticker'), { preserveScroll: true });
     };
+
+    useEffect(() => {
+        const id = gameId || form.data.game;
+        if (!id) return;
+        let isMounted = true;
+        const fetchTicker = async () => {
+            setLoading(true);
+            try {
+                const res = await axios.get(`/api/public/ticker/${id}`);
+                if (isMounted) setLiveData(res.data);
+            } catch (e) {
+                // ignore errors; keep last good data
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+        fetchTicker();
+        const interval = setInterval(fetchTicker, 4000);
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+    }, [gameId, form.data.game]);
 
     return (
         <div className="min-h-screen bg-slate-950 text-slate-50">
@@ -49,7 +82,7 @@ export default function Ticker({ game, gameId }) {
             </header>
 
             <main className="mx-auto max-w-6xl px-4 py-6">
-                {!game && (
+                {!liveData && (
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-indigo-900/20">
                         <form onSubmit={submit} className="flex flex-col gap-4 sm:flex-row sm:items-end">
                             <div className="flex-1">
@@ -72,20 +105,20 @@ export default function Ticker({ game, gameId }) {
                     </div>
                 )}
 
-                {gameId && !game && (
+                {gameId && !liveData && (
                     <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100 shadow-lg shadow-red-900/20">
                         Game not found.
                     </div>
                 )}
 
-                {game && (
+                {liveData && (
                     <div className="mt-6 space-y-6">
                         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">
                             <div className="my-5">
                                 <div className="text-center">
                                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
                                     <p className="text-[6rem] font-bold text-white tabular-nums">
-                                        {formatSeconds(game.current_seconds ?? 0)}
+                                        {formatSeconds(liveData.timer_seconds ?? liveData.current_seconds ?? 0)}
                                     </p>
                                     <p className="mx-auto text-xl font-bold text-slate-300">
                                         <span>{totalSessions === 4 ? 'Q' : 'Sessions'} {currentSession}</span>
@@ -96,12 +129,12 @@ export default function Ticker({ game, gameId }) {
                                 </div>
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
                                     <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
-                                        <span className="mb-5 text-3xl font-semibold">{game.team_a_name}</span>
-                                        <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
+                                        <span className="mb-5 text-3xl font-semibold">{liveData.team_a_name}</span>
+                                        <span className="text-5xl font-bold">{liveData.team_a_score ?? (liveData.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
                                     </div>
                                     <div id="score-team-b" className="flex w-1/2 flex-col items-end justify-center text-right">
-                                        <span className="mb-5 text-3xl font-semibold">{game.team_b_name}</span>
-                                        <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
+                                        <span className="mb-5 text-3xl font-semibold">{liveData.team_b_name}</span>
+                                        <span className="text-5xl font-bold">{liveData.team_b_score ?? (liveData.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
                                 </div>
                             </div>
