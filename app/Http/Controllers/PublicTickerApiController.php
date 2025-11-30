@@ -19,7 +19,7 @@ class PublicTickerApiController extends Controller
         $away = $game->teams->firstWhere('side', 'away');
 
         // Determine current session
-        $sessionCount = $game->sessions->count() ?: ($game->sessions ?? $game->sessions()->count());
+        $sessionCount = $game->sessions->count() ?: $game->sessions()->count();
         $endedSessions = $game->events->where('event_type', 'session_end')->count();
         $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
         $currentSession = $game->sessions->firstWhere('number', $currentSessionNumber)
