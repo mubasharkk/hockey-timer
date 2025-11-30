@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
 import moment from 'moment';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -39,6 +39,7 @@ export default function Timer({ auth, game, config = {} }) {
     const [status, setStatus] = useState('ready'); // ready | running | paused | finished
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [lastTick, setLastTick] = useState(null);
+    const latestElapsedRef = useRef(0);
     const breakStorageKey = `game_break_${game.id}`;
     const [breakStartAt, setBreakStartAt] = useState(() => {
         try {
@@ -111,6 +112,20 @@ export default function Timer({ auth, game, config = {} }) {
         const id = window.setInterval(tick, 250);
         return () => window.clearInterval(id);
     }, [status, lastTick, plannedSeconds, game.timer_mode, storageKey]);
+
+    useEffect(() => {
+        latestElapsedRef.current = elapsedSeconds;
+    }, [elapsedSeconds]);
+
+    useEffect(() => {
+        if (status !== 'running') return;
+
+        const id = window.setInterval(() => {
+            syncSessionState({ elapsed_seconds: Math.round(latestElapsedRef.current) });
+        }, 3000);
+
+        return () => window.clearInterval(id);
+    }, [status]);
 
     const teams = game.teams || [];
     const home = teams.find((t) => t.side === 'home');

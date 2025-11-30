@@ -13,13 +13,20 @@ class PublicTickerApiController extends Controller
             'teams' => fn ($q) => $q->orderBy('side'),
         ]);
         $sessionModels = $game->sessions()->orderBy('number')->get();
-        $eventModels = $game->events()->orderByDesc('occurred_at')->limit(10)->get();
+        $eventModels = $game->events()->orderByDesc('occurred_at')->limit(50)->get();
+        $goalCounts = $game->events()
+            ->selectRaw('team_id, COUNT(*) as total')
+            ->where('event_type', 'goal')
+            ->groupBy('team_id')
+            ->pluck('total', 'team_id');
 
         $home = $game->teams->firstWhere('side', 'home');
         $away = $game->teams->firstWhere('side', 'away');
+        $homeScore = $home ? ($goalCounts[$home->id] ?? $home->score ?? 0) : 0;
+        $awayScore = $away ? ($goalCounts[$away->id] ?? $away->score ?? 0) : 0;
 
         // Determine current session
-        $sessionCount = $sessionModels->count() ?: (int) ($game->getAttribute('sessions') ?? 0);
+        $sessionCount = max($sessionModels->count(), (int) ($game->getAttribute('sessions') ?? 0));
         $endedSessions = $eventModels->where('event_type', 'session_end')->count();
         $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
         $currentSession = $sessionModels->firstWhere('number', $currentSessionNumber)
@@ -28,9 +35,42 @@ class PublicTickerApiController extends Controller
         $elapsed = $currentSession?->actual_duration_seconds ?? 0;
         $planned = $currentSession?->planned_duration_seconds ?? ($game->session_duration_minutes * 60);
 
-        $timerSeconds = $game->timer_mode === 'DESC'
-            ? max($planned - $elapsed, 0)
-            : max($elapsed, 0);
+        $lastStartEvent = $game->events()
+            ->where(function ($q) {
+                $q->where('event_type', 'session_start')
+                    ->orWhere(function ($q2) {
+                        $q2->where('event_type', 'highlight')
+                            ->where('note', 'like', '%session%start%');
+                    });
+            })
+            ->latest('occurred_at')
+            ->first();
+
+        $lastEndEvent = $game->events()
+            ->whereIn('event_type', ['session_end', 'game_end'])
+            ->latest('occurred_at')
+            ->first();
+
+        $lastStartAt = $lastStartEvent?->occurred_at;
+        $lastEndAt = $lastEndEvent?->occurred_at;
+
+        $isRunning = $game->status !== 'finished'
+            && $lastStartAt
+            && (! $lastEndAt || $lastStartAt > $lastEndAt);
+
+        $isBreak = ! $isRunning
+            && $endedSessions >= ($currentSessionNumber - 1)
+            && (! $currentSession?->started_at || ($lastEndAt && (! $lastStartAt || $lastEndAt >= $lastStartAt)));
+
+        $timerSeconds = 0;
+        if ($isRunning) {
+            $timerSeconds = $game->timer_mode === 'DESC'
+                ? max($planned - $elapsed, 0)
+                : max($elapsed, 0);
+        } else {
+            // Keep timer at zero during breaks or when stopped.
+            $timerSeconds = 0;
+        }
 
         $recentEvents = $eventModels->take(5)->values()->map(function ($event) {
             return [
@@ -51,12 +91,15 @@ class PublicTickerApiController extends Controller
             'game_id' => $game->id,
             'team_a_name' => $game->team_a_name,
             'team_b_name' => $game->team_b_name,
-            'team_a_score' => $home?->score ?? 0,
-            'team_b_score' => $away?->score ?? 0,
+            'team_a_score' => $homeScore ?? 0,
+            'team_b_score' => $awayScore ?? 0,
             'timer_seconds' => $timerSeconds,
             'current_period' => $currentSessionNumber,
             'session_count' => $sessionCount,
             'timer_mode' => $game->timer_mode,
+            'status' => $game->status,
+            'is_running' => $isRunning,
+            'is_break' => $isBreak,
             'events' => $recentEvents,
         ]);
     }

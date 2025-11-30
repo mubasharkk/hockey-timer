@@ -7,6 +7,13 @@ export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
     const [liveData, setLiveData] = useState(game || null);
     const [loading, setLoading] = useState(false);
+    const [displaySeconds, setDisplaySeconds] = useState(game?.timer_seconds ?? game?.current_seconds ?? 0);
+    const effectiveSeconds = useMemo(() => {
+        if (!liveData) return displaySeconds ?? 0;
+        if (liveData.is_break) return 0;
+        if (liveData.status === 'finished' || liveData.status === 'game_over') return 0;
+        return displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
+    }, [displaySeconds, liveData]);
 
     const events = liveData?.events || [];
 
@@ -66,6 +73,17 @@ export default function Ticker({ game, gameId }) {
         };
     }, [gameId, form.data.game]);
 
+    useEffect(() => {
+        if (liveData?.timer_seconds !== undefined && liveData?.timer_seconds !== null) {
+            setDisplaySeconds(liveData.timer_seconds);
+        } else if (liveData?.current_seconds !== undefined && liveData?.current_seconds !== null) {
+            setDisplaySeconds(liveData.current_seconds);
+        }
+    }, [liveData?.timer_seconds, liveData?.current_seconds]);
+
+    // Keep timer display in lockstep with the authoritative value coming from the server
+    // (avoid drifting when the main timer is paused or adjusted).
+
     return (
         <div className="min-h-screen bg-slate-950 text-slate-50">
             <Head title="Live Ticker" />
@@ -118,13 +136,22 @@ export default function Ticker({ game, gameId }) {
                                 <div className="text-center">
                                     <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
                                     <p className="text-[6rem] font-bold text-white tabular-nums">
-                                        {formatSeconds(liveData.timer_seconds ?? liveData.current_seconds ?? 0)}
+                                        {formatSeconds(effectiveSeconds)}
                                     </p>
-                                    <p className="mx-auto text-xl font-bold text-slate-300">
-                                        <span>{totalSessions === 4 ? 'Q' : 'Sessions'} {currentSession}</span>
-                                        <span className={'mx-3'}>of</span>
+                                    <p className="mx-auto text-xl font-bold text-slate-300 flex items-center justify-center gap-3">
+                                        <span>{totalSessions === 4 ? 'Q' : 'Session'} {currentSession}</span>
+                                        <span className="text-slate-500">/</span>
                                         <span>{totalSessions ?? ''}</span>
-                                        {/*{game.timer_mode} mode*/}
+                                        {liveData?.is_break && (
+                                            <span className="rounded-full bg-amber-500/20 px-3 py-1 text-sm font-semibold text-amber-200 border border-amber-500/40">
+                                                Break
+                                            </span>
+                                        )}
+                                        {(liveData?.status === 'finished' || liveData?.status === 'game_over') && (
+                                            <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-sm font-semibold text-emerald-100 border border-emerald-500/40">
+                                                Final
+                                            </span>
+                                        )}
                                     </p>
                                 </div>
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
