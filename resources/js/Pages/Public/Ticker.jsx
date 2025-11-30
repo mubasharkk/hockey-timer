@@ -94,14 +94,13 @@ export default function Ticker({ game, gameId }) {
                                         {/*{game.timer_mode} mode*/}
                                     </p>
                                 </div>
-                                <div className="mt-5 flex justify-center gap-3p-3 text-sm text-slate-100 border-t border-slate-200 pt-10">
-                                    <div className="flex flex-col items-center justify-center">
-                                        <span className="text-3xl mb-5 font-semibold">{game.team_a_name}</span>
+                                <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
+                                    <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
+                                        <span className="mb-5 text-3xl font-semibold">{game.team_a_name}</span>
                                         <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
                                     </div>
-                                    <div className={'flex-full'}>X</div>
-                                    <div className="flex flex-col items-center justify-between">
-                                        <span className="text-3xl mb-5 font-semibold">{game.team_b_name}</span>
+                                    <div id="score-team-b" className="flex w-1/2 flex-col items-end justify-center text-right">
+                                        <span className="mb-5 text-3xl font-semibold">{game.team_b_name}</span>
                                         <span className="text-5xl font-bold">{(game.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
                                 </div>
