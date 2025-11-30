@@ -11,19 +11,19 @@ class PublicTickerApiController extends Controller
     {
         $game->load([
             'teams' => fn ($q) => $q->orderBy('side'),
-            'sessions' => fn ($q) => $q->orderBy('number'),
-            'events' => fn ($q) => $q->orderByDesc('occurred_at')->limit(10),
         ]);
+        $sessionModels = $game->sessions()->orderBy('number')->get();
+        $eventModels = $game->events()->orderByDesc('occurred_at')->limit(10)->get();
 
         $home = $game->teams->firstWhere('side', 'home');
         $away = $game->teams->firstWhere('side', 'away');
 
         // Determine current session
-        $sessionCount = $game->sessions->count() ?: $game->sessions()->count();
-        $endedSessions = $game->events->where('event_type', 'session_end')->count();
+        $sessionCount = $sessionModels->count() ?: (int) ($game->getAttribute('sessions') ?? 0);
+        $endedSessions = $eventModels->where('event_type', 'session_end')->count();
         $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
-        $currentSession = $game->sessions->firstWhere('number', $currentSessionNumber)
-            ?: $game->sessions->sortBy('number')->first();
+        $currentSession = $sessionModels->firstWhere('number', $currentSessionNumber)
+            ?: $sessionModels->sortBy('number')->first();
 
         $elapsed = $currentSession?->actual_duration_seconds ?? 0;
         $planned = $currentSession?->planned_duration_seconds ?? ($game->session_duration_minutes * 60);
@@ -32,7 +32,7 @@ class PublicTickerApiController extends Controller
             ? max($planned - $elapsed, 0)
             : max($elapsed, 0);
 
-        $recentEvents = $game->events->take(5)->values()->map(function ($event) {
+        $recentEvents = $eventModels->take(5)->values()->map(function ($event) {
             return [
                 'id' => $event->id,
                 'event_type' => $event->event_type,
