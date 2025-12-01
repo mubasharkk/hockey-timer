@@ -176,15 +176,32 @@ export default function Ticker({ game, gameId }) {
                                 {recentEvents.map((e) => (
                                     <div
                                         key={e.id || e.occurred_at || Math.random()}
-                                        className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
+                                        className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-3"
                                     >
-                                        <div>
-                                            <p className="font-semibold capitalize text-white">{e.event_type.replace('_', ' ')}</p>
-                                            <p className="text-xs text-slate-300">
-                                                Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
+                                        <img
+                                            src={iconForEvent(e.event_type)}
+                                            alt={e.event_type}
+                                            className="h-8 w-8 object-contain"
+                                        />
+                                        <div className="flex flex-1 items-start justify-between gap-2">
+                                            <div className="space-y-1">
+                                                <p className="font-semibold capitalize text-white">
+                                                    {e.event_type.replace('_', ' ')}
+                                                    {e.player_shirt_number ? ` · #${e.player_shirt_number}` : ''}
+                                                </p>
+                                                <p className="text-xs text-slate-300">
+                                                    Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
+                                                </p>
+                                                {(e.note || e.goal_type || e.card_type) && (
+                                                    <p className="text-xs text-slate-400">
+                                                        {[e.goal_type, e.card_type, e.note].filter(Boolean).join(' · ')}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-slate-400 whitespace-nowrap">
+                                                {e.occurred_at ? moment(e.occurred_at).format('HH:mm') : ''}
                                             </p>
                                         </div>
-                                        <p className="text-xs text-slate-400">{e.occurred_at ? moment(e.occurred_at).format('HH:mm') : ''}</p>
                                     </div>
                                 ))}
                                 {recentEvents.length === 0 && <p className="text-xs text-slate-400">No events yet.</p>}
@@ -196,6 +213,27 @@ export default function Ticker({ game, gameId }) {
         </div>
     );
 }
+
+const iconForEvent = (type) => {
+    switch (type) {
+        case 'goal':
+            return '/icons/goal.png';
+        case 'card':
+        case 'yellow_card':
+        case 'red_card':
+            return '/icons/red-card.png';
+        case 'session_end':
+        case 'half_time':
+            return '/icons/half-time.png';
+        case 'game_end':
+        case 'full_time':
+            return '/icons/full-time.png';
+        case 'foul':
+            return '/icons/foul.png';
+        default:
+            return '/icons/logo.png';
+    }
+};
 
 const formatSeconds = (seconds) => {
     const mins = Math.floor(seconds / 60)
