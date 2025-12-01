@@ -112,7 +112,7 @@ export default function Report({ auth, game }) {
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <h3 className="text-base font-semibold text-gray-900">Game Timeline</h3>
                         <div className="mt-4">
-                            <EventTimeline events={events} teams={game.teams || []} />
+                            <EventTimeline events={events} teams={game.teams || []} sessionCount={game.sessions?.length || game.sessions || null} />
                         </div>
                     </section>
                 </div>

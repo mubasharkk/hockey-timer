@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EventTimeline = ({ events = [], teams = [] }) => {
+const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
     if (!events.length) {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
@@ -82,6 +82,8 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                         );
                     }
 
+                    const sessionLabel = formatSessionAbbrev(event.session_number, sessionCount);
+
                     return (
                         <div key={event.id || idx} className="relative flex w-full items-center">
                             <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
@@ -107,11 +109,13 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                                             <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
                                     </div>
                                     <div className="space-y-1 text-left">
-                                        <p className="text-xs uppercase tracking-wide text-gray-500">
+                                        <p className="text-xs uppercase tracking-wide text-gray-500 flex items-center flex-wrap gap-1">
                                             <span className="text-[14px] font-bold mr-2">
                                                 {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
                                             </span>
-                                            Session {event.session_number} · {badge.label}
+                                            <span className="font-semibold">
+                                                {badge.label} {sessionLabel ? `(${sessionLabel})` : ''}
+                                            </span>
                                         </p>
                                         <p className="text-xs text-gray-600">
                                             {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
@@ -152,6 +156,17 @@ const cardIcon = (type) => {
     if (type === 'yellow') return '/icons/red-card.png';
     if (type === 'green') return '/icons/red-card.png';
     return '/icons/red-card.png';
+};
+
+const formatSessionAbbrev = (number, total) => {
+    if (!number) return '';
+    const label =
+        total === 2
+            ? 'H' // Half
+            : total === 4
+                ? 'Q' // Quarter
+                : 'S'; // Session
+    return `${label}${number}`;
 };
 
 const formatSeconds = (seconds) => {
