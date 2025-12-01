@@ -84,6 +84,8 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
 
                     const sessionLabel = formatSessionAbbrev(event.session_number, sessionCount);
 
+                    const cardBg = side === 'teamA' ? 'bg-gray-100' : 'bg-gray-50';
+
                     return (
                         <div key={event.id || idx} className="relative flex w-full items-center">
                             <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
@@ -92,7 +94,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
                                     side === 'teamA' ? 'mr-auto justify-end pr-12' : 'ml-auto justify-start pl-12'
                                 }`}
                             >
-                                <div className="relative flex max-w-[85%] items-start gap-3 rounded-md border border-gray-100 bg-gray-50 px-3 py-2 shadow-sm">
+                                <div className={`relative flex max-w-[85%] items-start gap-3 rounded-md border border-gray-100 ${cardBg} px-3 py-2 shadow-sm`}>
                                     <span
                                         className={`absolute top-1/2 -translate-y-1/2 h-px bg-gray-200 ${
                                             side === 'teamA' ? 'left-full w-10' : 'right-full w-10'
