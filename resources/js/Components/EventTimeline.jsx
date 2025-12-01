@@ -103,15 +103,15 @@ const EventTimeline = ({ events = [], teams = [] }) => {
                                                 : '-left-2 border-y-8 border-y-transparent border-r-8 border-r-gray-50'
                                         }`}
                                     />
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm">
-                                        <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
+                                    <div className="flex flex-col items-center">
+                                            <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
                                     </div>
                                     <div className="space-y-1 text-left">
                                         <p className="text-xs uppercase tracking-wide text-gray-500">
+                                            <span className="text-[14px] font-bold mr-2">
+                                                {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
+                                            </span>
                                             Session {event.session_number} · {badge.label}
-                                        </p>
-                                        <p className="text-sm font-semibold text-gray-800">
-                                            {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
                                         </p>
                                         <p className="text-xs text-gray-600">
                                             {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
