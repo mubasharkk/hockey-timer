@@ -172,11 +172,11 @@ export default function Ticker({ game, gameId }) {
                                 <h3 className="text-base font-semibold text-white">Recent Events</h3>
                                 <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
                             </div>
-                            <div className="grid grid-cols-3 mt-3 space-y-2 text-sm text-slate-100">
+                            <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100 sm:grid-cols-3">
                                 {recentEvents.map((e) => (
                                     <div
                                         key={e.id || e.occurred_at || Math.random()}
-                                        className="m-3 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
+                                        className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
                                     >
                                         <div>
                                             <p className="font-semibold capitalize text-white">{e.event_type.replace('_', ' ')}</p>
