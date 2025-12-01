@@ -31,34 +31,36 @@ export default function Dashboard({ auth, games = [], now }) {
                             <div className="mt-4 space-y-3">
                                 {games.length === 0 && <p className="text-sm text-gray-600">No games yet. Create one to get started.</p>}
 
-                                {games.map((game) => (
-                                    <div
-                                        key={game.id}
-                                        className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
-                                    >
-                                        <div className="space-y-1">
-                                            <div className="text-sm font-semibold text-gray-900">
-                                                {game.team_a_name} vs {game.team_b_name}
+                                {games.map((game) => {
+                                    const status = deriveStatus(game);
+                                    const relative = formatRelativeStart(game.game_date, game.game_time, now, status, game.ended_at);
+                                    return (
+                                        <div
+                                            key={game.id}
+                                            className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
+                                        >
+                                            <div className="space-y-1">
+                                                <div className="text-sm font-semibold text-gray-900">
+                                                    {game.team_a_name} vs {game.team_b_name}
+                                                </div>
+                                                {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
+                                                <div className="text-xs text-gray-600">
+                                                    {formatDateTime(game.game_date, game.game_time)} · {game.venue}
+                                                    {relative ? ` · ${relative}` : ''}
+                                                </div>
                                             </div>
-                                            {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
-                                            <div className="text-xs text-gray-600">
-                                                {formatDateTime(game.game_date, game.game_time)} · {game.venue}
-                                                {formatRelativeStart(game.game_date, game.game_time, now, game.status)
-                                                    ? ` · ${formatRelativeStart(game.game_date, game.game_time, now, game.status)}`
-                                                    : ''}
+                                            <div className="flex items-center gap-3">
+                                                <StatusBadge status={status} />
+                                                <Link
+                                                    href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
+                                                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                                >
+                                                    {status === 'finished' ? 'Report' : 'View'}
+                                                </Link>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
-                                            <StatusBadge status={game.status} />
-                                            <Link
-                                                href={route(game.status === 'finished' ? 'games.report' : 'games.summary', game.id)}
-                                                className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
-                                            >
-                                                {game.status === 'finished' ? 'Report' : 'View'}
-                                            </Link>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
@@ -93,11 +95,11 @@ const formatDateTime = (date, time) => {
     return value.format('DD.MM.YYYY HH:mm');
 };
 
-const formatRelativeStart = (date, time, nowIso, status) => {
+const formatRelativeStart = (date, time, nowIso, status, endedAt) => {
     const start = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     const now = nowIso ? moment(nowIso) : moment();
     if (!start.isValid()) return '';
-    if (status === 'finished') return 'Finished';
+    if (status === 'finished' || endedAt) return 'Finished';
 
     const diffMinutes = start.diff(now, 'minutes', true);
     if (diffMinutes > 1) {
@@ -112,4 +114,9 @@ const formatRelativeStart = (date, time, nowIso, status) => {
         return `${Math.round(minsAgo)} mins since start`;
     }
     return `${Math.round(minsAgo / 60)} hrs since start`;
+};
+
+const deriveStatus = (game) => {
+    if (game.status === 'finished' || game.ended_at) return 'finished';
+    return game.status || 'scheduled';
 };
