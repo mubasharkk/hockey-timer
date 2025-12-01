@@ -8,12 +8,17 @@ export default function Ticker({ game, gameId }) {
     const [liveData, setLiveData] = useState(game || null);
     const [loading, setLoading] = useState(false);
     const [displaySeconds, setDisplaySeconds] = useState(game?.timer_seconds ?? game?.current_seconds ?? 0);
+    const isFinished = useMemo(
+        () => liveData?.status === 'finished' || liveData?.status === 'game_over',
+        [liveData?.status]
+    );
+
     const effectiveSeconds = useMemo(() => {
         if (!liveData) return displaySeconds ?? 0;
+        if (isFinished) return 0;
         if (liveData.is_break) return 0;
-        if (liveData.status === 'finished' || liveData.status === 'game_over') return 0;
         return displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
-    }, [displaySeconds, liveData]);
+    }, [displaySeconds, liveData, isFinished]);
 
     const events = liveData?.events || [];
 
@@ -142,14 +147,14 @@ export default function Ticker({ game, gameId }) {
                                         <span>{totalSessions === 4 ? 'Q' : 'Session'} {currentSession}</span>
                                         <span className="text-slate-500">/</span>
                                         <span>{totalSessions ?? ''}</span>
-                                        {liveData?.is_break && (
+                                        {liveData?.is_break && !isFinished && (
                                             <span className="rounded-full bg-amber-500/20 px-3 py-1 text-sm font-semibold text-amber-200 border border-amber-500/40">
                                                 Break
                                             </span>
                                         )}
-                                        {(liveData?.status === 'finished' || liveData?.status === 'game_over') && (
+                                        {isFinished && (
                                             <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-sm font-semibold text-emerald-100 border border-emerald-500/40">
-                                                Final
+                                                Ended
                                             </span>
                                         )}
                                     </p>
