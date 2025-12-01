@@ -110,7 +110,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
                                     </div>
                                     <div className="space-y-1 text-left">
                                         <p className="text-xs uppercase tracking-wide text-gray-500 flex items-center flex-wrap gap-1">
-                                            <span className="text-[14px] font-bold mr-2">
+                                            <span className="text-[14px] font-bold text-black">
                                                 {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
                                             </span>
                                             <span className="font-semibold">
