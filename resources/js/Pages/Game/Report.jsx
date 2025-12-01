@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import EventTimeline from '@/Components/EventTimeline';
+import moment from 'moment';
 
 export default function Report({ auth, game }) {
     if (!game) {
@@ -154,15 +155,6 @@ const formatSeconds = (seconds) => {
 
 const formatLocalDate = (date) => {
     if (!date) return '';
-    // Normalize any ISO string (with or without time) to YYYY-MM-DD without timezone offset.
-    const iso = `${date}`.trim();
-    const match = iso.match(/^(\d{4}-\d{2}-\d{2})/);
-    if (match) return match[1];
-
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return date;
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    const m = moment(date);
+    return m.isValid() ? m.format('YYYY-MM-DD') : `${date}`;
 };
