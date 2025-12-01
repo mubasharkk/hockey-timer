@@ -25,9 +25,19 @@ export default function Report({ auth, game }) {
         <AuthenticatedLayout user={auth.user}>
             <Head title="Match Report" />
 
-            <div className="py-8">
-                <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between">
+            <div className="py-8 print:bg-white">
+                <style>
+                    {`
+                        @media print {
+                            .no-print { display: none !important; }
+                            body { background: white; }
+                            .print-container { max-width: 210mm; margin: 0 auto; }
+                            .print-section { page-break-inside: avoid; }
+                        }
+                    `}
+                </style>
+                <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8 print:mx-auto print:max-w-[210mm] print:px-0 print:py-0">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between print:flex-row print:items-center print:justify-between">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Match Report</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
@@ -36,15 +46,25 @@ export default function Report({ auth, game }) {
                             <p className="text-sm text-gray-600">
                                 {game.venue} · {game.game_date} {game.game_time}
                             </p>
+                            <p className="text-xs text-gray-500">Code: {game.code || game.id}</p>
                         </div>
-                        { game.status !== 'finished' ?
-                        <Link href={route('games.timer', game.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                            Back to Timer
-                        </Link>
-                        : null}
+                        <div className="flex flex-col items-start gap-2 sm:items-end print:hidden">
+                            {game.status !== 'finished' && (
+                                <Link href={route('games.timer', game.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                    Back to Timer
+                                </Link>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => window.print()}
+                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                            >
+                                Download PDF
+                            </button>
+                        </div>
                     </div>
 
-                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-semibold text-gray-900">Final Score</h2>
                             <div className="text-3xl font-bold text-gray-900">
@@ -56,7 +76,7 @@ export default function Report({ auth, game }) {
                         </p>
                     </section>
 
-                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <h3 className="text-base font-semibold text-gray-900">Sessions</h3>
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                             {sessions.map((session) => (
@@ -89,7 +109,7 @@ export default function Report({ auth, game }) {
                         </div>
                     </section>
 
-                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <h3 className="text-base font-semibold text-gray-900">Game Timeline</h3>
                         <div className="mt-4">
                             <EventTimeline events={events} teams={game.teams || []} />
