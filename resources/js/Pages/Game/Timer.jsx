@@ -523,33 +523,45 @@ export default function Timer({ auth, game, config = {} }) {
 
             <div className="py-6">
                 <div className="mx-auto max-w-5xl space-y-4 sm:px-6 lg:px-8">
-                    <header className="flex items-center justify-between">
-                        <div>
+                    <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="space-y-1 sm:space-y-2">
                             <p className="text-xs uppercase tracking-wide text-gray-500">{scheduledDisplay || 'Live Match'}</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                            {game.team_a_name} vs {game.team_b_name}
-                        </h1>
-                        {game.code && (
-                            <p className="text-xs font-semibold text-gray-500">
-                                Code: {game.code} · Public:{' '}
-                                <Link href={route('public.ticker.code', game.code)} className="text-indigo-600 hover:text-indigo-500">
-                                    {route('public.ticker.code', game.code)}
-                                </Link>
+                                {game.team_a_name} vs {game.team_b_name}
+                            </h1>
+                            {game.code && (
+                                <div className="space-y-1 text-xs font-semibold text-gray-500">
+                                    <p>
+                                        Code: {game.code}
+                                    </p>
+                                    <p>
+                                        Public:{' '}
+                                        <Link
+                                            href={route('public.ticker.code', game.code)}
+                                            className="text-indigo-600 hover:text-indigo-500"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {route('public.ticker.code', game.code)}
+                                        </Link>
+                                    </p>
+                                </div>
+                            )}
+                            <p className="text-sm text-gray-600">
+                                Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
+                                timer
                             </p>
-                        )}
-                        <p className="text-sm text-gray-600">
-                            Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
-                            timer
-                        </p>
-                        {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
-                    </div>
-                        <Link
-                            href={route('games.report', game.id)}
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
-                            preserveScroll
-                        >
-                            View Report →
-                        </Link>
+                            {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
+                        </div>
+                        <div className="flex flex-col items-start gap-1 sm:items-end sm:gap-0">
+                            <Link
+                                href={route('games.report', game.id)}
+                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 sm:block"
+                                preserveScroll
+                            >
+                                View Report →
+                            </Link>
+                        </div>
                     </header>
 
                     <div className="space-y-4">
