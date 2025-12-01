@@ -92,6 +92,19 @@ class GameController extends Controller
     {
         $game->load(['teams.players']);
 
+        $home = $game->teams->firstWhere('side', 'home');
+        $away = $game->teams->firstWhere('side', 'away');
+
+        $game->setAttribute('team_a_players_text', $home?->players
+            ->map(fn ($p) => trim(($p->shirt_number ? "{$p->shirt_number} " : '') . ($p->name ?? '')))
+            ->filter()
+            ->implode("\n"));
+
+        $game->setAttribute('team_b_players_text', $away?->players
+            ->map(fn ($p) => trim(($p->shirt_number ? "{$p->shirt_number} " : '') . ($p->name ?? '')))
+            ->filter()
+            ->implode("\n"));
+
         return Inertia::render('Game/Edit', [
             'game' => $game,
         ]);

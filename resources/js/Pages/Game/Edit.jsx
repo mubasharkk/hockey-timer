@@ -3,6 +3,12 @@ import { Head, useForm } from '@inertiajs/react';
 import moment from "moment";
 
 export default function Edit({ auth, game }) {
+    const playersToText = (players = []) =>
+        (players || [])
+            .map((p) => `${p.shirt_number ? `${p.shirt_number} ` : ''}${p.name ?? ''}`.trim())
+            .filter(Boolean)
+            .join('\n');
+
     const { data, setData, put, processing, errors } = useForm({
         team_a_name: game.team_a_name || '',
         team_b_name: game.team_b_name || '',
@@ -12,6 +18,12 @@ export default function Edit({ auth, game }) {
         sessions: game.sessions || 4,
         session_duration_minutes: game.session_duration_minutes || 15,
         timer_mode: game.timer_mode || 'DESC',
+        team_a_players_text:
+            game.team_a_players_text ||
+            playersToText((game.teams || []).find((t) => t.side === 'home')?.players || []),
+        team_b_players_text:
+            game.team_b_players_text ||
+            playersToText((game.teams || []).find((t) => t.side === 'away')?.players || []),
     });
 
     const submit = (e) => {
@@ -93,6 +105,39 @@ export default function Edit({ auth, game }) {
                                 onChange={(value) => setData('timer_mode', value)}
                                 error={errors.timer_mode}
                             />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <div className="items-center justify-between">
+                                    <label className="block text-sm font-medium text-gray-700">Team A Players</label>
+                                    <span className="text-xs text-gray-500">One per line. Optionally prefix shirt #.</span>
+                                </div>
+                                <textarea
+                                    rows={6}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.team_a_players_text}
+                                    onChange={(e) => setData('team_a_players_text', e.target.value)}
+                                />
+                                {errors.team_a_players_text && (
+                                    <p className="mt-1 text-xs text-red-600">{errors.team_a_players_text}</p>
+                                )}
+                            </div>
+                            <div>
+                                <div className="items-center justify-between">
+                                    <label className="block text-sm font-medium text-gray-700">Team B Players</label>
+                                    <span className="text-xs text-gray-500">One per line. Optionally prefix shirt #.</span>
+                                </div>
+                                <textarea
+                                    rows={6}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.team_b_players_text}
+                                    onChange={(e) => setData('team_b_players_text', e.target.value)}
+                                />
+                                {errors.team_b_players_text && (
+                                    <p className="mt-1 text-xs text-red-600">{errors.team_b_players_text}</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-end">

@@ -61,21 +61,45 @@ class GameService
      */
     public function updateGame(Game $game, array $data): Game
     {
-        $game->update([
-            'team_a_name' => $data['team_a_name'],
-            'team_b_name' => $data['team_b_name'],
-            'venue' => $data['venue'],
-            'game_date' => $data['game_date'],
-            'game_time' => $data['game_time'],
-            'sessions' => $data['sessions'],
-            'session_duration_minutes' => $data['session_duration_minutes'],
-            'timer_mode' => $data['timer_mode'],
-        ]);
+        $playersA = $this->parsePlayers($data['team_a_players_text'] ?? '');
+        $playersB = $this->parsePlayers($data['team_b_players_text'] ?? '');
 
-        // Keep sessions aligned with new session count/duration.
-        $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
+        return DB::transaction(function () use ($game, $data, $playersA, $playersB) {
+            $game->update([
+                'team_a_name' => $data['team_a_name'],
+                'team_b_name' => $data['team_b_name'],
+                'venue' => $data['venue'],
+                'game_date' => $data['game_date'],
+                'game_time' => $data['game_time'],
+                'sessions' => $data['sessions'],
+                'session_duration_minutes' => $data['session_duration_minutes'],
+                'timer_mode' => $data['timer_mode'],
+            ]);
 
-        return $game;
+            $home = $game->teams()->where('side', 'home')->first();
+            $away = $game->teams()->where('side', 'away')->first();
+
+            if ($home) {
+                $home->update(['name' => $data['team_a_name']]);
+                $home->players()->delete();
+                if ($playersA) {
+                    $home->players()->createMany($playersA);
+                }
+            }
+
+            if ($away) {
+                $away->update(['name' => $data['team_b_name']]);
+                $away->players()->delete();
+                if ($playersB) {
+                    $away->players()->createMany($playersB);
+                }
+            }
+
+            // Keep sessions aligned with new session count/duration.
+            $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
+
+            return $game;
+        });
     }
 
     /**
