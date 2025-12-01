@@ -44,7 +44,7 @@ export default function Report({ auth, game }) {
                                 {game.team_a_name} vs {game.team_b_name}
                             </h1>
                             <p className="text-sm text-gray-600">
-                                {game.venue} · {game.game_date} {game.game_time}
+                                {game.venue} · {formatLocalDate(game.game_date)} {game.game_time}
                             </p>
                             <p className="text-xs text-gray-500">Code: {game.code || game.id}</p>
                         </div>
@@ -150,4 +150,11 @@ const formatSeconds = (seconds) => {
         .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
+};
+
+const formatLocalDate = (date) => {
+    if (!date) return '';
+    const d = new Date(`${date}T00:00:00`);
+    if (Number.isNaN(d.getTime())) return date;
+    return d.toLocaleDateString();
 };
