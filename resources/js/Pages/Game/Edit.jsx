@@ -5,7 +5,7 @@ import moment from "moment";
 export default function Edit({ auth, game }) {
     const playersToText = (players = []) =>
         (players || [])
-            .map((p) => `${p.shirt_number ? `${p.shirt_number} ` : ''}${p.name ?? ''}`.trim())
+            .map((p) => `${p.shirt_number ? `${p.shirt_number} ` : ''}${(p.name ?? '').replace(/^#\s*/, '')}`.trim())
             .filter(Boolean)
             .join('\n');
 
