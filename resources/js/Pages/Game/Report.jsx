@@ -120,7 +120,12 @@ export default function Report({ auth, game }) {
                         <h3 className="text-base font-semibold text-gray-900">Teams & Players</h3>
                         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             {[home, away].map((team, idx) => (
-                                <div key={team?.id || idx} className="rounded-md border border-gray-100 bg-gray-50 p-4">
+                                <div
+                                    key={team?.id || idx}
+                                    className={`rounded-md border border-gray-100 p-4 ${
+                                        idx === 0 ? 'bg-gray-100' : 'bg-gray-50'
+                                    }`}
+                                >
                                     <p className="text-sm font-semibold text-gray-800">{team?.name || (idx === 0 ? 'Team A' : 'Team B')}</p>
                                     <ul className="mt-3 space-y-1 text-sm text-gray-700">
                                         {(team?.players || []).map((player) => (
