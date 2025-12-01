@@ -101,7 +101,7 @@ export default function Report({ auth, game }) {
                                         </div>
                                         <div>
                                             <dt className="font-semibold text-gray-700">Break</dt>
-                                            <dd>{session.break_duration_seconds ? `${session.break_duration_seconds}s` : '—'}</dd>
+                                            <dd>{session.break_duration_seconds ? formatSeconds(session.break_duration_seconds) : '—'}</dd>
                                         </div>
                                     </dl>
                                 </div>
