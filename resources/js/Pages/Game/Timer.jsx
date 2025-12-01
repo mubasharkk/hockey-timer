@@ -670,13 +670,15 @@ export default function Timer({ auth, game, config = {} }) {
                             </div>
                         </section>
 
-                        <section className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-semibold text-gray-800">Event Timeline</p>
+                        <details className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" open={false}>
+                            <summary className="flex cursor-pointer items-center justify-between text-sm font-semibold text-gray-800">
+                                <span>Event Timeline</span>
                                 <span className="text-xs text-gray-500">{events.length} events</span>
+                            </summary>
+                            <div className="mt-4 space-y-4">
+                                <EventTimeline events={events} teams={teams} sessionCount={sessionCount} />
                             </div>
-                            <EventTimeline events={events} teams={teams} sessionCount={sessionCount} />
-                        </section>
+                        </details>
                     </div>
                 </div>
             </div>
