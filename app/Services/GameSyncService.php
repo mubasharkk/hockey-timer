@@ -105,10 +105,20 @@ class GameSyncService
             ]);
         });
 
-        if ($collection->contains(fn (Event $e) => $e->event_type === 'game_end')) {
+        $hasGameEnd = $collection->contains(fn (Event $e) => $e->event_type === 'game_end')
+            || $game->events()->where('event_type', 'game_end')->exists();
+
+        if ($hasGameEnd) {
+            $endedAt = $collection
+                ->where('event_type', 'game_end')
+                ->map(fn (Event $e) => $e->occurred_at)
+                ->filter()
+                ->sortDesc()
+                ->first() ?? now();
+
             $game->forceFill([
                 'status' => 'finished',
-                'ended_at' => now(),
+                'ended_at' => $endedAt,
             ])->save();
         }
 
