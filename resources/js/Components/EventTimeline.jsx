@@ -5,6 +5,10 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
 
+    const orderedEvents = [...events].sort(
+        (a, b) => new Date(b?.occurred_at || 0) - new Date(a?.occurred_at || 0)
+    );
+
     const teamA = teams.find((t) => t.side === 'home') ?? teams[0] ?? null;
     const teamB = teams.find((t) => t.side === 'away') ?? teams[1] ?? null;
     const teamAId = teamA?.id ?? null;
@@ -19,7 +23,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
                 <span className="text-left text-xl text-black pl-4">{teamB?.name || 'Team B'}</span>
             </div>
             <div className="space-y-6">
-                {events.map((event, idx) => {
+                {orderedEvents.map((event, idx) => {
                     const team = event.team_id ? teamById(event.team_id) : null;
                     const side = event.team_id === teamBId ? 'teamB' : 'teamA';
                     const badge = eventBadge(event);
