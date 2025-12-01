@@ -27,7 +27,7 @@ class GameController extends Controller
             ->take(20)
             ->map(function (Team $team) {
                 $playersText = $team->players
-                    ->map(fn ($p) => ($p->shirt_number ? "#{$p->shirt_number} " : '') . $p->name)
+                    ->map(fn ($p) => ($p->shirt_number ? "{$p->shirt_number} " : '') . $p->name)
                     ->implode("\n");
 
                 return [

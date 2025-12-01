@@ -9,6 +9,12 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 const fallbackPresets = [];
 
 export default function Create({ auth, teamSuggestions = [] }) {
+    const sanitizePlayersText = (text = '') =>
+        text
+            .split('\n')
+            .map((line) => line.trim().replace(/^#\s*/, ''))
+            .join('\n');
+
     const { data, setData, post, processing, errors } = useForm({
         team_a_name: '',
         team_b_name: '',
@@ -28,7 +34,8 @@ export default function Create({ auth, teamSuggestions = [] }) {
             (p) => p.name.toLowerCase() === value.toLowerCase()
         );
         if (preset) {
-            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', preset.players_text || preset.players || '');
+            const cleaned = sanitizePlayersText(preset.players_text || preset.players || '');
+            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', cleaned);
         }
     };
 
