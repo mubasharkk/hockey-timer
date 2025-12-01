@@ -179,14 +179,14 @@ export default function Ticker({ game, gameId }) {
                                         className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-3"
                                     >
                                         <img
-                                            src={iconForEvent(e.event_type)}
-                                            alt={e.event_type}
+                                            src={eventBadge(e).icon}
+                                            alt={eventBadge(e).label}
                                             className="h-8 w-8 object-contain"
                                         />
                                         <div className="flex flex-1 items-start justify-between gap-2">
                                             <div className="space-y-1">
                                                 <p className="font-semibold capitalize text-white">
-                                                    {e.event_type.replace('_', ' ')}
+                                                    {eventBadge(e).label}
                                                     {e.player_shirt_number ? ` · #${e.player_shirt_number}` : ''}
                                                 </p>
                                                 <p className="text-xs text-slate-300">
@@ -214,25 +214,32 @@ export default function Ticker({ game, gameId }) {
     );
 }
 
-const iconForEvent = (type) => {
-    switch (type) {
+const eventBadge = (event) => {
+    switch (event.event_type) {
         case 'goal':
-            return '/icons/goal.png';
+            return { icon: '/icons/goal.png', label: event.goal_type ? `${event.goal_type} Goal` : 'Goal' };
+        case 'penalty_corner':
+            return { icon: '/icons/foul.png', label: 'Penalty Corner' };
+        case 'penalty_stroke':
+            return { icon: '/icons/foul.png', label: 'Penalty Stroke' };
         case 'card':
-        case 'yellow_card':
-        case 'red_card':
-            return '/icons/red-card.png';
+            return { icon: cardIcon(event.card_type), label: `${event.card_type || ''} Card`.trim() || 'Card' };
         case 'session_end':
-        case 'half_time':
-            return '/icons/half-time.png';
+            return { icon: '/icons/half-time.png', label: 'Session End' };
         case 'game_end':
-        case 'full_time':
-            return '/icons/full-time.png';
+            return { icon: '/icons/full-time.png', label: 'Game End' };
         case 'foul':
-            return '/icons/foul.png';
+            return { icon: '/icons/foul.png', label: 'Foul' };
         default:
-            return '/icons/logo.png';
+            return { icon: '/icons/logo.png', label: event.event_type?.replace('_', ' ') || 'Event' };
     }
+};
+
+const cardIcon = (type) => {
+    if (type === 'red') return '/icons/red-card.png';
+    if (type === 'yellow') return '/icons/red-card.png';
+    if (type === 'green') return '/icons/red-card.png';
+    return '/icons/red-card.png';
 };
 
 const formatSeconds = (seconds) => {
