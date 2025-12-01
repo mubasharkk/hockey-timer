@@ -9,7 +9,7 @@ export default function Ticker({ game, gameId }) {
     const [loading, setLoading] = useState(false);
     const [displaySeconds, setDisplaySeconds] = useState(game?.timer_seconds ?? game?.current_seconds ?? 0);
     const isFinished = useMemo(
-        () => liveData?.status === 'finished' || liveData?.status === 'game_over',
+        () => liveData?.status === 'finished',
         [liveData?.status]
     );
 
@@ -153,7 +153,7 @@ export default function Ticker({ game, gameId }) {
                                             </span>
                                         )}
                                         {isFinished && (
-                                            <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-sm font-semibold text-emerald-100 border border-emerald-500/40">
+                                            <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-semibold text-red-100 border border-red-500/40">
                                                 Ended
                                             </span>
                                         )}
