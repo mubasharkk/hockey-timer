@@ -147,7 +147,7 @@ const sportIcon = (sport) => {
         case 'basketball':
             return '/icons/basketball.png';
         default:
-            return '/icons/logo.png';
+            return '/icons/default-sport.png';
     }
 };
 
