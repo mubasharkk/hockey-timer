@@ -39,14 +39,27 @@ export default function Dashboard({ auth, games = [], now }) {
                                             key={game.id}
                                             className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
                                         >
-                                            <div className="space-y-1">
-                                                <div className="text-sm font-semibold text-gray-900">
-                                                    {game.team_a_name} vs {game.team_b_name}
-                                                </div>
-                                                {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
-                                                <div className="text-xs text-gray-600">
-                                                    {formatDateTime(game.game_date, game.game_time)} · {game.venue}
-                                                    {relative ? ` · ${relative}` : ''}
+                                            <div className="flex items-start gap-3">
+                                                <img
+                                                    src={sportIcon(game.sport_type)}
+                                                    alt={game.sport_type || 'sport'}
+                                                    className="h-10 w-10 rounded-md bg-white object-contain p-1 ring-1 ring-gray-200"
+                                                    loading="lazy"
+                                                />
+                                                <div className="space-y-1">
+                                                    <div className="text-sm font-semibold text-gray-900">
+                                                        {game.team_a_name} vs {game.team_b_name}
+                                                    </div>
+                                                    {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
+                                                    <div className="text-xs text-gray-600">
+                                                        {formatDateTime(game.game_date, game.game_time)} · {game.venue}
+                                                        {relative ? ` · ${relative}` : ''}
+                                                    </div>
+                                                    {game.sport_type && (
+                                                        <div className="text-[11px] uppercase tracking-wide text-gray-500">
+                                                            {sportLabel(game.sport_type)}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -119,4 +132,32 @@ const formatRelativeStart = (date, time, nowIso, status, endedAt) => {
 const deriveStatus = (game) => {
     if (game.status === 'finished' || game.ended_at) return 'finished';
     return game.status || 'scheduled';
+};
+
+const sportIcon = (sport) => {
+    switch (sport) {
+        case 'football':
+            return '/icons/football.png';
+        case 'field_hockey':
+            return '/icons/field-hockey.png';
+        case 'futsal':
+            return '/icons/futsal.png';
+        case 'handball':
+            return '/icons/handball.png';
+        case 'basketball':
+            return '/icons/basketball.png';
+        default:
+            return '/icons/logo.png';
+    }
+};
+
+const sportLabel = (sport) => {
+    const map = {
+        football: 'Football',
+        field_hockey: 'Field Hockey',
+        futsal: 'Futsal',
+        handball: 'Handball',
+        basketball: 'Basketball',
+    };
+    return map[sport] || 'Sport';
 };
