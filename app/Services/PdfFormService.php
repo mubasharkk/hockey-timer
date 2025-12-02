@@ -40,40 +40,48 @@ class PdfFormService
     private function generateWithFpdi(Game $game, string $templatePath, string $outputPath): string
     {
         $pdf = new \setasign\Fpdi\Fpdi();
-        $pageCount = $pdf->setSourceFile($templatePath);
+        $pdf->setSourceFile($templatePath);
         $tplIdx = $pdf->importPage(1);
 
+        $pdf->setSourceFile($templatePath);
         $pdf->AddPage();
         $pdf->useTemplate($tplIdx);
         $pdf->SetFont('Helvetica', '', 10);
         $pdf->SetTextColor(0, 0, 0);
 
-        $pdf->SetXY(20, 30);
-        $pdf->Write(6, "{$game->team_a_name} vs {$game->team_b_name}");
+        $pdf->SetXY(12, 33);
+        $pdf->Write(6, date("Y-m-d", strtotime($game->game_date)));
 
-        $pdf->SetXY(20, 38);
-        $pdf->Write(6, "Venue: {$game->venue} · {$game->game_date} {$game->game_time}");
+        $pdf->SetXY(38, 33);
+        $pdf->Write(6, date("H:i", strtotime($game->game_time)));
 
-        $pdf->SetXY(20, 46);
-        $pdf->Write(6, "Sessions: {$game->sessions} x {$game->session_duration_minutes} min");
+        $pdf->SetXY(56, 33);
+        $pdf->Write(6, $game->venue);
+
+        $pdf->SetXY(12, 50);
+        $pdf->Write(6, $game->team_a_name);
+
+        $pdf->SetXY(145, 50);
+        $pdf->Write(6, $game->team_b_name);
+
+
+        $pdf->SetXY(20, 70);
+        $pdf->Write(6, "{$game->sessions} x {$game->session_duration_minutes} min");
 
         // Players listing (basic placement)
-        $pdf->SetXY(20, 60);
-        $pdf->Write(6, 'Team A Players:');
-        $y = 66;
+        $y = 90;
         foreach (($game->teams->firstWhere('side', 'home')?->players ?? []) as $player) {
-            $pdf->SetXY(24, $y);
-            $pdf->Write(5, ($player->shirt_number ? "#{$player->shirt_number} " : '') . ($player->name ?? ''));
-            $y += 5;
+            $pdf->SetXY(22, $y);
+
+            $pdf->Write(5, ($player->shirt_number ? "{$player->shirt_number} " : '') . '     ' .($player->name ?? ''));
+            $y += 6.15;
         }
 
-        $pdf->SetXY(110, 60);
-        $pdf->Write(6, 'Team B Players:');
-        $y = 66;
+        $y = 90;
         foreach (($game->teams->firstWhere('side', 'away')?->players ?? []) as $player) {
-            $pdf->SetXY(114, $y);
-            $pdf->Write(5, ($player->shirt_number ? "#{$player->shirt_number} " : '') . ($player->name ?? ''));
-            $y += 5;
+            $pdf->SetXY(124, $y);
+            $pdf->Write(5, ($player->shirt_number ? "{$player->shirt_number} " : '') . '     ' .($player->name ?? ''));
+            $y += 6.15;
         }
 
         $pdf->Output($outputPath, 'F');
