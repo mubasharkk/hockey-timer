@@ -242,8 +242,8 @@ const eventBadge = (event) => {
 
 const cardIcon = (type) => {
     if (type === 'red') return '/icons/red-card.png';
-    if (type === 'yellow') return '/icons/red-card.png';
-    if (type === 'green') return '/icons/red-card.png';
+    if (type === 'yellow') return '/icons/yellow-card.png';
+    if (type === 'green') return '/icons/green-card.png';
     return '/icons/red-card.png';
 };
 

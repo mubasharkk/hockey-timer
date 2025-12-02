@@ -152,6 +152,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const [confirmModal, setConfirmModal] = useState(null); // { type: 'session' | 'game' }
     const [goalModal, setGoalModal] = useState(null); // { team, goalType, shirtNumber }
+    const [cardModal, setCardModal] = useState(null); // { team, cardType, shirtNumber, minutes }
 
     const syncSessionState = async (overrides = {}) => {
         const targetNumber = Math.max(1, overrides.number ?? sessionIndex + 1);
@@ -386,6 +387,16 @@ export default function Timer({ auth, game, config = {} }) {
         });
     };
 
+    const openCardDialog = (team, cardType) => {
+        if (!team || isGameOver) return;
+        setCardModal({
+            team,
+            cardType,
+            shirtNumber: '',
+            minutes: '',
+        });
+    };
+
     const handleAddGoal = ({ team, goalType, shirtNumber }) => {
         if (!team || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: (prev[team.id] ?? 0) + 1 }));
@@ -441,6 +452,26 @@ export default function Timer({ auth, game, config = {} }) {
         persistEvents([newEvent]);
         syncSessionState();
         syncGameScores();
+    };
+
+    const handleAddCard = ({ team, cardType, shirtNumber, minutes }) => {
+        if (!team || isGameOver) return;
+        const timerValue = minutes ? Math.max(parseInt(minutes, 10) * 60, 0) : displaySeconds;
+        const newEvent = {
+            id: `card-${Date.now()}`,
+            team_id: team.id,
+            session_number: sessionIndex + 1,
+            event_type: 'card',
+            card_type: cardType,
+            player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
+            timer_value_seconds: timerValue,
+            occurred_at: new Date().toISOString(),
+        };
+        setEvents((prev) => [...prev, newEvent]);
+        persistEvents([newEvent]);
+        syncSessionState();
+        syncGameScores();
+        setCardModal(null);
     };
 
     const handleSessionEnd = () => {
@@ -661,17 +692,27 @@ export default function Timer({ auth, game, config = {} }) {
                                         disabled={isGameOver}
                                     />
                                 </div>
-                                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                                    <div className="flex flex-col gap-2">
-                                        <QuickEventButton label="PC (Home)" onClick={() => handleQuickEvent('penalty_corner', home)} disabled={isGameOver || !home} />
-                                        <QuickEventButton label="PS (Home)" onClick={() => handleQuickEvent('penalty_stroke', home)} disabled={isGameOver || !home} />
+                            <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                                <div className="flex flex-col gap-2">
+                                    <QuickEventButton label="PC (Home)" onClick={() => handleQuickEvent('penalty_corner', home)} disabled={isGameOver || !home} />
+                                    <QuickEventButton label="PS (Home)" onClick={() => handleQuickEvent('penalty_stroke', home)} disabled={isGameOver || !home} />
+                                    <div className="flex items-center gap-2">
+                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(home, 'red')} disabled={isGameOver || !home} />
+                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(home, 'yellow')} disabled={isGameOver || !home} />
+                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(home, 'green')} disabled={isGameOver || !home} />
                                     </div>
-                                    <div className="flex flex-col gap-2">
-                                        <QuickEventButton label="PC (Away)" onClick={() => handleQuickEvent('penalty_corner', away)} disabled={isGameOver || !away} />
-                                        <QuickEventButton label="PS (Away)" onClick={() => handleQuickEvent('penalty_stroke', away)} disabled={isGameOver || !away} />
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <QuickEventButton label="PC (Away)" onClick={() => handleQuickEvent('penalty_corner', away)} disabled={isGameOver || !away} />
+                                    <QuickEventButton label="PS (Away)" onClick={() => handleQuickEvent('penalty_stroke', away)} disabled={isGameOver || !away} />
+                                    <div className="flex items-center gap-2">
+                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(away, 'red')} disabled={isGameOver || !away} />
+                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(away, 'yellow')} disabled={isGameOver || !away} />
+                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(away, 'green')} disabled={isGameOver || !away} />
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </section>
 
                         <details className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm" open={false}>
@@ -746,6 +787,39 @@ export default function Timer({ auth, game, config = {} }) {
                     </div>
                 </div>
             </Modal>
+            <Modal show={!!cardModal} onClose={() => setCardModal(null)} maxWidth="sm">
+                <div className="p-6 space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                        {cardModal?.cardType ? `${cardModal.cardType.toUpperCase()} Card` : 'Record Card'}
+                    </h2>
+                    <p className="text-sm text-gray-700">
+                        {cardModal?.team?.name ? `${cardModal.team.name} card details` : 'Enter card details'}
+                    </p>
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Player Shirt Number (optional)</label>
+                        <input
+                            type="number"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            value={cardModal?.shirtNumber || ''}
+                            onChange={(e) => setCardModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">Minute (optional)</label>
+                        <input
+                            type="number"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            value={cardModal?.minutes || ''}
+                            onChange={(e) => setCardModal((prev) => ({ ...prev, minutes: e.target.value }))}
+                        />
+                        <p className="text-xs text-gray-500">If provided, event time uses this minute; otherwise the live timer value.</p>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setCardModal(null)}>Cancel</SecondaryButton>
+                        <DangerButton onClick={() => handleAddCard(cardModal)}>Save</DangerButton>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }
@@ -796,6 +870,17 @@ const QuickEventButton = ({ label, onClick, disabled }) => (
     </button>
 );
 
+const IconButton = ({ icon, alt, onClick, disabled }) => (
+    <button
+        type="button"
+        className="rounded-md border border-gray-200 bg-white p-2 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={onClick}
+        disabled={disabled}
+    >
+        <img src={icon} alt={alt} className="h-8 w-8 object-contain" />
+    </button>
+);
+
 const eventBadge = (event) => {
     switch (event.event_type) {
         case 'goal':
@@ -830,8 +915,8 @@ const eventBadge = (event) => {
 
 const cardIcon = (type) => {
     if (type === 'red') return '/icons/red-card.png';
-    if (type === 'yellow') return '/icons/red-card.png';
-    if (type === 'green') return '/icons/red-card.png';
+    if (type === 'yellow') return '/icons/yellow-card.png';
+    if (type === 'green') return '/icons/green-card.png';
     return '/icons/red-card.png';
 };
 
