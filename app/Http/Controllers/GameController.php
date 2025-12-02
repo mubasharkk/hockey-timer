@@ -8,6 +8,7 @@ use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Services\PdfFormService;
+use App\Jobs\GenerateOfficialPdfJob;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -104,6 +105,13 @@ class GameController extends Controller
         // Fallback to service-based stub/template generation.
         $path = $pdfFormService->generate($game);
         return response()->download($path, "game-{$game->id}-official.pdf");
+    }
+
+    public function queueOfficialPdf(Game $game): RedirectResponse
+    {
+        GenerateOfficialPdfJob::dispatch($game);
+
+        return redirect()->back()->with('success', 'Official PDF generation started.');
     }
 
     public function edit(Game $game): Response

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import EventTimeline from '@/Components/EventTimeline';
 import moment from 'moment';
 
@@ -81,6 +81,13 @@ export default function Report({ auth, game }) {
                                 >
                                     Download Official PDF
                                 </a>
+                                <button
+                                    type="button"
+                                    onClick={() => router.post(route('games.official_pdf.queue', game.id))}
+                                    className="inline-flex items-center rounded-md bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-amber-500"
+                                >
+                                    Generate Official PDF (Background)
+                                </button>
                             </div>
                         </div>
                     </div>
