@@ -85,7 +85,7 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
                             <SelectField
                                 label="Sessions"
                                 value={data.sessions}
