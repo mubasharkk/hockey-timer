@@ -52,14 +52,14 @@ export default function Dashboard({ auth, games = [], now }) {
                                                     </div>
                                                     {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
                                                     <div className="text-xs text-gray-600">
-                                                        {formatDateTime(game.game_date, game.game_time)} · {game.venue}
+                                                        <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
                                                         {relative ? ` · ${relative}` : ''}
                                                     </div>
-                                                    {game.sport_type && (
-                                                        <div className="text-[11px] uppercase tracking-wide text-gray-500">
-                                                            {sportLabel(game.sport_type)}
-                                                        </div>
-                                                    )}
+                                                    {/*{game.sport_type && (*/}
+                                                    {/*    <div className="text-[11px] uppercase tracking-wide text-gray-500">*/}
+                                                    {/*        {sportLabel(game.sport_type)}*/}
+                                                    {/*    </div>*/}
+                                                    {/*)}*/}
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
