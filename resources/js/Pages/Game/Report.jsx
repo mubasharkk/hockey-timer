@@ -146,10 +146,9 @@ export default function Report({ auth, game }) {
 
 const formatSeconds = (seconds) => {
     if (seconds == null) return '--:--';
-    const mins = Math.floor(seconds / 60)
-        .toString()
-        .padStart(2, '0');
-    const secs = (seconds % 60).toString().padStart(2, '0');
+    const dur = moment.duration(seconds, 'seconds');
+    const mins = String(Math.floor(dur.asMinutes())).padStart(2, '0');
+    const secs = String(dur.seconds()).padStart(2, '0');
     return `${mins}:${secs}`;
 };
 
