@@ -68,9 +68,6 @@ class GameSyncService
                 'ended_at' => $session['ended_at'] ?? null,
                 'break_started_at' => $session['break_started_at'] ?? null,
                 'break_ended_at' => $session['break_ended_at'] ?? null,
-                'aggregate_previous' => $session['aggregate_previous'] ?? true,
-                'home_score' => $session['home_score'] ?? 0,
-                'away_score' => $session['away_score'] ?? 0,
             ];
 
             if (!empty($session['id'])) {
@@ -151,12 +148,7 @@ class GameSyncService
         for ($i = 1; $i <= $game->sessions; $i++) {
             MatchSession::firstOrCreate(
                 ['game_id' => $game->id, 'number' => $i],
-                [
-                    'planned_duration_seconds' => $game->session_duration_minutes * 60,
-                    'aggregate_previous' => true,
-                    'home_score' => 0,
-                    'away_score' => 0,
-                ]
+                ['planned_duration_seconds' => $game->session_duration_minutes * 60]
             );
         }
     }

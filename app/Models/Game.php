@@ -53,4 +53,36 @@ class Game extends Model
     {
         return $this->hasMany(Event::class, 'game_id');
     }
+
+    /**
+     * Return per-team scores for a given session. If $aggregate is true,
+     * scores include all sessions up to the requested session.
+     */
+    public function sessionScores(int $sessionNumber, bool $aggregate = false): array
+    {
+        $teams = $this->relationLoaded('teams') ? $this->teams : $this->teams()->get();
+        $events = $this->relationLoaded('events')
+            ? $this->events
+            : $this->events()->get(['team_id', 'session_number', 'event_type']);
+
+        $targetSessions = $aggregate
+            ? fn ($evt) => $evt->session_number <= $sessionNumber
+            : fn ($evt) => $evt->session_number === $sessionNumber;
+
+        $scores = [];
+        foreach ($teams as $team) {
+            $scores[$team->id] = [
+                'team_id' => $team->id,
+                'team_name' => $team->name,
+                'side' => $team->side,
+                'score' => $events
+                    ->where('team_id', $team->id)
+                    ->where('event_type', 'goal')
+                    ->filter($targetSessions)
+                    ->count(),
+            ];
+        }
+
+        return array_values($scores);
+    }
 }

@@ -25,9 +25,6 @@ class SyncSessionsRequest extends FormRequest
             'sessions.*.ended_at' => ['nullable', 'date'],
             'sessions.*.break_started_at' => ['nullable', 'date'],
             'sessions.*.break_ended_at' => ['nullable', 'date'],
-            'sessions.*.aggregate_previous' => ['nullable', 'boolean'],
-            'sessions.*.home_score' => ['nullable', 'integer', 'min:0'],
-            'sessions.*.away_score' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

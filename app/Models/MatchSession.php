@@ -24,9 +24,6 @@ class MatchSession extends Model
         'ended_at',
         'break_started_at',
         'break_ended_at',
-        'aggregate_previous',
-        'home_score',
-        'away_score',
     ];
 
     protected $casts = [
@@ -34,11 +31,11 @@ class MatchSession extends Model
         'ended_at' => 'datetime',
         'break_started_at' => 'datetime',
         'break_ended_at' => 'datetime',
-        'aggregate_previous' => 'boolean',
     ];
 
     public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class, 'game_id');
     }
+
 }
