@@ -93,7 +93,7 @@ class GameSyncService
     public function syncEvents(Game $game, array $events): Collection
     {
         $collection = collect($events)->map(function (array $event) use ($game) {
-            return Event::create([
+            $created = Event::create([
                 'game_id' => $game->id,
                 'team_id' => $event['team_id'] ?? null,
                 'session_number' => $event['session_number'],
@@ -105,6 +105,22 @@ class GameSyncService
                 'occurred_at' => $event['occurred_at'] ?? now(),
                 'note' => $event['note'] ?? null,
             ]);
+
+            // Auto-attach player name to note for card/goal events when a shirt number is provided.
+            if (
+                ! $created->note
+                && $created->player_shirt_number
+                && in_array($created->event_type, ['goal', 'card'], true)
+                && $created->team_id
+            ) {
+                $playerName = optional($created->team?->players)
+                    ->firstWhere('shirt_number', $created->player_shirt_number)?->name;
+                if ($playerName) {
+                    $created->update(['note' => $playerName]);
+                }
+            }
+
+            return $created;
         });
 
         $hasGameEnd = $collection->contains(fn (Event $e) => $e->event_type === 'game_end')
