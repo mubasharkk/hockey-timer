@@ -27,12 +27,13 @@ class GameSyncService
                     'code' => $code,
                     'game_date' => $data['game_date'],
                     'game_time' => $data['game_time'],
-                    'sessions' => $data['sessions'],
-                    'session_duration_minutes' => $data['session_duration_minutes'],
-                    'timer_mode' => $data['timer_mode'],
-                    'status' => $data['status'] ?? 'scheduled',
-                ]
-            );
+                'sessions' => $data['sessions'],
+                'session_duration_minutes' => $data['session_duration_minutes'],
+                'timer_mode' => $data['timer_mode'],
+                'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
+                'status' => $data['status'] ?? 'scheduled',
+            ]
+        );
 
             if (!empty($data['teams'])) {
                 collect($data['teams'])->each(function (array $team) use ($game) {

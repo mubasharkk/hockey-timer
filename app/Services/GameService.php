@@ -32,6 +32,7 @@ class GameService
                 'sessions' => $data['sessions'],
                 'session_duration_minutes' => $data['session_duration_minutes'],
                 'timer_mode' => $data['timer_mode'],
+                'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
                 'status' => 'scheduled',
             ]);
 
@@ -74,6 +75,7 @@ class GameService
                 'sessions' => $data['sessions'],
                 'session_duration_minutes' => $data['session_duration_minutes'],
                 'timer_mode' => $data['timer_mode'],
+                'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
             ]);
 
             $home = $game->teams()->where('side', 'home')->first();

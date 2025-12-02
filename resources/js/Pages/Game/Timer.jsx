@@ -205,6 +205,7 @@ export default function Timer({ auth, game, config = {} }) {
                 sessions: sessionCount,
                 session_duration_minutes: game.session_duration_minutes,
                 timer_mode: game.timer_mode,
+                continue_timer_on_goal: game.continue_timer_on_goal ?? false,
                 status: overrides.status ?? (isGameOver ? 'finished' : game.status),
                 ended_at: overrides.ended_at ?? (isGameOver ? new Date().toISOString() : game.ended_at ?? null),
                 teams: teamsPayload,
@@ -365,16 +366,19 @@ export default function Timer({ auth, game, config = {} }) {
 
     const openGoalDialog = (team) => {
         if (!team || isGameOver) return;
-        setStatus('paused');
-        setLastTick(null);
-        localStorage.setItem(
-            storageKey,
-            JSON.stringify({
-                status: 'paused',
-                elapsedSeconds,
-                sessionIndex,
-            })
-        );
+        const shouldPause = !game.continue_timer_on_goal;
+        if (shouldPause) {
+            setStatus('paused');
+            setLastTick(null);
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify({
+                    status: 'paused',
+                    elapsedSeconds,
+                    sessionIndex,
+                })
+            );
+        }
         setGoalModal({
             team,
             goalType: 'FG',

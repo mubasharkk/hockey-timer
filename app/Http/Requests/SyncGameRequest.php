@@ -23,6 +23,7 @@ class SyncGameRequest extends FormRequest
             'sessions' => ['required', 'integer', 'in:2,4,6,8'],
             'session_duration_minutes' => ['required', 'integer', 'in:15,20,30,45'],
             'timer_mode' => ['required', 'in:ASC,DESC'],
+            'continue_timer_on_goal' => ['nullable', 'boolean'],
             'status' => ['nullable', 'string', 'max:50'],
             'teams' => ['nullable', 'array'],
             'teams.*.id' => ['nullable', 'integer'],

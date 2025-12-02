@@ -24,6 +24,7 @@ export default function Create({ auth, teamSuggestions = [] }) {
         sessions: 4,
         session_duration_minutes: 15,
         timer_mode: 'DESC',
+        continue_timer_on_goal: false,
         team_a_players_text: '',
         team_b_players_text: '',
     });
@@ -160,6 +161,20 @@ export default function Create({ auth, teamSuggestions = [] }) {
                                 </select>
                                 {errors.timer_mode && <p className="mt-1 text-xs text-red-600">{errors.timer_mode}</p>}
                             </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="continue_timer_on_goal"
+                                name="continue_timer_on_goal"
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                checked={data.continue_timer_on_goal}
+                                onChange={(e) => setData('continue_timer_on_goal', e.target.checked)}
+                            />
+                            <label htmlFor="continue_timer_on_goal" className="text-sm text-gray-700">
+                                Continue running timer when goals or penalties are recorded
+                            </label>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

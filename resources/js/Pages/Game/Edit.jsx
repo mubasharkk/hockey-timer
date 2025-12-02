@@ -18,6 +18,7 @@ export default function Edit({ auth, game }) {
         sessions: game.sessions || 4,
         session_duration_minutes: game.session_duration_minutes || 15,
         timer_mode: game.timer_mode || 'DESC',
+        continue_timer_on_goal: game.continue_timer_on_goal ?? false,
         team_a_players_text:
             game.team_a_players_text ||
             playersToText((game.teams || []).find((t) => t.side === 'home')?.players || []),
@@ -105,6 +106,20 @@ export default function Edit({ auth, game }) {
                                 onChange={(value) => setData('timer_mode', value)}
                                 error={errors.timer_mode}
                             />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="continue_timer_on_goal"
+                                name="continue_timer_on_goal"
+                                type="checkbox"
+                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                checked={data.continue_timer_on_goal}
+                                onChange={(e) => setData('continue_timer_on_goal', e.target.checked)}
+                            />
+                            <label htmlFor="continue_timer_on_goal" className="text-sm text-gray-700">
+                                Continue running timer when goals or penalties are recorded
+                            </label>
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
