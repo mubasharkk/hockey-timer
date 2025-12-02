@@ -696,7 +696,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 <div className="flex flex-col gap-2">
                                     <QuickEventButton label="PC (Home)" onClick={() => handleQuickEvent('penalty_corner', home)} disabled={isGameOver || !home} />
                                     <QuickEventButton label="PS (Home)" onClick={() => handleQuickEvent('penalty_stroke', home)} disabled={isGameOver || !home} />
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center justify-center gap-2">
                                         <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(home, 'red')} disabled={isGameOver || !home} />
                                         <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(home, 'yellow')} disabled={isGameOver || !home} />
                                         <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(home, 'green')} disabled={isGameOver || !home} />
@@ -705,7 +705,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 <div className="flex flex-col gap-2">
                                     <QuickEventButton label="PC (Away)" onClick={() => handleQuickEvent('penalty_corner', away)} disabled={isGameOver || !away} />
                                     <QuickEventButton label="PS (Away)" onClick={() => handleQuickEvent('penalty_stroke', away)} disabled={isGameOver || !away} />
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center justify-center gap-2">
                                         <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(away, 'red')} disabled={isGameOver || !away} />
                                         <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(away, 'yellow')} disabled={isGameOver || !away} />
                                         <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(away, 'green')} disabled={isGameOver || !away} />
