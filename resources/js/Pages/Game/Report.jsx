@@ -65,13 +65,23 @@ export default function Report({ auth, game }) {
                                     Back to Timer
                                 </Link>
                             )}
-                            <button
-                                type="button"
-                                onClick={() => window.print()}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                            >
-                                Download PDF
-                            </button>
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => window.print()}
+                                    className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                >
+                                    Print / Save PDF
+                                </button>
+                                <a
+                                    href={route('games.official_pdf', game.id)}
+                                    className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Download Official PDF
+                                </a>
+                            </div>
                         </div>
                     </div>
 
