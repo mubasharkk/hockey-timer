@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import moment from "moment";
 
-export default function Edit({ auth, game }) {
+export default function Edit({ auth, game, sportsOptions = {} }) {
     const playersToText = (players = []) =>
         (players || [])
             .map((p) => `${p.shirt_number ? `${p.shirt_number} ` : ''}${(p.name ?? '').replace(/^#\s*/, '')}`.trim())
@@ -19,6 +19,7 @@ export default function Edit({ auth, game }) {
         session_duration_minutes: game.session_duration_minutes || 15,
         timer_mode: game.timer_mode || 'DESC',
         continue_timer_on_goal: game.continue_timer_on_goal ?? false,
+        sport_type: game.sport_type || 'field_hockey',
         team_a_players_text:
             game.team_a_players_text ||
             playersToText((game.teams || []).find((t) => t.side === 'home')?.players || []),
@@ -106,6 +107,13 @@ export default function Edit({ auth, game }) {
                                 onChange={(value) => setData('timer_mode', value)}
                                 error={errors.timer_mode}
                             />
+                            <SelectField
+                                label="Sport Type"
+                                value={data.sport_type}
+                                options={Object.entries(sportsOptions).map(([value, label]) => ({ value, label }))}
+                                onChange={(value) => setData('sport_type', value)}
+                                error={errors.sport_type}
+                            />
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -190,11 +198,15 @@ const SelectField = ({ label, value, options, onChange, error }) => (
             value={value}
             onChange={(e) => onChange(e.target.value)}
         >
-            {options.map((opt) => (
-                <option key={opt} value={opt}>
-                    {opt}
-                </option>
-            ))}
+            {options.map((opt) => {
+                const optionValue = typeof opt === 'object' ? opt.value : opt;
+                const optionLabel = typeof opt === 'object' ? opt.label : opt;
+                return (
+                    <option key={optionValue} value={optionValue}>
+                        {optionLabel}
+                    </option>
+                );
+            })}
         </select>
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>

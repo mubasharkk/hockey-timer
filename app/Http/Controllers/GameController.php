@@ -39,6 +39,7 @@ class GameController extends Controller
 
         return Inertia::render('Game/Create', [
             'teamSuggestions' => $teamSuggestions,
+            'sportsOptions' => config('game.sports'),
         ]);
     }
 
@@ -107,6 +108,7 @@ class GameController extends Controller
 
         return Inertia::render('Game/Edit', [
             'game' => $game,
+            'sportsOptions' => config('game.sports'),
         ]);
     }
 

@@ -8,7 +8,7 @@ const todayStr = () => new Date().toISOString().slice(0, 10);
 
 const fallbackPresets = [];
 
-export default function Create({ auth, teamSuggestions = [] }) {
+export default function Create({ auth, teamSuggestions = [], sportsOptions = {} }) {
     const sanitizePlayersText = (text = '') =>
         text
             .split('\n')
@@ -24,6 +24,7 @@ export default function Create({ auth, teamSuggestions = [] }) {
         sessions: 4,
         session_duration_minutes: 15,
         timer_mode: 'DESC',
+        sport_type: 'field_hockey',
         continue_timer_on_goal: false,
         team_a_players_text: '',
         team_b_players_text: '',
@@ -160,6 +161,21 @@ export default function Create({ auth, teamSuggestions = [] }) {
                                     <option value="DESC">Descending</option>
                                 </select>
                                 {errors.timer_mode && <p className="mt-1 text-xs text-red-600">{errors.timer_mode}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Sport Type</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.sport_type}
+                                    onChange={(e) => setData('sport_type', e.target.value)}
+                                >
+                                    {Object.entries(sportsOptions).map(([value, label]) => (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.sport_type && <p className="mt-1 text-xs text-red-600">{errors.sport_type}</p>}
                             </div>
                         </div>
 

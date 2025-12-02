@@ -32,6 +32,7 @@ class GameService
                 'sessions' => $data['sessions'],
                 'session_duration_minutes' => $data['session_duration_minutes'],
                 'timer_mode' => $data['timer_mode'],
+                'sport_type' => $data['sport_type'] ?? 'field_hockey',
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
                 'status' => 'scheduled',
             ]);
@@ -75,6 +76,7 @@ class GameService
                 'sessions' => $data['sessions'],
                 'session_duration_minutes' => $data['session_duration_minutes'],
                 'timer_mode' => $data['timer_mode'],
+                'sport_type' => $data['sport_type'] ?? $game->sport_type ?? 'field_hockey',
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
             ]);
 

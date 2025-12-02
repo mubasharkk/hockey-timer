@@ -23,6 +23,7 @@ class Game extends Model
         'sessions',
         'session_duration_minutes',
         'timer_mode',
+        'sport_type',
         'continue_timer_on_goal',
         'status',
         'started_at',
@@ -32,6 +33,7 @@ class Game extends Model
     protected $casts = [
         'game_date' => 'date',
         'game_time' => 'datetime:H:i',
+        'sport_type' => 'string',
         'continue_timer_on_goal' => 'boolean',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
