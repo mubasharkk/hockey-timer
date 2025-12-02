@@ -65,6 +65,28 @@ class PdfFormService
         $pdf->Write(6, $game->team_b_name);
 
 
+        $y = 70;
+        for($s = 1; $s <= $game->sessions; $s++) {
+            list($scoreA, $scoreB) =  $game->sessionScores($s, true);
+
+            $pdf->SetXY(115, $y);
+            $pdf->write(6, $scoreA['score']);
+
+            $pdf->SetXY(132,  $y);
+            $pdf->write(6, $scoreB['score']);
+
+            $y -= 6.5;
+        }
+
+        list($scoreA, $scoreB) =  $game->sessionScores($game->sessions, true);
+
+        $pdf->SetXY(115, 44);
+        $pdf->write(6, $scoreA['score']);
+
+        $pdf->SetXY(132,  44);
+        $pdf->write(6, $scoreB['score']);
+
+
         $pdf->SetXY(20, 70);
         $pdf->Write(6, "{$game->sessions} x {$game->session_duration_minutes} min");
 
