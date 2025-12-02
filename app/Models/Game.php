@@ -85,4 +85,10 @@ class Game extends Model
 
         return array_values($scores);
     }
+
+    public function getGameReportName()
+    {
+        $dt = date('YmdHis');
+        return "Game-Report-{$this->code}-{$dt}.pdf";
+    }
 }

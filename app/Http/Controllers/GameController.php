@@ -104,7 +104,7 @@ class GameController extends Controller
 
         // Fallback to service-based stub/template generation.
         $path = $pdfFormService->generate($game);
-        return response()->download($path, "game-{$game->id}-official.pdf");
+        return response()->download($path, $game->getGameReportName());
     }
 
     public function queueOfficialPdf(Game $game): RedirectResponse

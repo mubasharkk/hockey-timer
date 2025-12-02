@@ -15,7 +15,7 @@ class PdfFormService
      */
     public function generate(Game $game, ?string $outputPath = null): string
     {
-        $outputPath = $outputPath ?? storage_path("app/reports/game-{$game->id}.pdf");
+        $outputPath = $outputPath ?? storage_path("app/reports/" . $game->getGameReportName());
         File::ensureDirectoryExists(dirname($outputPath));
         Storage::makeDirectory('reports');
 
