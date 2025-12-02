@@ -21,6 +21,16 @@ export default function Report({ auth, game }) {
     const away = (game.teams || []).find((t) => t.side === 'away');
     const sessions = game.sessions || [];
     const events = game.events || [];
+    const cardEventsByTeamAndNumber = (() => {
+        const map = {};
+        (events || [])
+            .filter((e) => e.event_type === 'card' && e.player_shirt_number != null)
+            .forEach((e) => {
+                const key = `${e.team_id}-${e.player_shirt_number}`;
+                map[key] = e.card_type || 'card';
+            });
+        return map;
+    })();
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -124,12 +134,22 @@ export default function Report({ auth, game }) {
                                 <div key={team?.id || idx} className="rounded-md border border-gray-100 bg-gray-50 p-4">
                                     <p className="text-sm font-semibold text-gray-800">{team?.name || (idx === 0 ? 'Team A' : 'Team B')}</p>
                                     <ul className="mt-3 space-y-1 text-sm text-gray-700">
-                                        {(team?.players || []).map((player) => (
-                                            <li key={player.id || `${player.name}-${player.shirt_number || 'n'}`}>
-                                                {player.shirt_number ? `#${player.shirt_number} ` : ''}
-                                                {player.name}
-                                            </li>
-                                        ))}
+                                        {(team?.players || []).map((player) => {
+                                            const card = cardEventsByTeamAndNumber[`${team?.id}-${player.shirt_number}`];
+                                            return (
+                                                <li key={player.id || `${player.name}-${player.shirt_number || 'n'}`} className="flex items-center gap-2">
+                                                    {player.shirt_number ? `#${player.shirt_number} ` : ''}
+                                                    {player.name}
+                                                    {card && (
+                                                        <img
+                                                            src={cardIcon(card)}
+                                                            alt={`${card} card`}
+                                                            className="h-5 w-5 object-contain"
+                                                        />
+                                                    )}
+                                                </li>
+                                            );
+                                        })}
                                         {(team?.players || []).length === 0 && (
                                             <li className="text-xs text-gray-500">No players listed.</li>
                                         )}
@@ -156,4 +176,11 @@ const formatLocalDate = (date) => {
     if (!date) return '';
     const m = moment(date);
     return m.isValid() ? m.format('YYYY-MM-DD') : `${date}`;
+};
+
+const cardIcon = (type) => {
+    if (type === 'red') return '/icons/red-card.png';
+    if (type === 'yellow') return '/icons/yellow-card.png';
+    if (type === 'green') return '/icons/green-card.png';
+    return '/icons/red-card.png';
 };
