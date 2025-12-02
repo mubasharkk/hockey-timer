@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Game;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PdfFormService
 {
@@ -15,6 +16,7 @@ class PdfFormService
     public function generate(Game $game, ?string $outputPath = null): string
     {
         $outputPath = $outputPath ?? storage_path("app/reports/game-{$game->id}.pdf");
+        File::ensureDirectoryExists(dirname($outputPath));
         Storage::makeDirectory('reports');
 
         $templatePath = config('game.official_pdf_template', storage_path('app/templates/official_form.pdf'));
