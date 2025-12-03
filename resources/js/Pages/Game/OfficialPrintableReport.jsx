@@ -59,6 +59,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             .print-table { width: 100% !important; border-collapse: collapse !important; }
                             .print-table th, .print-table td { border: 1px solid #d1d5db !important; padding: 6px 8px !important; }
                             .print-table th { background: #f9fafb !important; }
+                            .final-score { color: #4338ca !important; font-weight: 800 !important; }
                             .page, .page-break { break-after: page; }
                         }
                         /* Screen defaults so what you see matches print */
@@ -105,7 +106,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 <div>
                                     <p className="text-sm font-semibold text-gray-900">Match Details</p>
                                 </div>
-                                <div className="text-2xl font-extrabold text-indigo-700">
+                                <div className="text-2xl font-extrabold text-indigo-700 final-score">
                                     {finalScore.homeScore} – {finalScore.awayScore}
                                 </div>
                             </div>
