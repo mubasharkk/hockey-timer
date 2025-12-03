@@ -96,12 +96,14 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         </div>
                     </div>
 
-                    <div className="print-page space-y-6 bg-white px-4 py-5 sm:px-6 sm:py-6 print:px-0 print:py-0">
-                        <section className="space-y-3">
+                    <div className="print-page bg-white px-4 py-5 sm:px-6 sm:py-6 print:px-0 print:py-0">
+                        <section className="space-y-2">
+                            <h1 className={'uppercase font-bold border-b border-indigo-600 pb-3 text-center'}>
+                                Official Report / {game.code} / {formatSport(game.sport_type)}
+                            </h1>
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <p className="text-sm font-semibold text-gray-900">Match Details</p>
-                                    <p className="text-xs text-gray-600">Formatted for print-ready export.</p>
                                 </div>
                                 <div className="text-2xl font-bold text-gray-900">
                                     {finalScore.homeScore} – {finalScore.awayScore}
@@ -110,7 +112,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             <table className="print-table w-full table-fixed text-xs text-gray-800">
                                 <tbody>
                                     <tr className="border-b border-gray-200">
-                                        <th className="w-32 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Code</th>
+                                        <th className="w-32 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Match ID</th>
                                         <td className="px-3 py-2">{game?.code || game?.id}</td>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Date</th>
                                         <td className="px-3 py-2">{formatDate(game?.game_date)}</td>
@@ -131,8 +133,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             </table>
                         </section>
 
-                        <section className="space-y-2">
-                            <p className="text-sm font-semibold text-gray-900">Sessions Detail</p>
+                        <section>
+                            <p className="text-sm font-semibold text-gray-900 py-2">Sessions Detail</p>
                             <table className="print-table w-full text-xs text-gray-800">
                                 <thead>
                                     <tr>
@@ -185,8 +187,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             </table>
                         </section>
 
-                        <section className="space-y-2 print:page-break-after-always">
-                            <p className="text-sm font-semibold text-gray-900">Teams &amp; Players</p>
+                        <section className="print:page-break-after-always">
+                            <p className="text-sm py-2 font-semibold text-gray-900">Teams &amp; Players</p>
                             <table className="print-table w-full text-xs text-gray-800">
                                 <thead>
                                     <tr>
@@ -241,8 +243,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         </section>
 
                         <div className={'page-break'}></div>
-                        <section className="space-y-2 page-break">
-                            <p className="text-sm font-semibold text-gray-900">Event Log</p>
+                        <section className="page-break">
+                            <p className="py-2 text-sm font-semibold text-gray-900">Event Log</p>
                             <table className="print-table w-full text-sm text-gray-800">
                                 <thead>
                                     <tr>
