@@ -58,6 +58,9 @@ export default function Report({ auth, game }) {
                                 {game.venue} · {formatLocalDate(game.game_date)} {game.game_time}
                             </p>
                             <p className="text-xs text-gray-500">Code: {game.code || game.id}</p>
+                            {game.game_officials && (
+                                <p className="text-xs text-gray-600">Game Officials: {game.game_officials}</p>
+                            )}
                         </div>
                         <div className="flex flex-col items-start gap-2 sm:items-end print:hidden">
                             {game.status !== 'finished' && (
@@ -134,6 +137,13 @@ export default function Report({ auth, game }) {
                             {[home, away].map((team, idx) => (
                                 <div key={team?.id || idx} className="rounded-md border border-gray-100 bg-gray-50 p-4">
                                     <p className="text-sm font-semibold text-gray-800">{team?.name || (idx === 0 ? 'Team A' : 'Team B')}</p>
+                                    {(team?.coach || team?.manager) && (
+                                        <p className="mt-1 text-xs text-gray-600">
+                                            {team.coach ? `Coach: ${team.coach}` : ''}
+                                            {team.coach && team.manager ? ' · ' : ''}
+                                            {team.manager ? `Manager: ${team.manager}` : ''}
+                                        </p>
+                                    )}
                                     <ul className="mt-3 space-y-1 text-sm text-gray-700">
                                         {(team?.players || []).map((player) => {
                                             const card = cardEventsByTeamAndNumber[`${team?.id}-${player.shirt_number}`];

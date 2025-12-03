@@ -109,6 +109,12 @@ class PdfFormService
             $y += 6.15;
         }
 
+        $pdf->SetXY(145, 50);
+        $pdf->Write(6, $game->team_b_name);
+
+        $pdf->SetXY(145, 50);
+        $pdf->Write(6, $game->team_b_name);
+
         $pdf->Output($outputPath, 'F');
 
         return $outputPath;
