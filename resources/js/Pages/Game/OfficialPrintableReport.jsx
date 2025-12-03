@@ -105,7 +105,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 <div>
                                     <p className="text-sm font-semibold text-gray-900">Match Details</p>
                                 </div>
-                                <div className="text-2xl font-bold text-gray-900">
+                                <div className="text-2xl font-extrabold text-indigo-700">
                                     {finalScore.homeScore} – {finalScore.awayScore}
                                 </div>
                             </div>
