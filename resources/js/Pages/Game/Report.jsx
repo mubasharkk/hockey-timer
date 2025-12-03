@@ -70,11 +70,10 @@ export default function Report({ auth, game }) {
                             )}
                             <Link
                                 href={route('games.official_report', game.id)}
-                                className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                                 target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Printable HTML
+                                rel="noopener noreferrer">
+                                Official Report
                             </Link>
                         </div>
                     </div>

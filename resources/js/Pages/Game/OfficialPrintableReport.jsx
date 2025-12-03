@@ -70,7 +70,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                 <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-6 lg:px-8 print:max-w-full print:px-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between no-print">
                         <div>
-                            <p className="text-xs uppercase tracking-wide text-gray-500">Official Printable Report</p>
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Official Report</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
                                 {game?.team_a_name} vs {game?.team_b_name}
                             </h1>
@@ -89,7 +89,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             <button
                                 type="button"
                                 onClick={() => window.print()}
-                                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                             >
                                 Print
                             </button>
