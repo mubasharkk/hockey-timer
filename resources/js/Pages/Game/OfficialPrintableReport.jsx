@@ -48,7 +48,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
 
     return (
         <AuthenticatedLayout user={auth?.user}>
-            <Head title="Official Printable Report" />
+            <Head title={`Official Report-${game.code}`}/>
             <div className="py-6 print:py-0">
                 <style>
                     {`
@@ -107,7 +107,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                     {finalScore.homeScore} – {finalScore.awayScore}
                                 </div>
                             </div>
-                            <table className="print-table w-full table-fixed text-sm text-gray-800">
+                            <table className="print-table w-full table-fixed text-xs text-gray-800">
                                 <tbody>
                                     <tr className="border-b border-gray-200">
                                         <th className="w-32 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Code</th>
@@ -133,7 +133,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
 
                         <section className="space-y-2">
                             <p className="text-sm font-semibold text-gray-900">Sessions Detail</p>
-                            <table className="print-table w-full text-sm text-gray-800">
+                            <table className="print-table w-full text-xs text-gray-800">
                                 <thead>
                                     <tr>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Session</th>
@@ -187,7 +187,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
 
                         <section className="space-y-2 print:page-break-after-always">
                             <p className="text-sm font-semibold text-gray-900">Teams &amp; Players</p>
-                            <table className="print-table w-full text-sm text-gray-800">
+                            <table className="print-table w-full text-xs text-gray-800">
                                 <thead>
                                     <tr>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700" colSpan={2}>
@@ -221,7 +221,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                         const homePlayer = home?.players?.[idx];
                                         const awayPlayer = away?.players?.[idx];
                                         return (
-                                            <tr key={idx} className="border-t border-gray-200">
+                                            <tr key={idx} className="text-xs border-t border-gray-200">
                                                 <td className="bg-gray-50 px-3 py-2">{homePlayer?.shirt_number ?? ''}</td>
                                                 <td className="px-3 py-2">{homePlayer?.name || ''}</td>
                                                 <td className="bg-gray-50 px-3 py-2">{awayPlayer?.shirt_number ?? ''}</td>
