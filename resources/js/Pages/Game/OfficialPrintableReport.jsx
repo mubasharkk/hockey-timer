@@ -96,7 +96,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         </div>
                     </div>
 
-                    <div className="print-page space-y-6 bg-white px-4 py-5 sm:px-6 sm:py-6">
+                    <div className="print-page space-y-6 bg-white px-4 py-5 sm:px-6 sm:py-6 print:px-0 print:py-0">
                         <section className="space-y-3">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
