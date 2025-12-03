@@ -7,13 +7,10 @@ use App\Models\Team;
 use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
-use App\Services\PdfFormService;
-use App\Jobs\GenerateOfficialPdfJob;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\LaravelPdf\Facades\Pdf;
 
 class GameController extends Controller
 {
@@ -121,28 +118,6 @@ class GameController extends Controller
                 : [],
             'events' => $game->events,
         ]);
-    }
-
-    public function downloadOfficialPdf(Game $game, PdfFormService $pdfFormService)
-    {
-        $game->load(['teams.players', 'sessions', 'events']);
-
-        if (class_exists(Pdf::class)) {
-            return Pdf::view('pdf.official', ['game' => $game])
-                ->format('a4')
-                ->download("game-{$game->id}-official.pdf");
-        }
-
-        // Fallback to service-based stub/template generation.
-        $path = $pdfFormService->generate($game);
-        return response()->download($path, $game->getGameReportName());
-    }
-
-    public function queueOfficialPdf(Game $game): RedirectResponse
-    {
-        GenerateOfficialPdfJob::dispatch($game);
-
-        return redirect()->back()->with('success', 'Official PDF generation started.');
     }
 
     public function edit(Game $game): Response

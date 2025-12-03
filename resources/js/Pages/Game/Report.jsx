@@ -76,14 +76,6 @@ export default function Report({ auth, game }) {
                             >
                                 Printable HTML
                             </Link>
-                            <a
-                                href={route('games.official_pdf', game.id)}
-                                className="inline-flex items-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-500"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                Download Official PDF
-                            </a>
                         </div>
                     </div>
 

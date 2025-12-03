@@ -86,12 +86,6 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             >
                                 Back to report
                             </Link>
-                            <a
-                                href={route('games.official_pdf', game?.id)}
-                                className="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-800"
-                            >
-                                Download PDF
-                            </a>
                             <button
                                 type="button"
                                 onClick={() => window.print()}

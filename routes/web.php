@@ -23,8 +23,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/games/{game}/timer', [GameController::class, 'showTimer'])->name('games.timer');
     Route::get('/games/{game}/report', [GameController::class, 'showReport'])->name('games.report');
     Route::get('/games/{game}/official-report', [GameController::class, 'showOfficialHtml'])->name('games.official_report');
-    Route::get('/games/{game}/official-pdf', [GameController::class, 'downloadOfficialPdf'])->name('games.official_pdf');
-    Route::post('/games/{game}/official-pdf', [GameController::class, 'queueOfficialPdf'])->name('games.official_pdf.queue');
     Route::get('/games/{game}/edit', [GameController::class, 'edit'])->name('games.edit');
     Route::put('/games/{game}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('games.destroy');
