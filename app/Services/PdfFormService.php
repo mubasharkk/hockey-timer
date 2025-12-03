@@ -112,8 +112,8 @@ class PdfFormService
         $pdf->SetXY(145, 50);
         $pdf->Write(6, $game->team_b_name);
 
-        $pdf->SetXY(145, 50);
-        $pdf->Write(6, $game->team_b_name);
+        $pdf->SetXY(145, 80);
+        $pdf->Write(6, $game->game_officials);
 
         $pdf->Output($outputPath, 'F');
 
