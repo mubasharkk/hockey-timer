@@ -241,49 +241,6 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                             </label>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team A Coach</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_a_coach}
-                                        onChange={(e) => setData('team_a_coach', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team A Manager</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_a_manager}
-                                        onChange={(e) => setData('team_a_manager', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team B Coach</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_b_coach}
-                                        onChange={(e) => setData('team_b_coach', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team B Manager</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_b_manager}
-                                        onChange={(e) => setData('team_b_manager', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Game Officials (optional)</label>
                             <input
@@ -325,6 +282,49 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                                 {errors.team_b_players_text && (
                                     <p className="mt-1 text-xs text-red-600">{errors.team_b_players_text}</p>
                                 )}
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_coach}
+                                        onChange={(e) => setData('team_a_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_manager}
+                                        onChange={(e) => setData('team_a_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_coach}
+                                        onChange={(e) => setData('team_b_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_manager}
+                                        onChange={(e) => setData('team_b_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
                             </div>
                         </div>
 
