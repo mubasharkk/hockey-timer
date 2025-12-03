@@ -20,6 +20,11 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
         timer_mode: game.timer_mode || 'DESC',
         continue_timer_on_goal: game.continue_timer_on_goal ?? false,
         sport_type: game.sport_type || 'field_hockey',
+        team_a_coach: (game.teams || []).find((t) => t.side === 'home')?.coach || '',
+        team_a_manager: (game.teams || []).find((t) => t.side === 'home')?.manager || '',
+        team_b_coach: (game.teams || []).find((t) => t.side === 'away')?.coach || '',
+        team_b_manager: (game.teams || []).find((t) => t.side === 'away')?.manager || '',
+        game_officials: game.game_officials || '',
         team_a_players_text:
             game.team_a_players_text ||
             playersToText((game.teams || []).find((t) => t.side === 'home')?.players || []),
@@ -129,6 +134,44 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
                                 Continue running timer when goals or penalties are recorded
                             </label>
                         </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field
+                                    label="Team A Coach"
+                                    value={data.team_a_coach}
+                                    onChange={(e) => setData('team_a_coach', e.target.value)}
+                                    error={errors.team_a_coach}
+                                />
+                                <Field
+                                    label="Team A Manager"
+                                    value={data.team_a_manager}
+                                    onChange={(e) => setData('team_a_manager', e.target.value)}
+                                    error={errors.team_a_manager}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Field
+                                    label="Team B Coach"
+                                    value={data.team_b_coach}
+                                    onChange={(e) => setData('team_b_coach', e.target.value)}
+                                    error={errors.team_b_coach}
+                                />
+                                <Field
+                                    label="Team B Manager"
+                                    value={data.team_b_manager}
+                                    onChange={(e) => setData('team_b_manager', e.target.value)}
+                                    error={errors.team_b_manager}
+                                />
+                            </div>
+                        </div>
+
+                        <Field
+                            label="Game Officials (optional)"
+                            value={data.game_officials}
+                            onChange={(e) => setData('game_officials', e.target.value)}
+                            error={errors.game_officials}
+                        />
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>

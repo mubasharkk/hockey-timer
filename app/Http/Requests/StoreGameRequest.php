@@ -26,6 +26,11 @@ class StoreGameRequest extends FormRequest
             'continue_timer_on_goal' => ['nullable', 'boolean'],
             'team_a_players_text' => ['nullable', 'string'],
             'team_b_players_text' => ['nullable', 'string'],
+            'team_a_coach' => ['nullable', 'string', 'max:255'],
+            'team_a_manager' => ['nullable', 'string', 'max:255'],
+            'team_b_coach' => ['nullable', 'string', 'max:255'],
+            'team_b_manager' => ['nullable', 'string', 'max:255'],
+            'game_officials' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

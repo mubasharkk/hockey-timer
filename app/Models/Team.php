@@ -17,6 +17,8 @@ class Team extends Model
         'name',
         'side',
         'score',
+        'coach',
+        'manager',
     ];
 
     public function game(): BelongsTo

@@ -32,6 +32,7 @@ class GameSyncService
                 'timer_mode' => $data['timer_mode'],
                 'sport_type' => $data['sport_type'] ?? $existing?->sport_type ?? 'field_hockey',
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
+                'game_officials' => $data['game_officials'] ?? $existing?->game_officials,
                 'status' => $data['status'] ?? 'scheduled',
             ]
         );
@@ -45,6 +46,8 @@ class GameSyncService
                             'name' => $team['name'],
                             'side' => $team['side'],
                             'score' => $team['score'] ?? 0,
+                            'coach' => $team['coach'] ?? null,
+                            'manager' => $team['manager'] ?? null,
                         ]
                     );
                 });

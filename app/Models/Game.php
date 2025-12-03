@@ -25,6 +25,7 @@ class Game extends Model
         'timer_mode',
         'sport_type',
         'continue_timer_on_goal',
+        'game_officials',
         'status',
         'started_at',
         'ended_at',
@@ -35,6 +36,7 @@ class Game extends Model
         'game_time' => 'datetime:H:i',
         'sport_type' => 'string',
         'continue_timer_on_goal' => 'boolean',
+        'game_officials' => 'string',
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
     ];

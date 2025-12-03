@@ -34,6 +34,7 @@ class GameService
                 'timer_mode' => $data['timer_mode'],
                 'sport_type' => $data['sport_type'] ?? 'field_hockey',
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
+                'game_officials' => $data['game_officials'] ?? null,
                 'status' => 'scheduled',
             ]);
 
@@ -41,12 +42,16 @@ class GameService
                 'game_id' => $game->id,
                 'name' => $data['team_a_name'],
                 'side' => 'home',
+                'coach' => $data['team_a_coach'] ?? null,
+                'manager' => $data['team_a_manager'] ?? null,
             ]);
 
             $away = Team::create([
                 'game_id' => $game->id,
                 'name' => $data['team_b_name'],
                 'side' => 'away',
+                'coach' => $data['team_b_coach'] ?? null,
+                'manager' => $data['team_b_manager'] ?? null,
             ]);
 
             $home->players()->createMany($playersA);
@@ -78,13 +83,18 @@ class GameService
                 'timer_mode' => $data['timer_mode'],
                 'sport_type' => $data['sport_type'] ?? $game->sport_type ?? 'field_hockey',
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
+                'game_officials' => $data['game_officials'] ?? $game->game_officials,
             ]);
 
             $home = $game->teams()->where('side', 'home')->first();
             $away = $game->teams()->where('side', 'away')->first();
 
             if ($home) {
-                $home->update(['name' => $data['team_a_name']]);
+                $home->update([
+                    'name' => $data['team_a_name'],
+                    'coach' => $data['team_a_coach'] ?? $home->coach,
+                    'manager' => $data['team_a_manager'] ?? $home->manager,
+                ]);
                 $home->players()->delete();
                 if ($playersA) {
                     $home->players()->createMany($playersA);
@@ -92,7 +102,11 @@ class GameService
             }
 
             if ($away) {
-                $away->update(['name' => $data['team_b_name']]);
+                $away->update([
+                    'name' => $data['team_b_name'],
+                    'coach' => $data['team_b_coach'] ?? $away->coach,
+                    'manager' => $data['team_b_manager'] ?? $away->manager,
+                ]);
                 $away->players()->delete();
                 if ($playersB) {
                     $away->players()->createMany($playersB);

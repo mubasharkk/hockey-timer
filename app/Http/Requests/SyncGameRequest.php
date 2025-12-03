@@ -31,6 +31,9 @@ class SyncGameRequest extends FormRequest
             'teams.*.name' => ['required_with:teams', 'string', 'max:255'],
             'teams.*.side' => ['required_with:teams', 'in:home,away'],
             'teams.*.score' => ['nullable', 'integer', 'min:0'],
+            'teams.*.coach' => ['nullable', 'string', 'max:255'],
+            'teams.*.manager' => ['nullable', 'string', 'max:255'],
+            'game_officials' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

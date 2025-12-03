@@ -26,6 +26,11 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
         timer_mode: 'DESC',
         sport_type: 'field_hockey',
         continue_timer_on_goal: false,
+        team_a_coach: '',
+        team_a_manager: '',
+        team_b_coach: '',
+        team_b_manager: '',
+        game_officials: '',
         team_a_players_text: '',
         team_b_players_text: '',
     });
@@ -179,6 +184,49 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_coach}
+                                        onChange={(e) => setData('team_a_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_manager}
+                                        onChange={(e) => setData('team_a_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_coach}
+                                        onChange={(e) => setData('team_b_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_manager}
+                                        onChange={(e) => setData('team_b_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="flex items-center gap-2">
                             <input
                                 id="continue_timer_on_goal"
@@ -191,6 +239,60 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                             <label htmlFor="continue_timer_on_goal" className="text-sm text-gray-700">
                                 Continue running timer when goals or penalties are recorded
                             </label>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_coach}
+                                        onChange={(e) => setData('team_a_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team A Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_a_manager}
+                                        onChange={(e) => setData('team_a_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Coach</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_coach}
+                                        onChange={(e) => setData('team_b_coach', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Team B Manager</label>
+                                    <input
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.team_b_manager}
+                                        onChange={(e) => setData('team_b_manager', e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Game Officials (optional)</label>
+                            <input
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value={data.game_officials}
+                                onChange={(e) => setData('game_officials', e.target.value)}
+                                placeholder="e.g., Ref: Alex / Umpires: Pat, Lee"
+                            />
+                            {errors.game_officials && <p className="mt-1 text-xs text-red-600">{errors.game_officials}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
