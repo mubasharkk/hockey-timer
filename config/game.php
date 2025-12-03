@@ -28,14 +28,4 @@ return [
         'handball' => 'Handball',
         'basketball' => 'Basketball',
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Official PDF Template
-    |--------------------------------------------------------------------------
-    |
-    | Path to a blank PDF form that will be filled by the background job.
-    |
-    */
-    'official_pdf_template' => env('GAME_OFFICIAL_PDF_TEMPLATE', storage_path('app/templates/official_form.pdf')),
 ];
