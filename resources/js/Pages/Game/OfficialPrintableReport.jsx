@@ -45,7 +45,20 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
     const orderedEvents = [...(events || [])]
         .filter((e) => e.team_id)
         .sort((a, b) => new Date(a?.occurred_at || 0) - new Date(b?.occurred_at || 0));
-    const cardEvents = orderedEvents.filter((e) => e.event_type === 'card');
+    const cardEvents = orderedEvents.filter((e) => e.event_type === 'card' && e.team_id && e.player_shirt_number != null);
+    const cardTimesByPlayer = cardEvents.reduce((acc, e) => {
+        const key = `${e.team_id}-${e.player_shirt_number}`;
+        if (!acc[key]) {
+            acc[key] = { red: [], yellow: [], green: [], card: [] };
+        }
+        const type = e.card_type || 'card';
+        if (acc[key][type]) {
+            acc[key][type].push(formatClock(e));
+        } else {
+            acc[key].card.push(formatClock(e));
+        }
+        return acc;
+    }, {});
 
     return (
         <AuthenticatedLayout user={auth?.user}>
@@ -189,49 +202,12 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             </table>
                         </section>
 
-                        <section className="space-y-2">
-                            <p className="text-sm font-semibold text-gray-900">Cards (with time given)</p>
-                            <table className="print-table w-full text-sm text-gray-800">
-                                <thead>
-                                    <tr>
-                                        <th className="w-10 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
-                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Team</th>
-                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Player / Note</th>
-                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Card</th>
-                                        <th className="w-24 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Session</th>
-                                        <th className="w-24 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Match Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {cardEvents.length === 0 && (
-                                        <tr className="border-t border-gray-200">
-                                            <td className="px-3 py-2 text-sm text-gray-500" colSpan={6}>
-                                                No cards recorded.
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {cardEvents.map((e, idx) => (
-                                        <tr key={e.id || idx} className="border-t border-gray-200">
-                                            <td className="bg-gray-50 px-3 py-2">{idx + 1}</td>
-                                            <td className="px-3 py-2">{teamName(e.team_id, game?.teams)}</td>
-                                            <td className="px-3 py-2 text-gray-800">
-                                                {playerNote(e)}
-                                            </td>
-                                            <td className="px-3 py-2 capitalize">{e.card_type || 'Card'}</td>
-                                            <td className="px-3 py-2">{sessionLabel(e.session_number)}</td>
-                                            <td className="px-3 py-2">{formatClock(e)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </section>
-
                         <section className="print:page-break-after-always">
                             <p className="text-sm py-2 font-semibold text-gray-900">Teams &amp; Players</p>
                             <table className="print-table w-full text-xs text-gray-800">
                                 <thead>
                                     <tr>
-                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700" colSpan={2}>
+                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700" colSpan={5}>
                                             <div className="flex flex-col">
                                                 <span>{home?.name || 'Team A'}</span>
                                                 {home?.coach && <span className="text-xs font-normal">Coach: {home.coach}</span>}
@@ -240,7 +216,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                                 )}
                                             </div>
                                         </th>
-                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700" colSpan={2}>
+                                        <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700" colSpan={5}>
                                             <div className="flex flex-col">
                                                 <span>{away?.name || 'Team B'}</span>
                                                 {away?.coach && <span className="text-xs font-normal">Coach: {away.coach}</span>}
@@ -251,10 +227,28 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th className="w-16 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
-                                        <th className="w-16 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/red-card.png" alt="Red" className="mx-auto h-4 w-4" />
+                                        </th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/yellow-card.png" alt="Yellow" className="mx-auto h-4 w-4" />
+                                        </th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/green-card.png" alt="Green" className="mx-auto h-4 w-4" />
+                                        </th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/red-card.png" alt="Red" className="mx-auto h-4 w-4" />
+                                        </th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/yellow-card.png" alt="Yellow" className="mx-auto h-4 w-4" />
+                                        </th>
+                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                            <img src="/icons/green-card.png" alt="Green" className="mx-auto h-4 w-4" />
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -265,8 +259,14 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <tr key={idx} className="text-xs border-t border-gray-200">
                                                 <td className="bg-gray-50 px-3 py-2">{homePlayer?.shirt_number ?? ''}</td>
                                                 <td className="px-3 py-2">{homePlayer?.name || ''}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.red?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.yellow?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.green?.join(', ') || '—'}</td>
                                                 <td className="bg-gray-50 px-3 py-2">{awayPlayer?.shirt_number ?? ''}</td>
                                                 <td className="px-3 py-2">{awayPlayer?.name || ''}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.red?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.yellow?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.green?.join(', ') || '—'}</td>
                                             </tr>
                                         );
                                     })}
