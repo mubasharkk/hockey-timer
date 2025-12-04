@@ -108,6 +108,31 @@ class GameSyncService
                 $timerSeconds = max(0, $occurredAt->diffInSeconds($sessionModel->started_at));
             }
 
+            $playerName = null;
+            if (!empty($event['player_shirt_number']) && !empty($event['team_id'])) {
+                $playerName = optional($game->teams()->with('players')->find($event['team_id']))
+                    ?->players
+                    ->firstWhere('shirt_number', $event['player_shirt_number'])
+                    ?->name;
+            }
+
+            $cardMinutes = null;
+            if (!empty($event['card_minutes'])) {
+                $cardMinutes = (int) $event['card_minutes'];
+            } elseif ($timerSeconds !== null) {
+                $cardMinutes = (int) floor($timerSeconds / 60);
+            }
+
+            $note = $event['note'] ?? null;
+            if ($event['event_type'] === 'card') {
+                $parts = [];
+                if ($playerName) $parts[] = $playerName;
+                if ($cardMinutes !== null) $parts[] = "{$cardMinutes}m";
+                $note = implode(' / ', array_filter($parts));
+            } elseif (! $note && $playerName) {
+                $note = $playerName;
+            }
+
             $created = Event::create([
                 'game_id' => $game->id,
                 'team_id' => $event['team_id'] ?? null,
@@ -118,7 +143,7 @@ class GameSyncService
                 'player_shirt_number' => $event['player_shirt_number'] ?? null,
                 'timer_value_seconds' => $timerSeconds,
                 'occurred_at' => $occurredAt,
-                'note' => $event['note'] ?? null,
+                'note' => $note,
             ]);
 
             // Auto-attach player name to note for card/goal events when a shirt number is provided.
