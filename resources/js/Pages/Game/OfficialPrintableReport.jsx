@@ -233,21 +233,21 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                         <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
                                             <img src="/icons/red-card.png" alt="Red" className="mx-auto h-4 w-4" />
                                         </th>
-                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                        <th className="w-12 bg-gray-50 px-3 py-2 font-semibold text-gray-700 text-center">
                                             <img src="/icons/yellow-card.png" alt="Yellow" className="mx-auto h-4 w-4" />
                                         </th>
-                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                        <th className="w-12 bg-gray-50 px-3 py-2 font-semibold text-gray-700 text-center">
                                             <img src="/icons/green-card.png" alt="Green" className="mx-auto h-4 w-4" />
                                         </th>
                                         <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">#</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
-                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                        <th className="w-12 bg-gray-50 px-3 py-2 font-semibold text-gray-700 text-center">
                                             <img src="/icons/red-card.png" alt="Red" className="mx-auto h-4 w-4" />
                                         </th>
-                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                        <th className="w-12 bg-gray-50 px-3 py-2 font-semibold text-gray-700 text-center">
                                             <img src="/icons/yellow-card.png" alt="Yellow" className="mx-auto h-4 w-4" />
                                         </th>
-                                        <th className="w-12 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 text-center">
+                                        <th className="w-12 bg-gray-50 px-3 py-2 font-semibold text-gray-700 text-center">
                                             <img src="/icons/green-card.png" alt="Green" className="mx-auto h-4 w-4" />
                                         </th>
                                     </tr>
@@ -308,13 +308,13 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 <tbody>
                                     {orderedEvents.length === 0 && (
                                         <tr className="border-t border-gray-200">
-                                            <td className="px-3 py-2 text-sm text-gray-500" colSpan={7}>
+                                            <td className="px-3 py-2 text-xs text-gray-500" colSpan={7}>
                                                 No events recorded.
                                             </td>
                                         </tr>
                                     )}
                                     {orderedEvents.map((event, idx) => (
-                                        <tr key={event.id || idx} className="border-t border-gray-200">
+                                        <tr key={event.id || idx} className="border-t border-gray-200 text-xs">
                                             <td className="bg-gray-50 px-3 py-2">{idx + 1}</td>
                                             <td className="px-3 py-2">{sessionLabel(event.session_number)}</td>
                                             <td className="px-3 py-2">

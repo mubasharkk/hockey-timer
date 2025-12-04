@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\Game;
 use App\Models\MatchSession;
 use App\Models\Team;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -96,6 +97,17 @@ class GameSyncService
     public function syncEvents(Game $game, array $events): Collection
     {
         $collection = collect($events)->map(function (array $event) use ($game) {
+            $sessionModel = null;
+            if (!empty($event['session_number'])) {
+                $sessionModel = $game->sessions()->where('number', $event['session_number'])->first();
+            }
+
+            $occurredAt = !empty($event['occurred_at']) ? Carbon::parse($event['occurred_at']) : now();
+            $timerSeconds = $event['timer_value_seconds'] ?? null;
+            if ($sessionModel?->started_at instanceof Carbon) {
+                $timerSeconds = max(0, $occurredAt->diffInSeconds($sessionModel->started_at));
+            }
+
             $created = Event::create([
                 'game_id' => $game->id,
                 'team_id' => $event['team_id'] ?? null,
@@ -104,8 +116,8 @@ class GameSyncService
                 'goal_type' => $event['goal_type'] ?? null,
                 'card_type' => $event['card_type'] ?? null,
                 'player_shirt_number' => $event['player_shirt_number'] ?? null,
-                'timer_value_seconds' => $event['timer_value_seconds'] ?? null,
-                'occurred_at' => $event['occurred_at'] ?? now(),
+                'timer_value_seconds' => $timerSeconds,
+                'occurred_at' => $occurredAt,
                 'note' => $event['note'] ?? null,
             ]);
 
