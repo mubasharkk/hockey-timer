@@ -52,10 +52,11 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
             acc[key] = { red: [], yellow: [], green: [], card: [] };
         }
         const type = e.card_type || 'card';
+        const time = formatClock(e);
         if (acc[key][type]) {
-            acc[key][type].push(formatClock(e));
+            acc[key][type].push(time);
         } else {
-            acc[key].card.push(formatClock(e));
+            acc[key].card.push(time);
         }
         return acc;
     }, {});
@@ -259,14 +260,14 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <tr key={idx} className="text-xs border-t border-gray-200">
                                                 <td className="bg-gray-50 px-3 py-2">{homePlayer?.shirt_number ?? ''}</td>
                                                 <td className="px-3 py-2">{homePlayer?.name || ''}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.red?.join(', ') || '—'}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.yellow?.join(', ') || '—'}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.green?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.red || []).join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.yellow || []).join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${home?.id}-${homePlayer?.shirt_number}`]?.green || []).join(', ') || '—'}</td>
                                                 <td className="bg-gray-50 px-3 py-2">{awayPlayer?.shirt_number ?? ''}</td>
                                                 <td className="px-3 py-2">{awayPlayer?.name || ''}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.red?.join(', ') || '—'}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.yellow?.join(', ') || '—'}</td>
-                                                <td className="bg-gray-50 px-3 py-2 text-center">{cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.green?.join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.red || []).join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.yellow || []).join(', ') || '—'}</td>
+                                                <td className="bg-gray-50 px-3 py-2 text-center">{(cardTimesByPlayer?.[`${away?.id}-${awayPlayer?.shirt_number}`]?.green || []).join(', ') || '—'}</td>
                                             </tr>
                                         );
                                     })}
