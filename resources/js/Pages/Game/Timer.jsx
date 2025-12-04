@@ -456,8 +456,13 @@ export default function Timer({ auth, game, config = {} }) {
 
     const handleAddCard = ({ team, cardType, shirtNumber, minutes }) => {
         if (!team || isGameOver) return;
-        const timerValue = minutes ? Math.max(parseInt(minutes, 10) * 60, 0) : displaySeconds;
+        const timerValue = displaySeconds;
         const playerName = findPlayerName(team, shirtNumber);
+        const minuteText = minutes
+            ? `${Math.max(parseInt(minutes, 10) || 0, 0)}m`
+            : `${Math.floor(timerValue / 60)}m`;
+        const note = [playerName, minuteText].filter(Boolean).join(' / ') || null;
+
         const newEvent = {
             id: `card-${Date.now()}`,
             team_id: team.id,
@@ -467,7 +472,7 @@ export default function Timer({ auth, game, config = {} }) {
             player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
             timer_value_seconds: timerValue,
             occurred_at: new Date().toISOString(),
-            note: playerName || null,
+            note,
         };
         setEvents((prev) => [...prev, newEvent]);
         persistEvents([newEvent]);
