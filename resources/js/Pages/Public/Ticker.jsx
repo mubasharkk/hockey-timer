@@ -2,6 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
+import ApplicationLogo from "@/Components/ApplicationLogo.jsx";
 
 export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
@@ -95,12 +96,8 @@ export default function Ticker({ game, gameId }) {
             <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
                     <div>
-                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Public Ticker</p>
-                        <h1 className="text-xl font-semibold text-white">Hockey Match</h1>
+                        <ApplicationLogo/>
                     </div>
-                    <Link href={route('dashboard')} className="text-sm font-semibold text-indigo-300 hover:text-indigo-200">
-                        Dashboard
-                    </Link>
                 </div>
             </header>
 
@@ -170,18 +167,21 @@ export default function Ticker({ game, gameId }) {
                                     </div>
                                 </div>
                             </div>
+                            <div className={'text-center'}>
+                                {game.venue}
+                            </div>
                         </div>
 
                         <div>
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-base font-semibold text-white">Recent Events</h3>
-                                <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
-                            </div>
-                            <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100 sm:grid-cols-3">
-                                {recentEvents.map((e) => (
-                                    <div
-                                        key={e.id || e.occurred_at || Math.random()}
-                                        className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-3"
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-base font-semibold text-white">Recent Events</h3>
+                                    <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
+                                </div>
+                                <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100 sm:grid-cols-3">
+                                    {recentEvents.map((e) => (
+                                        <div
+                                            key={e.id || e.occurred_at || Math.random()}
+                                            className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-3"
                                     >
                                         <img
                                             src={eventBadge(e).icon}
@@ -193,6 +193,9 @@ export default function Ticker({ game, gameId }) {
                                                 <p className="font-semibold capitalize text-white">
                                                     {eventBadge(e).label}
                                                     {e.player_shirt_number ? ` · #${e.player_shirt_number}` : ''}
+                                                </p>
+                                                <p className="text-xs font-semibold text-slate-300">
+                                                    {teamName(e.team_id, liveData?.teams)}
                                                 </p>
                                                 <p className="text-xs text-slate-300">
                                                     Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
