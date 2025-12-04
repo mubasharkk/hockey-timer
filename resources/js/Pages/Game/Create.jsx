@@ -3,7 +3,6 @@ import { Head, useForm } from '@inertiajs/react';
 import { Combobox } from '@headlessui/react';
 
 const sessionOptions = [2, 4, 6, 8];
-const durationOptions = [15, 20, 30, 45];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 const fallbackPresets = [];
@@ -140,17 +139,13 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Session Duration (min)</label>
-                                <select
+                                <input
+                                    type="text"
+                                    inputMode="numeric"
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     value={data.session_duration_minutes}
-                                    onChange={(e) => setData('session_duration_minutes', Number(e.target.value))}
-                                >
-                                    {durationOptions.map((value) => (
-                                        <option key={value} value={value}>
-                                            {value} minutes
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={(e) => setData('session_duration_minutes', e.target.value)}
+                                />
                                 {errors.session_duration_minutes && (
                                     <p className="mt-1 text-xs text-red-600">{errors.session_duration_minutes}</p>
                                 )}

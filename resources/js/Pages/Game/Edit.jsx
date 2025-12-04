@@ -98,11 +98,10 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
                                 onChange={(value) => setData('sessions', Number(value))}
                                 error={errors.sessions}
                             />
-                            <SelectField
+                            <Field
                                 label="Session Duration (min)"
                                 value={data.session_duration_minutes}
-                                options={[15, 20, 30, 45]}
-                                onChange={(value) => setData('session_duration_minutes', Number(value))}
+                                onChange={(e) => setData('session_duration_minutes', e.target.value)}
                                 error={errors.session_duration_minutes}
                             />
                             <SelectField

@@ -21,7 +21,7 @@ class SyncGameRequest extends FormRequest
             'game_date' => ['required', 'date'],
             'game_time' => ['required', 'date_format:H:i'],
             'sessions' => ['required', 'integer', 'in:2,4,6,8'],
-            'session_duration_minutes' => ['required', 'integer', 'in:15,20,30,45'],
+            'session_duration_minutes' => ['required', 'integer', 'min:1'],
             'timer_mode' => ['required', 'in:ASC,DESC'],
             'sport_type' => ['nullable', 'string', 'max:50'],
             'continue_timer_on_goal' => ['nullable', 'boolean'],
