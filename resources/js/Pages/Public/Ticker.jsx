@@ -250,6 +250,8 @@ const cardIcon = (type) => {
     return '/icons/red-card.png';
 };
 
+const teamName = (id, teams = []) => teams?.find((t) => t.id === id)?.name || '—';
+
 const formatSeconds = (seconds) => {
     const mins = Math.floor(seconds / 60)
         .toString()
