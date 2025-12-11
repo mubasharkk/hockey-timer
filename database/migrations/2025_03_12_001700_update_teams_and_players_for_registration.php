@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
@@ -63,12 +64,16 @@ return new class extends Migration {
             }
 
             if (Schema::hasColumn('teams', 'side')) {
-                $table->string('side', 12)->nullable(false)->change();
+                if (! DB::table('teams')->whereNull('side')->exists()) {
+                    $table->string('side', 12)->nullable(false)->change();
+                }
             }
 
             if (Schema::hasColumn('teams', 'game_id')) {
-                $table->unsignedBigInteger('game_id')->nullable(false)->change();
-                $table->foreign('game_id')->references('id')->on('games')->cascadeOnDelete();
+                if (! DB::table('teams')->whereNull('game_id')->exists()) {
+                    $table->unsignedBigInteger('game_id')->nullable(false)->change();
+                    $table->foreign('game_id')->references('id')->on('games')->cascadeOnDelete();
+                }
             }
         });
     }
