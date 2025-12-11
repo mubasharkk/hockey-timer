@@ -33,16 +33,43 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('players', function (Blueprint $table) {
-            $table->dropForeign(['registered_player_id']);
-            $table->dropColumn(['player_pass_number', 'nic_number', 'date_of_birth', 'is_active', 'registered_player_id']);
+            if (Schema::hasColumn('players', 'registered_player_id')) {
+                try {
+                    $table->dropForeign(['registered_player_id']);
+                } catch (\Throwable $e) {
+                    // ignore if FK missing
+                }
+            }
+
+            foreach (['registered_player_id', 'is_active', 'date_of_birth', 'nic_number', 'player_pass_number'] as $column) {
+                if (Schema::hasColumn('players', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
         });
 
         Schema::table('teams', function (Blueprint $table) {
-            $table->dropForeign(['registered_team_id']);
-            $table->dropColumn(['is_registered', 'registered_team_id']);
-            $table->string('side', 12)->nullable(false)->change();
-            $table->unsignedBigInteger('game_id')->nullable(false)->change();
-            $table->foreign('game_id')->references('id')->on('games')->cascadeOnDelete();
+            if (Schema::hasColumn('teams', 'registered_team_id')) {
+                try {
+                    $table->dropForeign(['registered_team_id']);
+                } catch (\Throwable $e) {
+                    // ignore if FK missing
+                }
+                $table->dropColumn('registered_team_id');
+            }
+
+            if (Schema::hasColumn('teams', 'is_registered')) {
+                $table->dropColumn('is_registered');
+            }
+
+            if (Schema::hasColumn('teams', 'side')) {
+                $table->string('side', 12)->nullable(false)->change();
+            }
+
+            if (Schema::hasColumn('teams', 'game_id')) {
+                $table->unsignedBigInteger('game_id')->nullable(false)->change();
+                $table->foreign('game_id')->references('id')->on('games')->cascadeOnDelete();
+            }
         });
     }
 };
