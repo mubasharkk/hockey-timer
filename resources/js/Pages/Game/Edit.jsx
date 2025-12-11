@@ -1,17 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import moment from "moment";
+import moment from 'moment';
 
-export default function Edit({ auth, game, sportsOptions = {} }) {
-    const playersToText = (players = []) =>
-        (players || [])
-            .map((p) => `${p.shirt_number ? `${p.shirt_number} ` : ''}${(p.name ?? '').replace(/^#\s*/, '')}`.trim())
-            .filter(Boolean)
-            .join('\n');
-
+export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {} }) {
     const { data, setData, put, processing, errors } = useForm({
-        team_a_name: game.team_a_name || '',
-        team_b_name: game.team_b_name || '',
+        home_team_id: game.home_team_id,
+        away_team_id: game.away_team_id,
+        tournament_id: game.tournament_id || '',
         venue: game.venue || '',
         game_date: game.game_date || '',
         game_time: game.game_time || '',
@@ -20,23 +15,15 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
         timer_mode: game.timer_mode || 'DESC',
         continue_timer_on_goal: game.continue_timer_on_goal ?? false,
         sport_type: game.sport_type || 'field_hockey',
-        team_a_coach: (game.teams || []).find((t) => t.side === 'home')?.coach || '',
-        team_a_manager: (game.teams || []).find((t) => t.side === 'home')?.manager || '',
-        team_b_coach: (game.teams || []).find((t) => t.side === 'away')?.coach || '',
-        team_b_manager: (game.teams || []).find((t) => t.side === 'away')?.manager || '',
         game_officials: game.game_officials || '',
-        team_a_players_text:
-            game.team_a_players_text ||
-            playersToText((game.teams || []).find((t) => t.side === 'home')?.players || []),
-        team_b_players_text:
-            game.team_b_players_text ||
-            playersToText((game.teams || []).find((t) => t.side === 'away')?.players || []),
     });
 
     const submit = (e) => {
         e.preventDefault();
         put(route('games.update', game.id));
     };
+
+    const findTeamName = (id) => teams.find((t) => t.id === id)?.name || '—';
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -46,24 +33,22 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-2">
                         <h1 className="text-2xl font-semibold text-gray-900">Edit Game</h1>
-                        <p className="text-sm text-gray-600">Update core game details. Sessions list will re-seed to match counts.</p>
+                        <p className="text-sm text-gray-600">Update timings, venue, and officials. Team rosters come from registered teams.</p>
                     </header>
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <Field
-                                label="Team A Name"
-                                value={data.team_a_name}
-                                onChange={(e) => setData('team_a_name', e.target.value)}
-                                error={errors.team_a_name}
-                            />
-                            <Field
-                                label="Team B Name"
-                                value={data.team_b_name}
-                                onChange={(e) => setData('team_b_name', e.target.value)}
-                                error={errors.team_b_name}
-                            />
+                            <ReadOnlyField label="Home Team" value={findTeamName(game.home_team_id)} />
+                            <ReadOnlyField label="Away Team" value={findTeamName(game.away_team_id)} />
                         </div>
+
+                        <SelectField
+                            label="Tournament (optional)"
+                            value={data.tournament_id}
+                            options={[{ value: '', label: 'No tournament' }, ...tournaments.map((t) => ({ value: t.id, label: t.title }))]}
+                            onChange={(value) => setData('tournament_id', value)}
+                            error={errors.tournament_id}
+                        />
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <Field
@@ -134,76 +119,12 @@ export default function Edit({ auth, game, sportsOptions = {} }) {
                             </label>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="grid grid-cols-2 gap-3">
-                                <Field
-                                    label="Team A Coach"
-                                    value={data.team_a_coach}
-                                    onChange={(e) => setData('team_a_coach', e.target.value)}
-                                    error={errors.team_a_coach}
-                                />
-                                <Field
-                                    label="Team A Manager"
-                                    value={data.team_a_manager}
-                                    onChange={(e) => setData('team_a_manager', e.target.value)}
-                                    error={errors.team_a_manager}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-3">
-                                <Field
-                                    label="Team B Coach"
-                                    value={data.team_b_coach}
-                                    onChange={(e) => setData('team_b_coach', e.target.value)}
-                                    error={errors.team_b_coach}
-                                />
-                                <Field
-                                    label="Team B Manager"
-                                    value={data.team_b_manager}
-                                    onChange={(e) => setData('team_b_manager', e.target.value)}
-                                    error={errors.team_b_manager}
-                                />
-                            </div>
-                        </div>
-
                         <Field
                             label="Game Officials (optional)"
                             value={data.game_officials}
                             onChange={(e) => setData('game_officials', e.target.value)}
                             error={errors.game_officials}
                         />
-
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <div className="items-center justify-between">
-                                    <label className="block text-sm font-medium text-gray-700">Team A Players</label>
-                                    <span className="text-xs text-gray-500">One per line. Optionally prefix shirt #.</span>
-                                </div>
-                                <textarea
-                                    rows={6}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_a_players_text}
-                                    onChange={(e) => setData('team_a_players_text', e.target.value)}
-                                />
-                                {errors.team_a_players_text && (
-                                    <p className="mt-1 text-xs text-red-600">{errors.team_a_players_text}</p>
-                                )}
-                            </div>
-                            <div>
-                                <div className="items-center justify-between">
-                                    <label className="block text-sm font-medium text-gray-700">Team B Players</label>
-                                    <span className="text-xs text-gray-500">One per line. Optionally prefix shirt #.</span>
-                                </div>
-                                <textarea
-                                    rows={6}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_b_players_text}
-                                    onChange={(e) => setData('team_b_players_text', e.target.value)}
-                                />
-                                {errors.team_b_players_text && (
-                                    <p className="mt-1 text-xs text-red-600">{errors.team_b_players_text}</p>
-                                )}
-                            </div>
-                        </div>
 
                         <div className="flex items-center justify-end">
                             <button
@@ -229,6 +150,13 @@ const Field = ({ label, error, ...props }) => (
             {...props}
         />
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+);
+
+const ReadOnlyField = ({ label, value }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <div className="mt-1 w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800">{value}</div>
     </div>
 );
 

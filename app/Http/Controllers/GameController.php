@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Game;
 use App\Models\Team;
+use App\Models\Tournament;
 use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
@@ -20,26 +21,18 @@ class GameController extends Controller
 
     public function create(): Response
     {
-        $teamSuggestions = Team::with('players')
-            ->orderByDesc('id')
-            ->get()
-            ->unique('name')
-            ->take(20)
-            ->map(function (Team $team) {
-                $playersText = $team->players
-                    ->map(fn ($p) => ($p->shirt_number ? "{$p->shirt_number} " : '') . $p->name)
-                    ->implode("\n");
+        $registeredTeams = Team::query()
+            ->where('is_registered', true)
+            ->with(['players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name')])
+            ->orderBy('name')
+            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
 
-                return [
-                    'name' => $team->name,
-                    'players_text' => $playersText,
-                ];
-            })
-            ->values();
+        $tournaments = Tournament::orderBy('title')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Game/Create', [
-            'teamSuggestions' => $teamSuggestions,
+            'teams' => $registeredTeams,
             'sportsOptions' => config('game.sports'),
+            'tournaments' => $tournaments,
         ]);
     }
 
@@ -124,22 +117,17 @@ class GameController extends Controller
     {
         $game->load(['teams.players']);
 
-        $home = $game->teams->firstWhere('side', 'home');
-        $away = $game->teams->firstWhere('side', 'away');
+        $teams = Team::where('is_registered', true)
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
-        $game->setAttribute('team_a_players_text', $home?->players
-            ->map(fn ($p) => trim(($p->shirt_number ? "{$p->shirt_number} " : '') . ltrim($p->name ?? '', '# ')))
-            ->filter()
-            ->implode("\n"));
-
-        $game->setAttribute('team_b_players_text', $away?->players
-            ->map(fn ($p) => trim(($p->shirt_number ? "{$p->shirt_number} " : '') . ltrim($p->name ?? '', '# ')))
-            ->filter()
-            ->implode("\n"));
+        $tournaments = Tournament::orderBy('title')->get(['id', 'title', 'slug']);
 
         return Inertia::render('Game/Edit', [
             'game' => $game,
             'sportsOptions' => config('game.sports'),
+            'teams' => $teams,
+            'tournaments' => $tournaments,
         ]);
     }
 

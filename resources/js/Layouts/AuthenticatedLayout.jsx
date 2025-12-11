@@ -38,6 +38,18 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href={route('teams.index')}
+                                    active={route().current('teams.*')}
+                                >
+                                    Teams
+                                </NavLink>
+                                <NavLink
+                                    href={route('tournaments.index')}
+                                    active={route().current('tournaments.*')}
+                                >
+                                    Tournaments
+                                </NavLink>
                             </div>
                         </div>
 
@@ -144,6 +156,18 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('dashboard')}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('teams.index')}
+                            active={route().current('teams.*')}
+                        >
+                            Teams
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('tournaments.index')}
+                            active={route().current('tournaments.*')}
+                        >
+                            Tournaments
                         </ResponsiveNavLink>
                     </div>
 

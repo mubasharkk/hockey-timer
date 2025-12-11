@@ -17,14 +17,21 @@ class GameService
         */
     public function createGame(array $data, ?User $user = null): Game
     {
-        $playersA = $this->parsePlayers($data['team_a_players_text'] ?? '');
-        $playersB = $this->parsePlayers($data['team_b_players_text'] ?? '');
+        $homeTemplate = Team::with('players')->findOrFail($data['home_team_id']);
+        $awayTemplate = Team::with('players')->findOrFail($data['away_team_id']);
 
-        return DB::transaction(function () use ($data, $user, $playersA, $playersB) {
+        if (! $homeTemplate->is_registered || ! $awayTemplate->is_registered) {
+            throw new \InvalidArgumentException('Teams must be registered before creating a game.');
+        }
+
+        return DB::transaction(function () use ($data, $user, $homeTemplate, $awayTemplate) {
             $game = Game::create([
                 'user_id' => $user?->id,
-                'team_a_name' => $data['team_a_name'],
-                'team_b_name' => $data['team_b_name'],
+                'tournament_id' => $data['tournament_id'] ?? null,
+                'team_a_name' => $homeTemplate->name,
+                'team_b_name' => $awayTemplate->name,
+                'home_team_id' => $homeTemplate->id,
+                'away_team_id' => $awayTemplate->id,
                 'venue' => $data['venue'],
                 'code' => $this->generateGameCode(),
                 'game_date' => $data['game_date'],
@@ -38,28 +45,12 @@ class GameService
                 'status' => 'scheduled',
             ]);
 
-            $home = Team::create([
-                'game_id' => $game->id,
-                'name' => $data['team_a_name'],
-                'side' => 'home',
-                'coach' => $data['team_a_coach'] ?? null,
-                'manager' => $data['team_a_manager'] ?? null,
-            ]);
-
-            $away = Team::create([
-                'game_id' => $game->id,
-                'name' => $data['team_b_name'],
-                'side' => 'away',
-                'coach' => $data['team_b_coach'] ?? null,
-                'manager' => $data['team_b_manager'] ?? null,
-            ]);
-
-            $home->players()->createMany($playersA);
-            $away->players()->createMany($playersB);
+            $home = $this->cloneTeam($homeTemplate, $game, 'home');
+            $away = $this->cloneTeam($awayTemplate, $game, 'away');
 
             $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
 
-            return $game;
+            return $game->setRelation('teams', collect([$home, $away]));
         });
     }
 
@@ -68,13 +59,9 @@ class GameService
      */
     public function updateGame(Game $game, array $data): Game
     {
-        $playersA = $this->parsePlayers($data['team_a_players_text'] ?? '');
-        $playersB = $this->parsePlayers($data['team_b_players_text'] ?? '');
-
-        return DB::transaction(function () use ($game, $data, $playersA, $playersB) {
+        return DB::transaction(function () use ($game, $data) {
             $game->update([
-                'team_a_name' => $data['team_a_name'],
-                'team_b_name' => $data['team_b_name'],
+                'tournament_id' => $data['tournament_id'] ?? $game->tournament_id,
                 'venue' => $data['venue'],
                 'game_date' => $data['game_date'],
                 'game_time' => $data['game_time'],
@@ -85,33 +72,6 @@ class GameService
                 'continue_timer_on_goal' => $data['continue_timer_on_goal'] ?? false,
                 'game_officials' => $data['game_officials'] ?? $game->game_officials,
             ]);
-
-            $home = $game->teams()->where('side', 'home')->first();
-            $away = $game->teams()->where('side', 'away')->first();
-
-            if ($home) {
-                $home->update([
-                    'name' => $data['team_a_name'],
-                    'coach' => $data['team_a_coach'] ?? $home->coach,
-                    'manager' => $data['team_a_manager'] ?? $home->manager,
-                ]);
-                $home->players()->delete();
-                if ($playersA) {
-                    $home->players()->createMany($playersA);
-                }
-            }
-
-            if ($away) {
-                $away->update([
-                    'name' => $data['team_b_name'],
-                    'coach' => $data['team_b_coach'] ?? $away->coach,
-                    'manager' => $data['team_b_manager'] ?? $away->manager,
-                ]);
-                $away->players()->delete();
-                if ($playersB) {
-                    $away->players()->createMany($playersB);
-                }
-            }
 
             // Keep sessions aligned with new session count/duration.
             $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
@@ -133,29 +93,36 @@ class GameService
         }
     }
 
-    private function parsePlayers(string $block): array
+    private function cloneTeam(Team $template, Game $game, string $side): Team
     {
-        $players = [];
+        $team = Team::create([
+            'game_id' => $game->id,
+            'registered_team_id' => $template->id,
+            'is_registered' => false,
+            'name' => $template->name,
+            'side' => $side,
+            'score' => 0,
+            'coach' => $template->coach,
+            'manager' => $template->manager,
+        ]);
 
-        foreach (preg_split('/\r\n|\r|\n/', trim($block)) as $line) {
-            $line = trim($line);
-            if ($line === '') {
-                continue;
-            }
+        $activePlayers = $template->players->filter(fn ($player) => $player->is_active ?? true);
 
-            if (preg_match('/^(\\d+)\\s+(.+)$/', $line, $matches)) {
-                $players[] = [
-                    'shirt_number' => (int) $matches[1],
-                    'name' => trim($matches[2]),
+        $team->players()->createMany(
+            $activePlayers->map(function ($player) {
+                return [
+                    'registered_player_id' => $player->id,
+                    'name' => $player->name,
+                    'shirt_number' => $player->shirt_number,
+                    'player_pass_number' => $player->player_pass_number,
+                    'nic_number' => $player->nic_number,
+                    'date_of_birth' => $player->date_of_birth,
+                    'is_active' => $player->is_active ?? true,
                 ];
-            } else {
-                $players[] = [
-                    'name' => $line,
-                ];
-            }
-        }
+            })->all()
+        );
 
-        return $players;
+        return $team;
     }
 
     private function generateGameCode(): string

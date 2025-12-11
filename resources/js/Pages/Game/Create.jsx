@@ -1,22 +1,14 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { Combobox } from '@headlessui/react';
 
 const sessionOptions = [2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-const fallbackPresets = [];
-
-export default function Create({ auth, teamSuggestions = [], sportsOptions = {} }) {
-    const sanitizePlayersText = (text = '') =>
-        text
-            .split('\n')
-            .map((line) => line.trim().replace(/^#\s*/, ''))
-            .join('\n');
-
+export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [] }) {
     const { data, setData, post, processing, errors } = useForm({
-        team_a_name: '',
-        team_b_name: '',
+        home_team_id: '',
+        away_team_id: '',
+        tournament_id: '',
         venue: '',
         game_date: todayStr(),
         game_time: '',
@@ -25,30 +17,15 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
         timer_mode: 'DESC',
         sport_type: 'field_hockey',
         continue_timer_on_goal: false,
-        team_a_coach: '',
-        team_a_manager: '',
-        team_b_coach: '',
-        team_b_manager: '',
         game_officials: '',
-        team_a_players_text: '',
-        team_b_players_text: '',
     });
-
-    const handleTeamSelection = (side, value) => {
-        setData(side === 'A' ? 'team_a_name' : 'team_b_name', value);
-        const preset = (teamSuggestions.length ? teamSuggestions : fallbackPresets).find(
-            (p) => p.name.toLowerCase() === value.toLowerCase()
-        );
-        if (preset) {
-            const cleaned = sanitizePlayersText(preset.players_text || preset.players || '');
-            setData(side === 'A' ? 'team_a_players_text' : 'team_b_players_text', cleaned);
-        }
-    };
 
     const submit = (e) => {
         e.preventDefault();
         post(route('games.store'));
     };
+
+    const rosterFor = (teamId) => teams.find((t) => `${t.id}` === `${teamId}`);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -58,25 +35,42 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-2">
                         <h1 className="text-2xl font-semibold text-gray-900">New Match</h1>
-                        <p className="text-sm text-gray-600">Capture match details, sessions, and optional player lists.</p>
+                        <p className="text-sm text-gray-600">Pick registered teams and set match timing.</p>
                     </header>
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <TeamCombobox
-                                label="Team A Name"
-                                value={data.team_a_name}
-                                onChange={(val) => handleTeamSelection('A', val)}
-                                teamSuggestions={teamSuggestions}
-                                error={errors.team_a_name}
+                            <TeamSelect
+                                label="Home Team"
+                                value={data.home_team_id}
+                                onChange={(val) => setData('home_team_id', val)}
+                                teams={teams}
+                                error={errors.home_team_id}
                             />
-                            <TeamCombobox
-                                label="Team B Name"
-                                value={data.team_b_name}
-                                onChange={(val) => handleTeamSelection('B', val)}
-                                teamSuggestions={teamSuggestions}
-                                error={errors.team_b_name}
+                            <TeamSelect
+                                label="Away Team"
+                                value={data.away_team_id}
+                                onChange={(val) => setData('away_team_id', val)}
+                                teams={teams}
+                                error={errors.away_team_id}
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Tournament (optional)</label>
+                            <select
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                value={data.tournament_id}
+                                onChange={(e) => setData('tournament_id', e.target.value)}
+                            >
+                                <option value="">No tournament</option>
+                                {tournaments.map((tournament) => (
+                                    <option key={tournament.id} value={tournament.id}>
+                                        {tournament.title}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.tournament_id && <p className="mt-1 text-xs text-red-600">{errors.tournament_id}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -91,22 +85,22 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                                 {errors.venue && <p className="mt-1 text-xs text-red-600">{errors.venue}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Match Date</label>
-                                <input
-                                    type="date"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.game_date}
-                                    min={todayStr()}
-                                    onChange={(e) => {
-                                        const val = e.target.value;
-                                        const min = todayStr();
-                                        setData('game_date', val && val >= min ? val : min);
-                                    }}
-                                    required
-                                />
-                                {errors.game_date && <p className="mt-1 text-xs text-red-600">{errors.game_date}</p>}
-                            </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Match Date</label>
+                                    <input
+                                        type="date"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        value={data.game_date}
+                                        min={todayStr()}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            const min = todayStr();
+                                            setData('game_date', val && val >= min ? val : min);
+                                        }}
+                                        required
+                                    />
+                                    {errors.game_date && <p className="mt-1 text-xs text-red-600">{errors.game_date}</p>}
+                                </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Match Time</label>
                                     <input
@@ -205,84 +199,13 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <div className=" items-center justify-between">
-                                    <label className="block text-sm font-medium text-gray-700">Team A Players (optional)</label>
-                                    <span className="text-xs text-gray-500">One per line. Prefix number to capture shirt #.</span>
-                                </div>
-                                <textarea
-                                    rows={6}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_a_players_text}
-                                    onChange={(e) => setData('team_a_players_text', e.target.value)}
-                                />
-                                {errors.team_a_players_text && (
-                                    <p className="mt-1 text-xs text-red-600">{errors.team_a_players_text}</p>
-                                )}
-                            </div>
-                            <div>
-                                <div className=" items-center justify-between">
-                                    <label className="block text-sm font-medium text-gray-700">Team B Players (optional)</label>
-                                    <span className="text-xs text-gray-500">Example: “12 Alex Smith”.</span>
-                                </div>
-                                <textarea
-                                    rows={6}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    value={data.team_b_players_text}
-                                    onChange={(e) => setData('team_b_players_text', e.target.value)}
-                                />
-                                {errors.team_b_players_text && (
-                                    <p className="mt-1 text-xs text-red-600">{errors.team_b_players_text}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div className="grid grid-cols-1 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team A Coach</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_a_coach}
-                                        onChange={(e) => setData('team_a_coach', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team A Manager</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_a_manager}
-                                        onChange={(e) => setData('team_a_manager', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-3">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team B Coach</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_b_coach}
-                                        onChange={(e) => setData('team_b_coach', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Team B Manager</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                        value={data.team_b_manager}
-                                        onChange={(e) => setData('team_b_manager', e.target.value)}
-                                        placeholder="Optional"
-                                    />
-                                </div>
-                            </div>
+                            <RosterPreview title="Home Roster" team={rosterFor(data.home_team_id)} />
+                            <RosterPreview title="Away Roster" team={rosterFor(data.away_team_id)} />
                         </div>
 
                         <div className="flex items-center justify-between">
                             <p className="text-xs text-gray-500">
-                            Matches can only start when browser time matches the scheduled time (enforced on the summary screen).
+                                Matches can only start when browser time matches the scheduled time (enforced on the summary screen).
                             </p>
                             <button
                                 type="submit"
@@ -299,41 +222,64 @@ export default function Create({ auth, teamSuggestions = [], sportsOptions = {} 
     );
 }
 
-const TeamCombobox = ({ label, value, onChange, error, teamSuggestions }) => {
-    const filtered =
-        value.trim() === ''
-            ? teamSuggestions
-            : teamSuggestions.filter((preset) => preset.name.toLowerCase().includes(value.toLowerCase()));
+const TeamSelect = ({ label, value, onChange, teams, error }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        <select
+            className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            required
+        >
+            <option value="">Select team</option>
+            {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                    {team.name}
+                </option>
+            ))}
+        </select>
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+);
+
+const RosterPreview = ({ title, team }) => {
+    if (!team) {
+        return (
+            <div className="rounded-md border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+                <p className="font-semibold text-gray-700">{title}</p>
+                <p>Select a team to preview the registered lineup.</p>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">{label}</label>
-            <Combobox value={value} onChange={onChange}>
-                <div className="relative">
-                    <Combobox.Input
-                        className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                        onChange={(event) => onChange(event.target.value)}
-                        displayValue={(val) => val}
-                        required
-                    />
-                    {filtered.length > 0 && (
-                        <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-gray-200 bg-white shadow-lg">
-                            {filtered.map((preset) => (
-                                <Combobox.Option
-                                    key={preset.name}
-                                    value={preset.name}
-                                    className={({ active }) =>
-                                        `cursor-pointer px-3 py-2 text-sm ${active ? 'bg-indigo-50 text-indigo-700' : 'text-gray-800'}`
-                                    }
-                                >
-                                    {preset.name}
-                                </Combobox.Option>
-                            ))}
-                        </Combobox.Options>
-                    )}
+        <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+            <div className="mb-2 flex items-center justify-between">
+                <div>
+                    <p className="text-sm font-semibold text-gray-800">{title}</p>
+                    <p className="text-xs text-gray-600">{team.name}</p>
                 </div>
-            </Combobox>
-            {error && <p className="text-xs text-red-600">{error}</p>}
+                <span className="rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-semibold uppercase text-indigo-700">
+                    {team.players?.length ?? 0} players
+                </span>
+            </div>
+            {team.players && team.players.length > 0 ? (
+                <ul className="space-y-1 text-sm text-gray-700">
+                    {team.players.map((player) => (
+                        <li key={player.id} className="flex items-center justify-between rounded bg-white px-2 py-1">
+                            <span className="flex items-center gap-2">
+                                <span className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                                    {player.shirt_number ?? '—'}
+                                </span>
+                                <span>{player.name}</span>
+                            </span>
+                            {!player.is_active && <span className="text-[11px] font-semibold uppercase text-amber-600">Inactive</span>}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-sm text-gray-500">No players registered for this team.</p>
+            )}
         </div>
     );
 };

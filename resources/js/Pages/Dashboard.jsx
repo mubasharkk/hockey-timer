@@ -10,6 +10,18 @@ export default function Dashboard({ auth, games = [], now }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                         <Link
+                            href={route('tournaments.create')}
+                            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                        >
+                            New Tournament
+                        </Link>
+                        <Link
+                            href={route('teams.create')}
+                            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                        >
+                            Register Team
+                        </Link>
+                        <Link
                             href={route('games.create')}
                             className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                         >

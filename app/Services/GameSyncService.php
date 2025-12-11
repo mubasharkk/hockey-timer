@@ -22,6 +22,7 @@ class GameSyncService
             $game = Game::updateOrCreate(
                 ['id' => $data['id'] ?? null],
                 [
+                    'tournament_id' => $data['tournament_id'] ?? $existing?->tournament_id,
                     'team_a_name' => $data['team_a_name'],
                     'team_b_name' => $data['team_b_name'],
                     'venue' => $data['venue'],
@@ -44,6 +45,8 @@ class GameSyncService
                         ['id' => $team['id'] ?? null],
                         [
                             'game_id' => $game->id,
+                            'registered_team_id' => $team['registered_team_id'] ?? null,
+                            'is_registered' => $team['is_registered'] ?? false,
                             'name' => $team['name'],
                             'side' => $team['side'],
                             'score' => $team['score'] ?? 0,

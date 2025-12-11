@@ -4,7 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Tournament;
 
 class Game extends Model
 {
@@ -16,6 +18,9 @@ class Game extends Model
         'user_id',
         'team_a_name',
         'team_b_name',
+        'home_team_id',
+        'away_team_id',
+        'tournament_id',
         'venue',
         'code',
         'game_date',
@@ -46,6 +51,16 @@ class Game extends Model
         return $this->hasMany(Team::class, 'game_id');
     }
 
+    public function homeTeam(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'home_team_id');
+    }
+
+    public function awayTeam(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'away_team_id');
+    }
+
     public function sessions(): HasMany
     {
         return $this->hasMany(MatchSession::class, 'game_id');
@@ -54,6 +69,11 @@ class Game extends Model
     public function events(): HasMany
     {
         return $this->hasMany(Event::class, 'game_id');
+    }
+
+    public function tournament(): BelongsTo
+    {
+        return $this->belongsTo(Tournament::class);
     }
 
     /**

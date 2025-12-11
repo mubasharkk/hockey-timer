@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreGameRequest extends FormRequest
 {
@@ -14,8 +15,18 @@ class StoreGameRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'team_a_name' => ['required', 'string', 'max:255'],
-            'team_b_name' => ['required', 'string', 'max:255'],
+            'home_team_id' => [
+                'required',
+                'integer',
+                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('is_registered', true)),
+            ],
+            'away_team_id' => [
+                'required',
+                'integer',
+                'different:home_team_id',
+                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('is_registered', true)),
+            ],
+            'tournament_id' => ['nullable', 'integer', 'exists:tournaments,id'],
             'venue' => ['required', 'string', 'max:255'],
             'game_date' => ['required', 'date'],
             'game_time' => ['required', 'date_format:H:i'],
@@ -24,12 +35,6 @@ class StoreGameRequest extends FormRequest
             'timer_mode' => ['required', 'in:ASC,DESC'],
             'sport_type' => ['nullable', 'string', 'max:50'],
             'continue_timer_on_goal' => ['nullable', 'boolean'],
-            'team_a_players_text' => ['nullable', 'string'],
-            'team_b_players_text' => ['nullable', 'string'],
-            'team_a_coach' => ['nullable', 'string', 'max:255'],
-            'team_a_manager' => ['nullable', 'string', 'max:255'],
-            'team_b_coach' => ['nullable', 'string', 'max:255'],
-            'team_b_manager' => ['nullable', 'string', 'max:255'],
             'game_officials' => ['nullable', 'string', 'max:500'],
         ];
     }
