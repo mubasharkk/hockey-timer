@@ -48,6 +48,7 @@ class TeamSeeder extends Seeder
                     'is_active' => (bool) rand(0, 1),
                     'created_at' => now(),
                     'updated_at' => now(),
+                    'team_id' => $team->id,
                 ];
             }
 

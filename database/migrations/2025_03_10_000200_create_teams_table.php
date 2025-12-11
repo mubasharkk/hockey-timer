@@ -9,10 +9,15 @@ return new class extends Migration {
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('game_id')->constrained('games')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('game_id')->nullable()->constrained('games')->cascadeOnDelete();
+            $table->foreignId('registered_team_id')->nullable()->constrained('teams')->nullOnDelete();
+            $table->boolean('is_registered')->default(false);
             $table->string('name');
-            $table->enum('side', ['home', 'away']);
+            $table->string('side', 12)->nullable();
             $table->unsignedSmallInteger('score')->default(0);
+            $table->string('coach')->nullable();
+            $table->string('manager')->nullable();
             $table->timestamps();
         });
     }
