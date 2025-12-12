@@ -163,6 +163,19 @@ export default function Show({ auth, tournament }) {
                             <GameList games={resultGames} emptyMessage="No finished games yet." />
                         )}
                     </div>
+
+                    {tournament.sponsor_logo_urls && tournament.sponsor_logo_urls.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                            <h3 className="text-sm font-semibold text-gray-900">Sponsors</h3>
+                            <div className="mt-3 flex flex-wrap items-center gap-3">
+                                {tournament.sponsor_logo_urls.map((url, idx) => (
+                                    <div key={idx} className="flex h-16 w-24 items-center justify-center rounded-md bg-gray-50 ring-1 ring-gray-200">
+                                        <img src={url} alt={`Sponsor ${idx + 1}`} className="max-h-14 max-w-full object-contain" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
