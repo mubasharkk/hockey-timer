@@ -9,6 +9,7 @@ use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,7 +20,7 @@ class GameController extends Controller
     {
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
         $registeredTeams = Team::query()
             ->where('is_registered', true)
@@ -27,12 +28,15 @@ class GameController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
 
-        $tournaments = Tournament::orderBy('title')->get(['id', 'title', 'slug']);
+        $tournaments = Tournament::with(['pools.teams:id,name'])
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug', 'venue']);
 
         return Inertia::render('Game/Create', [
             'teams' => $registeredTeams,
             'sportsOptions' => config('game.sports'),
             'tournaments' => $tournaments,
+            'prefillTournamentId' => $request->input('tournament_id'),
         ]);
     }
 
@@ -119,9 +123,11 @@ class GameController extends Controller
 
         $teams = Team::where('is_registered', true)
             ->orderBy('name')
-            ->get(['id', 'name']);
+            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
 
-        $tournaments = Tournament::orderBy('title')->get(['id', 'title', 'slug']);
+        $tournaments = Tournament::with(['pools.teams:id,name'])
+            ->orderBy('title')
+            ->get(['id', 'title', 'slug', 'venue']);
 
         return Inertia::render('Game/Edit', [
             'game' => $game,

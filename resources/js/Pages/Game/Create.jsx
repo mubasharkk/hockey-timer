@@ -1,14 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { useEffect, useMemo } from 'react';
 
 const sessionOptions = [2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [] }) {
+export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [], prefillTournamentId = '' }) {
     const { data, setData, post, processing, errors } = useForm({
         home_team_id: '',
         away_team_id: '',
-        tournament_id: '',
+        tournament_id: prefillTournamentId || '',
         venue: '',
         excerpt: '',
         notes: '',
@@ -26,6 +27,39 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
         e.preventDefault();
         post(route('games.store'));
     };
+
+    const selectedTournament = useMemo(
+        () => tournaments.find((t) => `${t.id}` === `${data.tournament_id}`),
+        [tournaments, data.tournament_id]
+    );
+
+    const tournamentTeamIds = useMemo(() => {
+        if (!selectedTournament || !selectedTournament.pools) return [];
+        const ids = selectedTournament.pools.flatMap((p) => (p.teams || []).map((team) => team.id));
+        return Array.from(new Set(ids));
+    }, [selectedTournament]);
+
+    const filteredTeams = useMemo(() => {
+        if (data.tournament_id) {
+            return teams.filter((team) => tournamentTeamIds.includes(team.id));
+        }
+        return teams;
+    }, [teams, tournamentTeamIds, data.tournament_id]);
+
+    useEffect(() => {
+        if (selectedTournament?.venue) {
+            setData('venue', selectedTournament.venue);
+        }
+    }, [selectedTournament, setData]);
+
+    useEffect(() => {
+        if (!filteredTeams.find((t) => `${t.id}` === `${data.home_team_id}`)) {
+            setData('home_team_id', '');
+        }
+        if (!filteredTeams.find((t) => `${t.id}` === `${data.away_team_id}`)) {
+            setData('away_team_id', '');
+        }
+    }, [filteredTeams, data.home_team_id, data.away_team_id, setData]);
 
     const rosterFor = (teamId) => teams.find((t) => `${t.id}` === `${teamId}`);
 
@@ -46,14 +80,14 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                 label="Home Team"
                                 value={data.home_team_id}
                                 onChange={(val) => setData('home_team_id', val)}
-                                teams={teams}
+                                teams={filteredTeams}
                                 error={errors.home_team_id}
                             />
                             <TeamSelect
                                 label="Away Team"
                                 value={data.away_team_id}
                                 onChange={(val) => setData('away_team_id', val)}
-                                teams={teams}
+                                teams={filteredTeams}
                                 error={errors.away_team_id}
                             />
                         </div>

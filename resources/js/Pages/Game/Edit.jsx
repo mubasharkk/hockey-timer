@@ -1,6 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import moment from 'moment';
+import { useEffect, useMemo } from 'react';
 
 export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {} }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -20,12 +21,34 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         game_officials: game.game_officials || '',
     });
 
+    const selectedTournament = useMemo(
+        () => tournaments.find((t) => `${t.id}` === `${data.tournament_id}`),
+        [tournaments, data.tournament_id]
+    );
+
+    const tournamentTeamIds = useMemo(() => {
+        if (!selectedTournament || !selectedTournament.pools) return [];
+        const ids = selectedTournament.pools.flatMap((p) => (p.teams || []).map((team) => team.id));
+        return Array.from(new Set(ids));
+    }, [selectedTournament]);
+
+    const filteredTeams = useMemo(() => {
+        if (data.tournament_id) {
+            return teams.filter((team) => tournamentTeamIds.includes(team.id));
+        }
+        return teams;
+    }, [teams, tournamentTeamIds, data.tournament_id]);
+
+    useEffect(() => {
+        if (selectedTournament?.venue) {
+            setData('venue', selectedTournament.venue);
+        }
+    }, [selectedTournament, setData]);
+
     const submit = (e) => {
         e.preventDefault();
         put(route('games.update', game.id));
     };
-
-    const findTeamName = (id) => teams.find((t) => t.id === id)?.name || '—';
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -40,8 +63,22 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <ReadOnlyField label="Home Team" value={findTeamName(game.home_team_id)} />
-                            <ReadOnlyField label="Away Team" value={findTeamName(game.away_team_id)} />
+                            <TeamSelect
+                                label="Home Team"
+                                value={data.home_team_id}
+                                onChange={(val) => setData('home_team_id', val)}
+                                teams={filteredTeams}
+                                error={errors.home_team_id}
+                                disabled
+                            />
+                            <TeamSelect
+                                label="Away Team"
+                                value={data.away_team_id}
+                                onChange={(val) => setData('away_team_id', val)}
+                                teams={filteredTeams}
+                                error={errors.away_team_id}
+                                disabled
+                            />
                         </div>
 
                         <Field
@@ -197,6 +234,34 @@ const SelectField = ({ label, value, options, onChange, error }) => (
                     </option>
                 );
             })}
+        </select>
+        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+);
+
+const TeamSelect = ({ label, value, onChange, teams, error, disabled = false }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+        {Boolean(value) && !teams.find((t) => `${t.id}` === `${value}`) && (
+            <p className="mb-1 text-xs text-amber-600">
+                Current team is not in the selected tournament’s pools.
+            </p>
+        )}
+        <select
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+        >
+            <option value="">Select team</option>
+            {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                    {team.name}
+                </option>
+            ))}
+            {Boolean(value) && !teams.find((t) => `${t.id}` === `${value}`) && (
+                <option value={value}>Current team (not in pools)</option>
+            )}
         </select>
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
