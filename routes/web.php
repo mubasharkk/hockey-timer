@@ -8,6 +8,7 @@ use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\TournamentPoolTeamController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicTickerController;
+use App\Http\Controllers\PublicTournamentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -64,5 +65,6 @@ Route::middleware('auth')->group(function () {
 // Public ticker view (no auth required)
 Route::get('/ticker', [PublicTickerController::class, 'index'])->name('public.ticker');
 Route::get('/ticker/{code}', [PublicTickerController::class, 'index'])->name('public.ticker.code');
+Route::get('/public/tournaments/{slug}', [PublicTournamentController::class, 'show'])->name('public.tournaments.show');
 
 require __DIR__.'/auth.php';
