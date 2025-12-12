@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faTrash, faUsers } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { faArrowLeft, faCalendarAlt, faClock, faPen, faTrash, faTrophy, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { useMemo, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -10,6 +10,7 @@ import moment from 'moment';
 
 export default function Show({ auth, tournament }) {
     const [confirming, setConfirming] = useState(false);
+    const [tab, setTab] = useState('upcoming');
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
@@ -17,6 +18,22 @@ export default function Show({ auth, tournament }) {
             onSuccess: () => setConfirming(false),
         });
     };
+
+    const upcomingGames = useMemo(() => {
+        return (tournament.games || []).filter((g) => {
+            if (!g.game_date) return false;
+            const date = moment(g.game_date).startOf('day');
+            return date.isSameOrAfter(moment().startOf('day'));
+        });
+    }, [tournament.games]);
+
+    const resultGames = useMemo(() => {
+        return (tournament.games || []).filter((g) => {
+            if (!g.game_date) return true;
+            const date = moment(g.game_date).startOf('day');
+            return g.status === 'finished' || date.isBefore(moment().startOf('day'));
+        });
+    }, [tournament.games]);
 
     return (
         <AuthenticatedLayout
@@ -101,6 +118,35 @@ export default function Show({ auth, tournament }) {
                             </div>
                         )}
                     </div>
+
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                        <div className="mb-4 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-indigo-600" />
+                                <h3 className="text-sm font-semibold text-gray-900">Games</h3>
+                            </div>
+                            <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
+                                <button
+                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    onClick={() => setTab('upcoming')}
+                                >
+                                    Upcoming
+                                </button>
+                                <button
+                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    onClick={() => setTab('results')}
+                                >
+                                    Results
+                                </button>
+                            </div>
+                        </div>
+
+                        {tab === 'upcoming' ? (
+                            <GameList games={upcomingGames} emptyMessage="No upcoming games." />
+                        ) : (
+                            <GameList games={resultGames} emptyMessage="No finished games yet." />
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -133,4 +179,36 @@ const formatDate = (date) => {
     if (!date) return '—';
     const d = moment(date);
     return d.isValid() ? d.format('DD.MM.YYYY') : date;
+};
+
+const GameList = ({ games, emptyMessage }) => {
+    if (!games || games.length === 0) {
+        return <p className="text-sm text-gray-500">{emptyMessage}</p>;
+    }
+
+    return (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {games.map((game) => (
+                <div key={game.id} className="rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
+                    <div className="flex items-center justify-between text-xs uppercase tracking-wide text-gray-500">
+                        <div className="flex items-center gap-2">
+                            <FontAwesomeIcon icon={faCalendarAlt} className="h-3.5 w-3.5" />
+                            <span>{formatDate(game.game_date)}</span>
+                        </div>
+                        {game.game_time && (
+                            <div className="flex items-center gap-1">
+                                <FontAwesomeIcon icon={faClock} className="h-3.5 w-3.5" />
+                                <span>{game.game_time}</span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="mt-2 text-sm font-semibold text-gray-900">
+                        {game.team_a_name} <span className="text-gray-500">vs</span> {game.team_b_name}
+                    </div>
+                    {game.excerpt && <p className="mt-1 text-xs text-gray-700">{game.excerpt}</p>}
+                    <p className="mt-1 text-xs text-gray-500">{game.venue}</p>
+                </div>
+            ))}
+        </div>
+    );
 };

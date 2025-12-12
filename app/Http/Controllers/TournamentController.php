@@ -30,7 +30,10 @@ class TournamentController extends Controller
 
     public function show(Tournament $tournament): Response
     {
-        $tournament->load(['pools.teams']);
+        $tournament->load([
+            'pools.teams',
+            'games' => fn ($q) => $q->orderBy('game_date')->orderBy('game_time'),
+        ]);
 
         return Inertia::render('Tournaments/Show', [
             'tournament' => $tournament,
