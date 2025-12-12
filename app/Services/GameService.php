@@ -47,12 +47,9 @@ class GameService
                 'status' => 'scheduled',
             ]);
 
-            $home = $this->cloneTeam($homeTemplate, $game, 'home');
-            $away = $this->cloneTeam($awayTemplate, $game, 'away');
-
             $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
 
-            return $game->setRelation('teams', collect([$home, $away]));
+            return $game->setRelation('teams', collect([$homeTemplate, $awayTemplate]));
         });
     }
 
@@ -95,38 +92,6 @@ class GameService
                 ['planned_duration_seconds' => $durationMinutes * 60]
             );
         }
-    }
-
-    private function cloneTeam(Team $template, Game $game, string $side): Team
-    {
-        $team = Team::create([
-            'game_id' => $game->id,
-            'registered_team_id' => $template->id,
-            'is_registered' => false,
-            'name' => $template->name,
-            'side' => $side,
-            'score' => 0,
-            'coach' => $template->coach,
-            'manager' => $template->manager,
-        ]);
-
-        $activePlayers = $template->players->filter(fn ($player) => $player->is_active ?? true);
-
-        $team->players()->createMany(
-            $activePlayers->map(function ($player) {
-                return [
-                    'registered_player_id' => $player->id,
-                    'name' => $player->name,
-                    'shirt_number' => $player->shirt_number,
-                    'player_pass_number' => $player->player_pass_number,
-                    'nic_number' => $player->nic_number,
-                    'date_of_birth' => $player->date_of_birth,
-                    'is_active' => $player->is_active ?? true,
-                ];
-            })->all()
-        );
-
-        return $team;
     }
 
     private function generateGameCode(): string
