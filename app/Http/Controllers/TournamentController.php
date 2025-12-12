@@ -66,6 +66,18 @@ class TournamentController extends Controller
             'loss_points' => $request->integer('loss_points'),
         ]);
 
+        if ($request->hasFile('logo')) {
+            $tournament->clearMediaCollection('logo');
+            $tournament->addMediaFromRequest('logo')->toMediaCollection('logo');
+        }
+
+        if ($request->hasFile('sponsor_logos')) {
+            $tournament->clearMediaCollection('sponsor_logos');
+            foreach ($request->file('sponsor_logos', []) as $file) {
+                $tournament->addMedia($file)->toMediaCollection('sponsor_logos');
+            }
+        }
+
         $this->seedPools($tournament, (int) $request->input('pools_count', 1));
 
         return redirect()->route('tournaments.index')->with('success', 'Tournament created.');
@@ -86,6 +98,18 @@ class TournamentController extends Controller
             'draw_points' => $request->integer('draw_points'),
             'loss_points' => $request->integer('loss_points'),
         ]);
+
+        if ($request->hasFile('logo')) {
+            $tournament->clearMediaCollection('logo');
+            $tournament->addMediaFromRequest('logo')->toMediaCollection('logo');
+        }
+
+        if ($request->hasFile('sponsor_logos')) {
+            $tournament->clearMediaCollection('sponsor_logos');
+            foreach ($request->file('sponsor_logos', []) as $file) {
+                $tournament->addMedia($file)->toMediaCollection('sponsor_logos');
+            }
+        }
 
         if ($request->filled('pools_count')) {
             $this->seedPools($tournament, (int) $request->input('pools_count'));

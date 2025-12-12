@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,9 +11,9 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-class Tournament extends Model
+class Tournament extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'user_id',
@@ -38,6 +40,18 @@ class Tournament extends Model
     public function pools(): HasMany
     {
         return $this->hasMany(TournamentPool::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this
+            ->addMediaCollection('logo')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif'])
+            ->singleFile();
+
+        $this
+            ->addMediaCollection('sponsor_logos')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif']);
     }
 
     protected function slug(): Attribute

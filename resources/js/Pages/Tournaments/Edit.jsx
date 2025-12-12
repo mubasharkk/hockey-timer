@@ -16,6 +16,8 @@ export default function Edit({ auth, tournament }) {
         draw_points: tournament.draw_points ?? 1,
         loss_points: tournament.loss_points ?? 0,
         pools_count: tournament.pools?.length || 1,
+        logo: null,
+        sponsor_logos: [],
     });
 
     const submit = (e) => {
@@ -115,6 +117,31 @@ export default function Edit({ auth, tournament }) {
                                 onChange={(val) => setData('pools_count', val)}
                                 error={errors.pools_count}
                             />
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Logo (optional)</label>
+                                <input
+                                    type="file"
+                                    accept=".jpg,.jpeg,.png,.gif"
+                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                    onChange={(e) => setData('logo', e.target.files[0] || null)}
+                                />
+                                {errors.logo && <p className="mt-1 text-xs text-red-600">{errors.logo}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Sponsor Logos (optional, multiple)</label>
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept=".jpg,.jpeg,.png,.gif"
+                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                    onChange={(e) => setData('sponsor_logos', Array.from(e.target.files || []))}
+                                />
+                                {errors.sponsor_logos && <p className="mt-1 text-xs text-red-600">{errors.sponsor_logos}</p>}
+                                {errors['sponsor_logos.*'] && <p className="mt-1 text-xs text-red-600">{errors['sponsor_logos.*']}</p>}
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-end">
