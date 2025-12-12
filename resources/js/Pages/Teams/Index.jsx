@@ -21,7 +21,8 @@ export default function Index({ auth, teams = [] }) {
                             Register Team
                         </Link>
                         <Link
-                            href={route('public.tournaments.show', 'latest')}\n                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                            href={route('public.tournaments.show', 'latest')}
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
                         >
                             Public view
                         </Link>
