@@ -27,8 +27,8 @@ export default function Tournament({ tournament, poolResults = [] }) {
     return (
         <PublicLayout fullWidth>
             <Head title={tournament.title} />
-            <div className="bg-gray-50 px-[calc(50vw-50%)] py-10">
-                <div className="mx-auto max-w-5xl space-y-6 px-4 sm:px-0">
+            <div className="bg-gray-50 px-0 sm:px-[calc(50vw-50%)] py-10">
+                <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="flex items-center justify-between gap-3">
                             <div>

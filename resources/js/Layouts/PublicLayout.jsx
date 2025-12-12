@@ -6,7 +6,7 @@ export default function PublicLayout({ children, fullWidth = false }) {
             <div className="flex justify-center py-6">
                 <ApplicationLogo className="h-12 w-12 fill-current text-gray-600" />
             </div>
-            <div className="mx-10 overflow-hidden rounded-2xl">{children}</div>
+            <div className="mx-0 sm:mx-10 overflow-hidden rounded-2xl">{children}</div>
         </div>
     );
 }
