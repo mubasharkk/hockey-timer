@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTournamentRequest;
 use App\Http\Requests\UpdateTournamentRequest;
 use App\Models\Tournament;
 use App\Models\TournamentPool;
+use App\Http\Resources\TournamentResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -19,7 +20,7 @@ class TournamentController extends Controller
         $tournaments = Tournament::orderByDesc('id')->get();
 
         return Inertia::render('Tournaments/Index', [
-            'tournaments' => $tournaments,
+            'tournaments' => TournamentResource::collection($tournaments)->resolve(),
         ]);
     }
 
@@ -36,7 +37,7 @@ class TournamentController extends Controller
         ]);
 
         return Inertia::render('Tournaments/Show', [
-            'tournament' => $tournament,
+            'tournament' => TournamentResource::make($tournament)->resolve(),
         ]);
     }
 
@@ -45,7 +46,7 @@ class TournamentController extends Controller
         $tournament->load('pools');
 
         return Inertia::render('Tournaments/Edit', [
-            'tournament' => $tournament,
+            'tournament' => TournamentResource::make($tournament)->resolve(),
         ]);
     }
 
