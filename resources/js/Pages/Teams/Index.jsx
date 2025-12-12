@@ -12,13 +12,20 @@ export default function Index({ auth, teams = [] }) {
             header={
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Teams</h2>
-                    <Link
-                        href={route('teams.create')}
-                        className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                    >
-                        <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                        Register Team
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            href={route('teams.create')}
+                            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                        >
+                            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                            Register Team
+                        </Link>
+                        <Link
+                            href={route('public.tournaments.show', 'latest')}\n                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                        >
+                            Public view
+                        </Link>
+                    </div>
                 </div>
             }
         >
