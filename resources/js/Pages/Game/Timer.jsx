@@ -571,6 +571,7 @@ export default function Timer({ auth, game, config = {} }) {
                             <h1 className="text-2xl font-semibold text-gray-900">
                                 {game.team_a_name} vs {game.team_b_name}
                             </h1>
+                            {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
                             {game.code && (
                                 <div className="space-y-1 text-xs font-semibold text-gray-500">
                                     <p>

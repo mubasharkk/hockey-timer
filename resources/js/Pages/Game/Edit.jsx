@@ -8,6 +8,8 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         away_team_id: game.away_team_id,
         tournament_id: game.tournament_id || '',
         venue: game.venue || '',
+        excerpt: game.excerpt || '',
+        notes: game.notes || '',
         game_date: game.game_date || '',
         game_time: game.game_time || '',
         sessions: game.sessions || 4,
@@ -41,6 +43,13 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             <ReadOnlyField label="Home Team" value={findTeamName(game.home_team_id)} />
                             <ReadOnlyField label="Away Team" value={findTeamName(game.away_team_id)} />
                         </div>
+
+                        <Field
+                            label="Excerpt (public)"
+                            value={data.excerpt}
+                            onChange={(e) => setData('excerpt', e.target.value)}
+                            error={errors.excerpt}
+                        />
 
                         <SelectField
                             label="Tournament (optional)"
@@ -125,6 +134,17 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             onChange={(e) => setData('game_officials', e.target.value)}
                             error={errors.game_officials}
                         />
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Notes (admin only, optional)</label>
+                            <textarea
+                                rows={3}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value={data.notes}
+                                onChange={(e) => setData('notes', e.target.value)}
+                            />
+                            {errors.notes && <p className="mt-1 text-xs text-red-600">{errors.notes}</p>}
+                        </div>
 
                         <div className="flex items-center justify-end">
                             <button

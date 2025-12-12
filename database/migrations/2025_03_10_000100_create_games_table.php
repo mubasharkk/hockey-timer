@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->string('team_a_name');
             $table->string('team_b_name');
             $table->string('venue');
+            $table->string('excerpt')->nullable();
+            $table->mediumText('notes')->nullable();
             $table->string('code', 10)->unique();
             $table->date('game_date');
             $table->time('game_time');

@@ -54,6 +54,7 @@ export default function Report({ auth, game }) {
                             <h1 className="text-2xl font-semibold text-gray-900">
                                 {game.team_a_name} vs {game.team_b_name}
                             </h1>
+                            {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
                             <p className="text-sm text-gray-600">
                                 {game.venue} · {formatLocalDate(game.game_date)} {game.game_time}
                             </p>

@@ -15,7 +15,7 @@ export default function Edit({ auth, tournament }) {
         win_points: tournament.win_points ?? 3,
         draw_points: tournament.draw_points ?? 1,
         loss_points: tournament.loss_points ?? 0,
-        pools_count: tournament.pools?.length ?? '',
+        pools_count: tournament.pools?.length || 1,
     });
 
     const submit = (e) => {

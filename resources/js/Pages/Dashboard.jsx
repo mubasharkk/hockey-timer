@@ -35,60 +35,56 @@ export default function Dashboard({ auth, games = [], now }) {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            <h3 className="text-lg font-semibold text-gray-900">Games</h3>
-                            <p className="mt-1 text-sm text-gray-600">Recent games with status and scheduled start.</p>
+                            <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                                <div className="p-6 text-gray-900">
+                                    <h3 className="text-lg font-semibold text-gray-900">Games</h3>
+                                    <p className="mt-1 text-sm text-gray-600">Recent games with status and scheduled start.</p>
 
-                            <div className="mt-4 space-y-3">
-                                {games.length === 0 && <p className="text-sm text-gray-600">No games yet. Create one to get started.</p>}
+                                    <div className="mt-4 space-y-3">
+                                        {games.length === 0 && <p className="text-sm text-gray-600">No games yet. Create one to get started.</p>}
 
-                                {games.map((game) => {
-                                    const status = deriveStatus(game);
-                                    const relative = formatRelativeStart(game.game_date, game.game_time, now, status, game.ended_at);
-                                    return (
-                                        <div
-                                            key={game.id}
-                                            className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
-                                        >
-                                            <div className="flex items-start gap-3">
-                                                <img
-                                                    src={sportIcon(game.sport_type)}
-                                                    alt={game.sport_type || 'sport'}
-                                                    className="h-10 w-10 rounded-md bg-white object-contain p-1 ring-1 ring-gray-200"
-                                                    loading="lazy"
-                                                />
-                                                <div className="space-y-1">
-                                                    <div className="text-sm font-semibold text-gray-900">
-                                                        {game.team_a_name} vs {game.team_b_name}
-                                                    </div>
-                                                    {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
-                                                    <div className="text-xs text-gray-600">
-                                                        <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
-                                                        {relative ? ` · ${relative}` : ''}
-                                                    </div>
-                                                    {/*{game.sport_type && (*/}
-                                                    {/*    <div className="text-[11px] uppercase tracking-wide text-gray-500">*/}
-                                                    {/*        {sportLabel(game.sport_type)}*/}
-                                                    {/*    </div>*/}
-                                                    {/*)}*/}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <StatusBadge status={status} />
-                                                <Link
-                                                    href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
-                                                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                        {games.map((game) => {
+                                            const status = deriveStatus(game);
+                                            const relative = formatRelativeStart(game.game_date, game.game_time, now, status, game.ended_at);
+                                            return (
+                                                <div
+                                                    key={game.id}
+                                                    className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
                                                 >
-                                                    {status === 'finished' ? 'Report' : 'View'}
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                                                    <div className="flex items-start gap-3">
+                                                        <img
+                                                            src={sportIcon(game.sport_type)}
+                                                            alt={game.sport_type || 'sport'}
+                                                            className="h-10 w-10 rounded-md bg-white object-contain p-1 ring-1 ring-gray-200"
+                                                            loading="lazy"
+                                                        />
+                                                        <div className="space-y-1">
+                                                            <div className="text-sm font-semibold text-gray-900">
+                                                                {game.team_a_name} vs {game.team_b_name}
+                                                            </div>
+                                                            {game.excerpt && <div className="text-xs text-gray-700">{game.excerpt}</div>}
+                                                            {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
+                                                            <div className="text-xs text-gray-600">
+                                                                <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
+                                                                {relative ? ` · ${relative}` : ''}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        <StatusBadge status={status} />
+                                                        <Link
+                                                            href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
+                                                            className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                                        >
+                                                            {status === 'finished' ? 'Report' : 'View'}
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

@@ -10,6 +10,8 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
         away_team_id: '',
         tournament_id: '',
         venue: '',
+        excerpt: '',
+        notes: '',
         game_date: todayStr(),
         game_time: '',
         sessions: 4,
@@ -83,6 +85,16 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                     required
                                 />
                                 {errors.venue && <p className="mt-1 text-xs text-red-600">{errors.venue}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Excerpt (public)</label>
+                                <input
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.excerpt}
+                                    onChange={(e) => setData('excerpt', e.target.value)}
+                                    placeholder="Short public summary"
+                                />
+                                {errors.excerpt && <p className="mt-1 text-xs text-red-600">{errors.excerpt}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -196,6 +208,18 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                 placeholder="e.g., Ref: Alex / Umpires: Pat, Lee"
                             />
                             {errors.game_officials && <p className="mt-1 text-xs text-red-600">{errors.game_officials}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Notes (admin only, optional)</label>
+                            <textarea
+                                rows={3}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value={data.notes}
+                                onChange={(e) => setData('notes', e.target.value)}
+                                placeholder="Internal notes"
+                            />
+                            {errors.notes && <p className="mt-1 text-xs text-red-600">{errors.notes}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

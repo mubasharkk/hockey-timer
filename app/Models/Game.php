@@ -22,6 +22,8 @@ class Game extends Model
         'away_team_id',
         'tournament_id',
         'venue',
+        'excerpt',
+        'notes',
         'code',
         'game_date',
         'game_time',

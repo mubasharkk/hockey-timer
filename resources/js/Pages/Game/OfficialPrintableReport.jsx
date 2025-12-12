@@ -93,6 +93,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             <p className="text-sm text-gray-600">
                                 {formatDate(game?.game_date)} · {game?.game_time} · {game?.venue}
                             </p>
+                            {game?.excerpt && <p className="text-xs text-gray-700">{game.excerpt}</p>}
                             <p className="text-xs text-gray-500">Code: {game?.code || game?.id}</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">

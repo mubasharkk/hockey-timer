@@ -33,6 +33,8 @@ class GameService
                 'home_team_id' => $homeTemplate->id,
                 'away_team_id' => $awayTemplate->id,
                 'venue' => $data['venue'],
+                'excerpt' => $data['excerpt'] ?? null,
+                'notes' => $data['notes'] ?? null,
                 'code' => $this->generateGameCode(),
                 'game_date' => $data['game_date'],
                 'game_time' => $data['game_time'],
@@ -63,6 +65,8 @@ class GameService
             $game->update([
                 'tournament_id' => $data['tournament_id'] ?? $game->tournament_id,
                 'venue' => $data['venue'],
+                'excerpt' => $data['excerpt'] ?? $game->excerpt,
+                'notes' => $data['notes'] ?? $game->notes,
                 'game_date' => $data['game_date'],
                 'game_time' => $data['game_time'],
                 'sessions' => $data['sessions'],

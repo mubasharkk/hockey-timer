@@ -24,7 +24,7 @@ class TeamSeeder extends Seeder
         $faker = Faker::create();
         $existingPasses = Player::pluck('player_pass_number')->filter()->all();
 
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             $team = Team::create([
                 'user_id' => $user->id,
                 'name' => "Team " . Str::upper(Str::random(4)),

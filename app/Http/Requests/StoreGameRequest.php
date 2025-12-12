@@ -28,6 +28,8 @@ class StoreGameRequest extends FormRequest
             ],
             'tournament_id' => ['nullable', 'integer', 'exists:tournaments,id'],
             'venue' => ['required', 'string', 'max:255'],
+            'excerpt' => ['nullable', 'string', 'max:255'],
+            'notes' => ['nullable', 'string'],
             'game_date' => ['required', 'date'],
             'game_time' => ['required', 'date_format:H:i'],
             'sessions' => ['required', 'integer', 'in:2,4,6,8'],

@@ -13,6 +13,8 @@ export default function Ticker({ game, gameId }) {
         () => liveData?.status === 'finished',
         [liveData?.status]
     );
+    const venue = liveData?.venue ?? game?.venue ?? '';
+    const excerpt = liveData?.excerpt ?? game?.excerpt ?? '';
 
     const effectiveSeconds = useMemo(() => {
         if (!liveData) return displaySeconds ?? 0;
@@ -167,8 +169,9 @@ export default function Ticker({ game, gameId }) {
                                     </div>
                                 </div>
                             </div>
-                            <div className={'text-center'}>
-                                {game.venue}
+                            {excerpt && <p className="text-center text-sm text-slate-200">{excerpt}</p>}
+                            <div className="text-center text-sm text-slate-400">
+                                {venue}
                             </div>
                         </div>
 

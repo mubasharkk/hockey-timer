@@ -49,27 +49,20 @@ class AssignTournamentTeamsRequest extends FormRequest
                 : collect($this->input('pools', []))->flatten()->all();
 
             $teamIds = array_values(array_unique(array_filter($teamIds)));
-            $total = count($teamIds);
 
-            if ($total < 4) {
-                $validator->errors()->add('teams', 'At least 4 teams are required to assign pools.');
+            if ($this->boolean('randomize')) {
+                if (count($teamIds) < $poolCount * 2) {
+                    $validator->errors()->add('team_ids', 'Random assignment needs at least 2 teams per pool.');
+                }
                 return;
             }
 
-            if ($total % $poolCount !== 0) {
-                $validator->errors()->add('teams', 'Teams must be evenly divisible across all pools.');
-                return;
-            }
-
-            if (! $this->boolean('randomize')) {
-                $pools = $this->input('pools', []);
-                $expectedPerPool = $total / $poolCount;
-                foreach ($pools as $poolId => $ids) {
-                    $count = count(array_unique(array_filter($ids ?? [])));
-                    if ($count !== $expectedPerPool) {
-                        $validator->errors()->add('pools', 'Each pool must have the same number of teams.');
-                        break;
-                    }
+            $pools = $this->input('pools', []);
+            foreach ($pools as $poolId => $ids) {
+                $count = count(array_unique(array_filter($ids ?? [])));
+                if ($count < 2) {
+                    $validator->errors()->add('pools', 'Each pool must have at least 2 teams.');
+                    break;
                 }
             }
         });

@@ -35,11 +35,13 @@ class TournamentPoolTeamController extends Controller
         if ($request->boolean('randomize')) {
             $teamIds = array_values(array_unique(array_filter($request->input('team_ids', []))));
             shuffle($teamIds);
-            $chunkSize = count($teamIds) / $poolCount;
-            $chunks = array_chunk($teamIds, $chunkSize);
-
-            foreach ($pools as $index => $pool) {
-                $assignments[$pool->id] = $chunks[$index] ?? [];
+            $poolIds = $pools->pluck('id')->values()->all();
+            foreach ($poolIds as $poolId) {
+                $assignments[$poolId] = [];
+            }
+            foreach ($teamIds as $index => $teamId) {
+                $targetPoolId = $poolIds[$index % $poolCount];
+                $assignments[$targetPoolId][] = $teamId;
             }
         } else {
             foreach ($request->input('pools', []) as $poolId => $teamIds) {
