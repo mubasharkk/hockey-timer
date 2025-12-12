@@ -3,6 +3,8 @@ import { Head, useForm } from '@inertiajs/react';
 import moment from 'moment';
 import { useEffect, useMemo } from 'react';
 
+const sessionOptions = [1, 2, 4, 6, 8];
+
 export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {} }) {
     const { data, setData, put, processing, errors } = useForm({
         home_team_id: game.home_team_id,
@@ -125,7 +127,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             <SelectField
                                 label="Sessions"
                                 value={data.sessions}
-                                options={[2, 4, 6, 8]}
+                                options={sessionOptions}
                                 onChange={(value) => setData('sessions', Number(value))}
                                 error={errors.sessions}
                             />

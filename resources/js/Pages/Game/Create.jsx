@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect, useMemo } from 'react';
 
-const sessionOptions = [2, 4, 6, 8];
+const sessionOptions = [1, 2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [], prefillTournamentId = '' }) {
