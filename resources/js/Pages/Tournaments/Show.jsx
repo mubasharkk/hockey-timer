@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCalendarAlt, faClock, faPen, faTrash, faTrophy, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCalendarAlt, faClock, faPen, faPlus, faTrash, faTrophy, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { useMemo, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
@@ -50,6 +50,13 @@ export default function Show({ auth, tournament }) {
                         >
                             <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
                             Edit
+                        </Link>
+                        <Link
+                            href={route('games.create', { tournament_id: tournament.id })}
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                        >
+                            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                            New Game
                         </Link>
                         <Link
                             href={route('tournaments.pools.teams.edit', tournament.id)}
