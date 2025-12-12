@@ -35,11 +35,20 @@ export default function Index({ auth, tournaments = [] }) {
                                         key={tournament.id}
                                         className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
                                     >
-                                        <div>
-                                            <div className="text-sm font-semibold text-gray-900">{tournament.title}</div>
-                                            <div className="text-xs text-gray-600">Slug: {tournament.slug}</div>
-                                            <div className="text-xs text-gray-600">
-                                                Venue: {tournament.venue} · {tournament.win_points}/{tournament.draw_points}/{tournament.loss_points} (W/D/L)
+                                        <div className="flex items-center gap-3">
+                                            {tournament.logo_url && (
+                                                <img
+                                                    src={tournament.logo_url}
+                                                    alt={`${tournament.title} logo`}
+                                                    className="h-10 w-10 rounded-md object-contain ring-1 ring-gray-200 bg-white"
+                                                />
+                                            )}
+                                            <div>
+                                                <div className="text-sm font-semibold text-gray-900">{tournament.title}</div>
+                                                <div className="text-xs text-gray-600">Slug: {tournament.slug}</div>
+                                                <div className="text-xs text-gray-600">
+                                                    Venue: {tournament.venue} · {tournament.win_points}/{tournament.draw_points}/{tournament.loss_points} (W/D/L)
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3 text-sm font-semibold">

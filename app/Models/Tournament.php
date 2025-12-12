@@ -32,6 +32,10 @@ class Tournament extends Model implements HasMedia
         'end_date' => 'date',
     ];
 
+    protected $appends = [
+        'logo_url',
+    ];
+
     public function games(): HasMany
     {
         return $this->hasMany(Game::class);
@@ -52,6 +56,13 @@ class Tournament extends Model implements HasMedia
         $this
             ->addMediaCollection('sponsor_logos')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif']);
+    }
+
+    protected function logoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getFirstMediaUrl('logo') ?: null,
+        );
     }
 
     protected function slug(): Attribute

@@ -44,6 +44,13 @@ export default function Show({ auth, tournament }) {
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">{tournament.title}</h2>
                     </div>
                     <div className="flex items-center gap-2">
+                        {tournament.logo_url && (
+                            <img
+                                src={tournament.logo_url}
+                                alt={`${tournament.title} logo`}
+                                className="h-10 w-10 rounded-md object-contain ring-1 ring-gray-200 bg-white"
+                            />
+                        )}
                         <Link
                             href={route('tournaments.edit', tournament.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
