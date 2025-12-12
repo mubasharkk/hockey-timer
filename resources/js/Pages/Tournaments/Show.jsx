@@ -7,8 +7,10 @@ import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import moment from 'moment';
+import GameMatchup from '@/Components/GameMatchup';
+import PoolResults from '@/Components/PoolResults';
 
-export default function Show({ auth, tournament }) {
+export default function Show({ auth, tournament, poolResults = [] }) {
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
     const { delete: destroy, processing } = useForm();
@@ -99,7 +101,6 @@ export default function Show({ auth, tournament }) {
                     )}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <Info label="Slug" value={tournament.slug} />
                             <Info label="Venue" value={tournament.venue} />
                             <Info
                                 label="Dates"
@@ -145,6 +146,14 @@ export default function Show({ auth, tournament }) {
                                 </div>
                             </div>
                         )}
+                    </div>
+
+                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                        <div className="mb-4 flex items-center gap-3">
+                            <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-indigo-600" />
+                            <h3 className="text-sm font-semibold text-gray-900">Pool Standings</h3>
+                        </div>
+                        <PoolResults results={poolResults} />
                     </div>
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
@@ -217,25 +226,7 @@ const GameList = ({ games, emptyMessage }) => {
     return (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {games.map((game) => (
-                <div key={game.id} className="rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
-                    <div className="flex items-center justify-between text-xs uppercase tracking-wide text-gray-500">
-                        <div className="flex items-center gap-2">
-                            <FontAwesomeIcon icon={faCalendarAlt} className="h-3.5 w-3.5" />
-                            <span>{formatDate(game.game_date)}</span>
-                        </div>
-                        {game.game_time && (
-                            <div className="flex items-center gap-1">
-                                <FontAwesomeIcon icon={faClock} className="h-3.5 w-3.5" />
-                                <span>{game.game_time}</span>
-                            </div>
-                        )}
-                    </div>
-                    <div className="mt-2 text-sm font-semibold text-gray-900">
-                        {game.team_a_name} <span className="text-gray-500">vs</span> {game.team_b_name}
-                    </div>
-                    {game.excerpt && <p className="mt-1 text-xs text-gray-700">{game.excerpt}</p>}
-                    <p className="mt-1 text-xs text-gray-500">{game.venue}</p>
-                </div>
+                <GameMatchup key={game.id} game={game} />
             ))}
         </div>
     );

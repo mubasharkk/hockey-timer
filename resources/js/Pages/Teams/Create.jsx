@@ -8,11 +8,14 @@ export default function Create({ auth }) {
         name: '',
         coach: '',
         manager: '',
+        logo: null,
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.store'));
+        post(route('teams.store'), {
+            forceFormData: true,
+        });
     };
 
     return (
@@ -59,6 +62,18 @@ export default function Create({ auth }) {
                                 />
                                 {errors.manager && <p className="mt-1 text-xs text-red-600">{errors.manager}</p>}
                             </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Team Logo (optional)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="mt-1 block w-full text-sm text-gray-700"
+                                onChange={(e) => setData('logo', e.target.files[0] || null)}
+                            />
+                            <p className="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 5MB.</p>
+                            {errors.logo && <p className="mt-1 text-xs text-red-600">{errors.logo}</p>}
                         </div>
 
                         <div className="flex items-center justify-between">

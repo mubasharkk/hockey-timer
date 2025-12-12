@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePlayerRequest;
 use App\Models\Player;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -15,7 +16,7 @@ class PlayerController extends Controller
 {
     public function create(Team $team): Response
     {
-        abort_unless($team->is_registered, 404);
+        $this->ensureTeamAccess($team);
 
         return Inertia::render('Players/Create', [
             'team' => $team,
@@ -24,7 +25,8 @@ class PlayerController extends Controller
 
     public function edit(Team $team, Player $player): Response
     {
-        abort_unless($team->is_registered && $player->team_id === $team->id, 404);
+        $this->ensureTeamAccess($team);
+        abort_unless($player->team_id === $team->id, 404);
 
         $address = $player->addresses()->first();
         $player->setAttribute('address', $address);
@@ -38,7 +40,7 @@ class PlayerController extends Controller
 
     public function store(StorePlayerRequest $request, Team $team): RedirectResponse
     {
-        abort_unless($team->is_registered, 404);
+        $this->ensureTeamAccess($team);
 
         $player = $team->players()->create([
             'registered_player_id' => null,
@@ -75,7 +77,8 @@ class PlayerController extends Controller
 
     public function update(UpdatePlayerRequest $request, Team $team, Player $player): RedirectResponse
     {
-        abort_unless($team->is_registered && $player->team_id === $team->id, 404);
+        $this->ensureTeamAccess($team);
+        abort_unless($player->team_id === $team->id, 404);
 
         $player->update([
             'name' => $request->string('name'),
@@ -121,11 +124,18 @@ class PlayerController extends Controller
 
     public function destroy(Team $team, Player $player): RedirectResponse
     {
-        abort_unless($team->is_registered && $player->team_id === $team->id, 404);
+        $this->ensureTeamAccess($team);
+        abort_unless($player->team_id === $team->id, 404);
 
         $player->delete();
 
         return redirect()->route('teams.show', $team)->with('success', 'Player removed.');
+    }
+
+    private function ensureTeamAccess(Team $team): void
+    {
+        abort_unless($team->is_registered, 404);
+        abort_unless($team->user_id === Auth::id(), 403);
     }
 
     private function resolvePassNumber(?string $value, ?Player $current = null): string

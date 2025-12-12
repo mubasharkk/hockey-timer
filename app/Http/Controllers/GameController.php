@@ -24,7 +24,10 @@ class GameController extends Controller
     {
         $registeredTeams = Team::query()
             ->where('is_registered', true)
-            ->with(['players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name')])
+            ->with([
+                'media',
+                'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            ])
             ->orderBy('name')
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
 
@@ -123,6 +126,7 @@ class GameController extends Controller
 
         $teams = Team::where('is_registered', true)
             ->orderBy('name')
+            ->with('media')
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
 
         $tournaments = Tournament::with(['pools.teams:id,name'])

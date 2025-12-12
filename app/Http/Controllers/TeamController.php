@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTeamRequest;
+use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,10 @@ class TeamController extends Controller
     {
         $teams = Team::query()
             ->where('is_registered', true)
-            ->with(['players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name')])
+            ->with([
+                'media',
+                'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            ])
             ->orderBy('name')
             ->get();
 
@@ -39,6 +43,12 @@ class TeamController extends Controller
             'is_registered' => true,
         ]);
 
+        if ($request->hasFile('logo')) {
+            $team
+                ->addMediaFromRequest('logo')
+                ->toMediaCollection('logo');
+        }
+
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
     }
 
@@ -46,10 +56,61 @@ class TeamController extends Controller
     {
         abort_unless($team->is_registered, 404);
 
-        $team->load(['players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name')]);
+        $team->load([
+            'media',
+            'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+        ]);
 
         return Inertia::render('Teams/Show', [
             'team' => $team,
         ]);
+    }
+
+    public function edit(Team $team): Response
+    {
+        $this->ensureManageable($team);
+
+        return Inertia::render('Teams/Edit', [
+            'team' => $team,
+        ]);
+    }
+
+    public function update(UpdateTeamRequest $request, Team $team): RedirectResponse
+    {
+        $this->ensureManageable($team);
+
+        $team->update([
+            'name' => $request->string('name'),
+            'coach' => $request->string('coach') ?: null,
+            'manager' => $request->string('manager') ?: null,
+        ]);
+
+        if ($request->boolean('remove_logo')) {
+            $team->clearMediaCollection('logo');
+        }
+
+        if ($request->hasFile('logo')) {
+            $team->clearMediaCollection('logo');
+            $team
+                ->addMediaFromRequest('logo')
+                ->toMediaCollection('logo');
+        }
+
+        return redirect()->route('teams.show', $team)->with('success', 'Team updated.');
+    }
+
+    public function destroy(Team $team): RedirectResponse
+    {
+        $this->ensureManageable($team);
+
+        $team->delete();
+
+        return redirect()->route('teams.index')->with('success', 'Team deleted.');
+    }
+
+    private function ensureManageable(Team $team): void
+    {
+        abort_unless($team->is_registered, 404);
+        abort_unless($team->user_id === Auth::id(), 403);
     }
 }

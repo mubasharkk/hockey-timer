@@ -9,6 +9,7 @@ use App\Models\TournamentPool;
 use App\Http\Resources\TournamentResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -33,11 +34,27 @@ class TournamentController extends Controller
     {
         $tournament->load([
             'pools.teams',
-            'games' => fn ($q) => $q->orderBy('game_date')->orderBy('game_time'),
+            'games' => fn ($q) => $q
+                ->orderBy('game_date')
+                ->orderBy('game_time')
+                ->with([
+                    'homeTeam.media',
+                    'awayTeam.media',
+                ]),
         ]);
+
+        $poolResults = DB::table('tournament_pool_results')
+            ->where('tournament_id', $tournament->id)
+            ->orderBy('pool_id')
+            ->orderByDesc('total_points')
+            ->orderBy('team_name')
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
 
         return Inertia::render('Tournaments/Show', [
             'tournament' => TournamentResource::make($tournament)->resolve(),
+            'poolResults' => $poolResults,
         ]);
     }
 

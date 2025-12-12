@@ -45,6 +45,16 @@ class TournamentResource extends JsonResource
                         'id' => $game->id,
                         'team_a_name' => $game->team_a_name,
                         'team_b_name' => $game->team_b_name,
+                        'home_team' => $game->homeTeam ? [
+                            'id' => $game->homeTeam->id,
+                            'name' => $game->homeTeam->name,
+                            'logo_url' => $game->homeTeam->getFirstMediaUrl('logo') ?: null,
+                        ] : null,
+                        'away_team' => $game->awayTeam ? [
+                            'id' => $game->awayTeam->id,
+                            'name' => $game->awayTeam->name,
+                            'logo_url' => $game->awayTeam->getFirstMediaUrl('logo') ?: null,
+                        ] : null,
                         'game_date' => $game->game_date,
                         'game_time' => $game->game_time,
                         'venue' => $game->venue,

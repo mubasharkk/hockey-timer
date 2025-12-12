@@ -9,14 +9,24 @@ import { faArrowLeft, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg
 
 export default function Show({ auth, team }) {
     const [confirming, setConfirming] = useState(null);
-    const { delete: destroy, processing } = useForm();
+    const [confirmingTeamDelete, setConfirmingTeamDelete] = useState(false);
+    const { delete: deletePlayer, processing: deletingPlayer } = useForm();
+    const { delete: deleteTeam, processing: deletingTeam } = useForm();
+
+    const canManage = team?.user_id === auth?.user?.id;
 
     const confirmRemove = (player) => setConfirming(player);
     const closeModal = () => setConfirming(null);
     const handleDelete = () => {
         if (!confirming) return;
-        destroy(route('teams.players.destroy', [team.id, confirming.id]), {
+        deletePlayer(route('teams.players.destroy', [team.id, confirming.id]), {
             onFinish: closeModal,
+        });
+    };
+
+    const handleTeamDelete = () => {
+        deleteTeam(route('teams.destroy', team.id), {
+            onFinish: () => setConfirmingTeamDelete(false),
         });
     };
 
@@ -24,18 +34,48 @@ export default function Show({ auth, team }) {
         <AuthenticatedLayout
             header={
                 <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Team</p>
-                        <h2 className="text-xl font-semibold leading-tight text-gray-800">{team.name}</h2>
+                    <div className="flex items-center gap-3">
+                        {team.logo_url && (
+                            <img
+                                src={team.logo_url}
+                                alt={`${team.name} logo`}
+                                className="h-12 w-12 rounded-md border border-gray-200 object-cover"
+                            />
+                        )}
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Team</p>
+                            <h2 className="text-xl font-semibold leading-tight text-gray-800">{team.name}</h2>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Link
-                            href={route('teams.players.create', team.id)}
-                            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                        >
-                            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                            Add Player
-                        </Link>
+                        {canManage && (
+                            <Link
+                                href={route('teams.players.create', team.id)}
+                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                            >
+                                <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                                Add Player
+                            </Link>
+                        )}
+                        {canManage && (
+                            <Link
+                                href={route('teams.edit', team.id)}
+                                className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            >
+                                <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
+                                Edit Team
+                            </Link>
+                        )}
+                        {canManage && (
+                            <button
+                                type="button"
+                                onClick={() => setConfirmingTeamDelete(true)}
+                                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500"
+                            >
+                                <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                Delete
+                            </button>
+                        )}
                         <Link
                             href={route('teams.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
@@ -62,13 +102,15 @@ export default function Show({ auth, team }) {
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-3 flex items-center justify-between">
                             <h3 className="text-lg font-semibold text-gray-900">Players</h3>
-                            <Link
-                                href={route('teams.players.create', team.id)}
-                                className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
-                            >
-                                <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
-                                Add Player
-                            </Link>
+                            {canManage && (
+                                <Link
+                                    href={route('teams.players.create', team.id)}
+                                    className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                >
+                                    <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
+                                    Add Player
+                                </Link>
+                            )}
                         </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -78,7 +120,7 @@ export default function Show({ auth, team }) {
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Name</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Pass</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Status</th>
-                                        <th className="px-3 py-2 text-right font-semibold text-gray-700">Actions</th>
+                                        {canManage && <th className="px-3 py-2 text-right font-semibold text-gray-700">Actions</th>}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
@@ -98,30 +140,32 @@ export default function Show({ auth, team }) {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="px-3 py-2 text-right text-sm font-semibold">
-                                                <div className="flex justify-end gap-2">
-                                                    <Link
-                                                        href={route('teams.players.edit', [team.id, player.id])}
-                                                        className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-500"
-                                                    >
-                                                        <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
-                                                        Edit
-                                                    </Link>
-                                                    <button
-                                                        type="button"
-                                                        className="inline-flex items-center gap-1 text-red-600 hover:text-red-500"
-                                                        onClick={() => confirmRemove(player)}
-                                                    >
-                                                        <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
-                                                        Remove
-                                                    </button>
-                                                </div>
-                                            </td>
+                                            {canManage && (
+                                                <td className="px-3 py-2 text-right text-sm font-semibold">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Link
+                                                            href={route('teams.players.edit', [team.id, player.id])}
+                                                            className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-500"
+                                                        >
+                                                            <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
+                                                            Edit
+                                                        </Link>
+                                                        <button
+                                                            type="button"
+                                                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-500"
+                                                            onClick={() => confirmRemove(player)}
+                                                        >
+                                                            <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            )}
                                         </tr>
                                     ))}
                                     {(team.players || []).length === 0 && (
                                         <tr>
-                                            <td className="px-3 py-3 text-sm text-gray-500" colSpan="5">
+                                            <td className="px-3 py-3 text-sm text-gray-500" colSpan={canManage ? 5 : 4}>
                                                 No players yet. Add the first player.
                                             </td>
                                         </tr>
@@ -140,8 +184,23 @@ export default function Show({ auth, team }) {
                     </p>
                     <div className="mt-4 flex justify-end gap-3">
                         <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
-                        <DangerButton onClick={handleDelete} disabled={processing}>
-                            {processing ? 'Removing...' : 'Remove'}
+                        <DangerButton onClick={handleDelete} disabled={deletingPlayer}>
+                            {deletingPlayer ? 'Removing...' : 'Remove'}
+                        </DangerButton>
+                    </div>
+                </div>
+            </Modal>
+            <Modal show={confirmingTeamDelete} onClose={() => setConfirmingTeamDelete(false)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">Delete this team?</h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        This removes the team and its players. Games and tournaments referencing it will keep their own
+                        records but the registered team will be gone.
+                    </p>
+                    <div className="mt-4 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setConfirmingTeamDelete(false)}>Cancel</SecondaryButton>
+                        <DangerButton onClick={handleTeamDelete} disabled={deletingTeam}>
+                            {deletingTeam ? 'Deleting...' : 'Delete team'}
                         </DangerButton>
                     </div>
                 </div>

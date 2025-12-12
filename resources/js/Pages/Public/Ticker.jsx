@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import ApplicationLogo from "@/Components/ApplicationLogo.jsx";
+import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
@@ -93,17 +94,9 @@ export default function Ticker({ game, gameId }) {
     // (avoid drifting when the main timer is paused or adjusted).
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-50">
+        <PublicLayout fullWidth>
             <Head title="Live Ticker" />
-            <header className="border-b border-slate-800 bg-slate-900/80 backdrop-blur">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-                    <div>
-                        <ApplicationLogo/>
-                    </div>
-                </div>
-            </header>
-
-            <main className="mx-auto max-w-6xl px-4 py-6">
+            <div className="min-h-screen bg-slate-950 px-[calc(50vw-50%)] py-6 text-slate-50">
                 {!liveData && (
                     <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-indigo-900/20">
                         <form onSubmit={submit} className="flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -220,8 +213,8 @@ export default function Ticker({ game, gameId }) {
                         </div>
                     </div>
                 )}
-            </main>
-        </div>
+            </div>
+        </PublicLayout>
     );
 }
 
