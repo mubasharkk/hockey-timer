@@ -32,7 +32,7 @@ class StoreGameRequest extends FormRequest
             'notes' => ['nullable', 'string'],
             'game_date' => ['required', 'date'],
             'game_time' => ['required', 'date_format:H:i'],
-            'sessions' => ['required', 'integer', 'in:2,4,6,8'],
+            'sessions' => ['required', 'integer', 'in:1,2,4,6,8'],
             'session_duration_minutes' => ['required', 'integer', 'min:1'],
             'timer_mode' => ['required', 'in:ASC,DESC'],
             'sport_type' => ['nullable', 'string', 'max:50'],
