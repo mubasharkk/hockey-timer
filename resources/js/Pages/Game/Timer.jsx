@@ -594,6 +594,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
                                 timer
                             </p>
+                            {game.game_officials && <p className="text-sm text-gray-600">Officials: {game.game_officials}</p>}
                             {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
                         </div>
                         <div className="flex flex-col items-start gap-1 sm:items-end sm:gap-0">
