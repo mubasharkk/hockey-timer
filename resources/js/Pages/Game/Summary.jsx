@@ -66,6 +66,10 @@ export default function Summary({ auth, game }) {
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Timer Mode</dt>
                                 <dd className="text-lg font-semibold text-gray-900">{game.timer_mode}</dd>
                             </div>
+                            <div className="sm:col-span-2">
+                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Game Officials</dt>
+                                <dd className="text-sm text-gray-900">{game.game_officials || '—'}</dd>
+                            </div>
                             <div>
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Home Players</dt>
                                 <dd className="text-sm text-gray-900">
