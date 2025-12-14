@@ -17,6 +17,7 @@ class PublicTickerController extends Controller
         if ($code) {
             $game = Game::with([
                 'teams.players',
+                'tournament:id,title,logo_url',
                 'sessions' => fn ($q) => $q->orderBy('number'),
                 'events' => fn ($q) => $q->orderBy('occurred_at'),
             ])->where('code', $code)->first();
@@ -26,6 +27,7 @@ class PublicTickerController extends Controller
         if ($gameId) {
             $game = Game::with([
                 'teams.players',
+                'tournament:id,title,logo_url',
                 'sessions' => fn ($q) => $q->orderBy('number'),
                 'events' => fn ($q) => $q->orderBy('occurred_at'),
             ])->find($gameId);

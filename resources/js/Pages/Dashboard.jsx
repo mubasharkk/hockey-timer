@@ -129,18 +129,24 @@ const formatRelativeStart = (date, time, nowIso, status, endedAt) => {
     if (status === 'finished' || endedAt) return 'Finished';
 
     const diffMinutes = start.diff(now, 'minutes', true);
-    if (diffMinutes > 1) {
-        return `${Math.round(diffMinutes)} mins to start`;
-    }
-    if (diffMinutes > 0) {
-        return 'Starting soon';
-    }
+    if (Math.abs(diffMinutes) < 1) return 'Starting now';
 
-    const minsAgo = now.diff(start, 'minutes', true);
-    if (minsAgo < 60) {
-        return `${Math.round(minsAgo)} mins since start`;
-    }
-    return `${Math.round(minsAgo / 60)} hrs since start`;
+    return formatMinutesHuman(diffMinutes, 'to start', 'since start');
+};
+
+const formatMinutesHuman = (minutes, futureSuffix = '', pastSuffix = '') => {
+    const total = Math.abs(Math.round(minutes));
+    const days = Math.floor(total / 1440);
+    const hours = Math.floor((total % 1440) / 60);
+    const mins = total % 60;
+
+    const parts = [];
+    if (days) parts.push(`${days}d`);
+    if (hours) parts.push(`${hours}h`);
+    if (mins || parts.length === 0) parts.push(`${mins}m`);
+
+    const suffix = minutes >= 0 ? futureSuffix : pastSuffix;
+    return `${parts.join(' ')} ${suffix}`.trim();
 };
 
 const deriveStatus = (game) => {
