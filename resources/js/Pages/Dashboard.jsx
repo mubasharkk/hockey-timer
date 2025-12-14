@@ -62,6 +62,11 @@ export default function Dashboard({ auth, games = [], now }) {
                                                             <div className="text-sm font-semibold text-gray-900">
                                                                 {game.team_a_name} vs {game.team_b_name}
                                                             </div>
+                                                            {game.tournament?.title && (
+                                                                <div className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600">
+                                                                    {game.tournament.title}
+                                                                </div>
+                                                            )}
                                                             {game.excerpt && <div className="text-xs text-gray-700">{game.excerpt}</div>}
                                                             {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
                                                             <div className="text-xs text-gray-600">
@@ -110,10 +115,11 @@ const StatusBadge = ({ status }) => {
 };
 
 const formatDateTime = (date, time) => {
-    if (!date || !time) return '—';
-    const value = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
-    if (!value.isValid()) return `${date} ${time}`;
-    return value.format('DD.MM.YYYY HH:mm');
+    const value = moment(`${date || ''} ${time || ''}`.trim(), 'YYYY-MM-DD HH:mm');
+    if (!value.isValid()) {
+        return [date, time].filter(Boolean).join(' ') || 'TBD';
+    }
+    return value.format('DD.MM.YYYY · HH:mm');
 };
 
 const formatRelativeStart = (date, time, nowIso, status, endedAt) => {

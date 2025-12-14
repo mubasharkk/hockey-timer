@@ -40,7 +40,6 @@ class Game extends Model
 
     protected $casts = [
         'game_date' => 'date',
-        'game_time' => 'datetime:H:i',
         'sport_type' => 'string',
         'continue_timer_on_goal' => 'boolean',
         'game_officials' => 'string',

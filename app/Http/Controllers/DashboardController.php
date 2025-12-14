@@ -12,6 +12,7 @@ class DashboardController extends Controller
     public function __invoke(): Response
     {
         $games = Game::query()
+            ->with('tournament:id,title')
             ->latest('game_date')
             ->latest('game_time')
             ->take(10)
@@ -19,6 +20,7 @@ class DashboardController extends Controller
                 'id',
                 'team_a_name',
                 'team_b_name',
+                'tournament_id',
                 'venue',
                 'sport_type',
                 'code',

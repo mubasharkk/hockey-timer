@@ -14,6 +14,7 @@ export default function GameMatchup({ game }) {
             {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600">
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
+                {game.game_time}
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
             </div>
         </div>
