@@ -13,8 +13,8 @@ class DashboardController extends Controller
     {
         $games = Game::query()
             ->with('tournament:id,title')
-            ->latest('game_date')
-            ->latest('game_time')
+            ->orderBy('game_date')
+            ->orderBy('game_time')
             ->take(10)
             ->get([
                 'id',

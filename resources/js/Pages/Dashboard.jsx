@@ -1,8 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useMemo, useState } from 'react';
 import moment from 'moment';
 
 export default function Dashboard({ auth, games = [], now }) {
+    const [tab, setTab] = useState('upcoming');
+    const nowMoment = useMemo(() => (now ? moment(now) : moment()), [now]);
+
+    const upcomingGames = useMemo(() => partitionGames(games, nowMoment).upcoming, [games, nowMoment]);
+    const resultGames = useMemo(() => partitionGames(games, nowMoment).results, [games, nowMoment]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -40,53 +47,29 @@ export default function Dashboard({ auth, games = [], now }) {
                                     <h3 className="text-lg font-semibold text-gray-900">Games</h3>
                                     <p className="mt-1 text-sm text-gray-600">Recent games with status and scheduled start.</p>
 
-                                    <div className="mt-4 space-y-3">
-                                        {games.length === 0 && <p className="text-sm text-gray-600">No games yet. Create one to get started.</p>}
-
-                                        {games.map((game) => {
-                                            const status = deriveStatus(game);
-                                            const relative = formatRelativeStart(game.game_date, game.game_time, now, status, game.ended_at);
-                                            return (
-                                                <div
-                                                    key={game.id}
-                                                    className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
+                                    <div className="mt-4 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
+                                                <button
+                                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                                    onClick={() => setTab('upcoming')}
                                                 >
-                                                    <div className="flex items-start gap-3">
-                                                        <img
-                                                            src={sportIcon(game.sport_type)}
-                                                            alt={game.sport_type || 'sport'}
-                                                            className="h-10 w-10 rounded-md bg-white object-contain p-1 ring-1 ring-gray-200"
-                                                            loading="lazy"
-                                                        />
-                                                        <div className="space-y-1">
-                                                            <div className="text-sm font-semibold text-gray-900">
-                                                                {game.team_a_name} vs {game.team_b_name}
-                                                            </div>
-                                                            {game.tournament?.title && (
-                                                                <div className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600">
-                                                                    {game.tournament.title}
-                                                                </div>
-                                                            )}
-                                                            {game.excerpt && <div className="text-xs text-gray-700">{game.excerpt}</div>}
-                                                            {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
-                                                            <div className="text-xs text-gray-600">
-                                                                <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
-                                                                {relative ? ` · ${relative}` : ''}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-3">
-                                                        <StatusBadge status={status} />
-                                                        <Link
-                                                            href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
-                                                            className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
-                                                        >
-                                                            {status === 'finished' ? 'Report' : 'View'}
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                                                    Upcoming ({upcomingGames.length})
+                                                </button>
+                                                <button
+                                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                                    onClick={() => setTab('results')}
+                                                >
+                                                    Results ({resultGames.length})
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {tab === 'upcoming' ? (
+                                            <GameList games={upcomingGames} now={nowMoment} emptyMessage="No upcoming games." />
+                                        ) : (
+                                            <GameList games={resultGames} now={nowMoment} emptyMessage="No finished games yet." />
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -95,6 +78,62 @@ export default function Dashboard({ auth, games = [], now }) {
         </AuthenticatedLayout>
     );
 }
+
+const GameList = ({ games, now, emptyMessage }) => {
+    if (!games || games.length === 0) {
+        return <p className="text-sm text-gray-600">{emptyMessage}</p>;
+    }
+
+    return (
+        <div className="space-y-3">
+            {games.map((game) => (
+                <GameRow key={game.id} game={game} now={now} />
+            ))}
+        </div>
+    );
+};
+
+const GameRow = ({ game, now }) => {
+    const status = deriveStatus(game);
+    const relative = formatRelativeStart(game.game_date, game.game_time, now, status, game.ended_at);
+    return (
+        <div className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3">
+            <div className="flex items-start gap-3">
+                <img
+                    src={sportIcon(game.sport_type)}
+                    alt={game.sport_type || 'sport'}
+                    className="h-10 w-10 rounded-md bg-white object-contain p-1 ring-1 ring-gray-200"
+                    loading="lazy"
+                />
+                <div className="space-y-1">
+                    <div className="text-sm font-semibold text-gray-900">
+                        {game.team_a_name} vs {game.team_b_name}
+                    </div>
+                    {game.tournament?.title && (
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600">
+                            {game.tournament.title}
+                        </div>
+                    )}
+                    {game.excerpt && <div className="text-xs text-gray-700">{game.excerpt}</div>}
+                    {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
+                    <div className="text-xs text-gray-600">
+                        <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
+                        {relative ? ` · ${relative}` : ''}
+                    </div>
+                </div>
+            </div>
+            <div className="flex items-center gap-3">
+                <StatusBadge status={status} />
+                <Link
+                    href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                    {status === 'finished' ? 'Report' : 'View'}
+                </Link>
+            </div>
+        </div>
+    );
+};
 
 const StatusBadge = ({ status }) => {
     const palette = {
@@ -152,6 +191,26 @@ const formatMinutesHuman = (minutes, futureSuffix = '', pastSuffix = '') => {
 const deriveStatus = (game) => {
     if (game.status === 'finished' || game.ended_at) return 'finished';
     return game.status || 'scheduled';
+};
+
+const partitionGames = (games, now) => {
+    const upcoming = [];
+    const results = [];
+
+    games.forEach((game) => {
+        const status = deriveStatus(game);
+        const start = moment(`${game.game_date} ${game.game_time}`, 'YYYY-MM-DD HH:mm');
+
+        const isResult = status === 'finished' || game.ended_at || (start.isValid() && start.isBefore(now));
+
+        if (isResult) {
+            results.push(game);
+        } else {
+            upcoming.push(game);
+        }
+    });
+
+    return { upcoming, results };
 };
 
 const sportIcon = (sport) => {
