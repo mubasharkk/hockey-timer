@@ -127,8 +127,19 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                                             {(pool.teams || []).length > 0 ? (
                                                 <ul className="space-y-1 text-sm text-gray-800">
                                                     {pool.teams.map((team) => (
-                                                        <li key={team.id} className="rounded bg-white px-2 py-1">
-                                                            {team.name}
+                                                        <li key={team.id} className="flex items-center gap-2 rounded bg-white px-2 py-1">
+                                                            {team.logo_url ? (
+                                                                <img
+                                                                    src={team.logo_url}
+                                                                    alt={`${team.name} logo`}
+                                                                    className="h-6 w-6 rounded object-cover ring-1 ring-gray-200"
+                                                                />
+                                                            ) : (
+                                                                <div className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-[10px] font-semibold uppercase text-gray-500 ring-1 ring-gray-200">
+                                                                    {team.name?.[0]?.toUpperCase() ?? '?'}
+                                                                </div>
+                                                            )}
+                                                            <span>{team.name}</span>
                                                         </li>
                                                     ))}
                                                 </ul>

@@ -131,14 +131,17 @@ export default function Ticker({ game, gameId }) {
                     <div className="mt-6 space-y-6">
                         {(tournament?.logo_url || tournament?.title) && (
                             <div className="flex flex-col items-center justify-center gap-3 text-center">
-                                {tournament?.logo_url && (
+                                {tournament?.logo_url ? (
                                     <img
                                         src={tournament.logo_url}
                                         alt={tournament.title || 'Tournament logo'}
                                         className="h-auto max-h-24 w-full max-w-xs object-contain"
                                     />
+                                ) : (
+                                    <div className="flex h-24 w-full max-w-xs items-center justify-center rounded-lg border border-slate-800 bg-slate-900/60 px-4 text-sm font-semibold text-slate-200">
+                                        {tournament?.title}
+                                    </div>
                                 )}
-                                {tournament?.title && <h1 className="text-xl font-semibold text-white">{tournament.title}</h1>}
                             </div>
                         )}
                         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">

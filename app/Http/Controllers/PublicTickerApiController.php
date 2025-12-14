@@ -11,7 +11,7 @@ class PublicTickerApiController extends Controller
     {
         $game->load([
             'teams' => fn ($q) => $q->orderBy('side'),
-            'tournament:id,title,logo_url',
+            'tournament:id,title',
         ]);
         $sessionModels = $game->sessions()->orderBy('number')->get();
         $eventModels = $game->events()->orderByDesc('occurred_at')->limit(50)->get();
@@ -95,7 +95,11 @@ class PublicTickerApiController extends Controller
             'team_a_score' => $homeScore ?? 0,
             'team_b_score' => $awayScore ?? 0,
             'tournament' => $game->tournament
-                ? $game->tournament->only(['id', 'title', 'logo_url'])
+                ? [
+                    'id' => $game->tournament->id,
+                    'title' => $game->tournament->title,
+                    'logo_url' => $game->tournament->getFirstMediaUrl('logo') ?: null,
+                ]
                 : null,
             'timer_seconds' => $timerSeconds,
             'current_period' => $currentSessionNumber,
