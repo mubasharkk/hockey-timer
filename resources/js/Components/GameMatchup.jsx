@@ -30,12 +30,12 @@ const TeamBlock = ({ team }) => (
 
 const Logo = ({ src, alt }) => {
     if (src) {
-        return <img src={src} alt={alt || 'team logo'} className="h-14 w-14 rounded-md border border-gray-200 object-cover bg-white" />;
+        return <img src={src} alt={alt || 'team logo'} className="h-14 w-14 object-contain" />;
     }
 
     const initial = (alt || 'T')[0]?.toUpperCase() ?? 'T';
     return (
-        <div className="flex h-14 w-14 items-center justify-center rounded-md border border-dashed border-gray-200 bg-white text-lg font-semibold text-gray-400">
+        <div className="flex h-14 w-14 items-center justify-center text-lg font-semibold text-gray-400">
             {initial}
         </div>
     );
