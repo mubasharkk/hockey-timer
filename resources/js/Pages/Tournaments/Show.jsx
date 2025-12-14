@@ -101,7 +101,7 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                             <img
                                 src={tournament.logo_url}
                                 alt={`${tournament.title} logo`}
-                                className="h-28 w-28 rounded-lg object-contain ring-1 ring-gray-200 bg-white"
+                                className="h-auto max-h-[100px] w-full rounded-lg object-contain"
                             />
                         </div>
                     )}

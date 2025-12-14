@@ -29,8 +29,18 @@ export default function Tournament({ tournament, poolResults = [] }) {
             <Head title={tournament.title} />
             <div className="bg-gray-50 px-0 sm:px-[calc(50vw-50%)] py-10">
                 <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
+                    {tournament.logo_url && (
+                        <div className="flex justify-center">
+                            <img
+                                src={tournament.logo_url}
+                                alt={`${tournament.title} logo`}
+                                className="h-auto max-h-[100px] w-full rounded-lg object-contain"
+                            />
+                        </div>
+                    )}
+
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Tournament</p>
                                 <h1 className="text-2xl font-semibold text-gray-900">{tournament.title}</h1>
@@ -40,13 +50,6 @@ export default function Tournament({ tournament, poolResults = [] }) {
                                     {tournament.end_date ? ` → ${formatDate(tournament.end_date)}` : ''}
                                 </p>
                             </div>
-                            {tournament.logo_url && (
-                                <img
-                                    src={tournament.logo_url}
-                                    alt={`${tournament.title} logo`}
-                                    className="h-20 w-20 rounded-lg object-contain ring-1 ring-gray-200 bg-white"
-                                />
-                            )}
                         </div>
                         {tournament.sponsor_logo_urls && tournament.sponsor_logo_urls.length > 0 && (
                             <div className="mt-6 rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
