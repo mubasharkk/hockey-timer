@@ -10,8 +10,8 @@ class PublicTickerApiController extends Controller
     public function show(Game $game): JsonResponse
     {
         $game->load([
-            'teams' => fn ($q) => $q->orderBy('side'),
-            'tournament:id,title',
+            'teams' => fn ($q) => $q->with('media')->orderBy('side'),
+            'tournament' => fn ($q) => $q->with('media')->select(['id', 'title']),
         ]);
         $sessionModels = $game->sessions()->orderBy('number')->get();
         $eventModels = $game->events()->orderByDesc('occurred_at')->limit(50)->get();
@@ -94,6 +94,14 @@ class PublicTickerApiController extends Controller
             'team_b_name' => $game->team_b_name,
             'team_a_score' => $homeScore ?? 0,
             'team_b_score' => $awayScore ?? 0,
+            'teams' => $game->teams->map(function ($team) {
+                return [
+                    'id' => $team->id,
+                    'name' => $team->name,
+                    'side' => $team->side,
+                    'logo_url' => $team->logo_url,
+                ];
+            }),
             'tournament' => $game->tournament
                 ? [
                     'id' => $game->tournament->id,

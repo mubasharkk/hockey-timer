@@ -17,6 +17,9 @@ export default function Ticker({ game, gameId }) {
     const venue = liveData?.venue ?? game?.venue ?? '';
     const excerpt = liveData?.excerpt ?? game?.excerpt ?? '';
     const tournament = liveData?.tournament ?? game?.tournament ?? null;
+    const teams = liveData?.teams ?? game?.teams ?? [];
+    const homeTeam = teams.find((t) => t.side === 'home') || { name: liveData?.team_a_name ?? game?.team_a_name };
+    const awayTeam = teams.find((t) => t.side === 'away') || { name: liveData?.team_b_name ?? game?.team_b_name };
 
     const effectiveSeconds = useMemo(() => {
         if (!liveData) return displaySeconds ?? 0;
@@ -146,34 +149,44 @@ export default function Ticker({ game, gameId }) {
                         )}
                         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">
                             <div className="my-5">
-                                <div className="text-center">
-                                    <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
-                                    <p className="text-[6rem] font-bold text-white tabular-nums">
-                                        {formatSeconds(effectiveSeconds)}
-                                    </p>
-                                    <p className="mx-auto text-xl font-bold text-slate-300 flex items-center justify-center gap-3">
-                                        <span>{totalSessions === 4 ? 'Q' : 'Session'} {currentSession}</span>
-                                        <span className="text-slate-500">/</span>
-                                        <span>{totalSessions ?? ''}</span>
-                                        {liveData?.is_break && !isFinished && (
-                                            <span className="rounded-full bg-amber-500/20 px-3 py-1 text-sm font-semibold text-amber-200 border border-amber-500/40">
-                                                Break
-                                            </span>
-                                        )}
-                                        {isFinished && (
-                                            <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-semibold text-red-100 border border-red-500/40">
-                                                Ended
-                                            </span>
-                                        )}
-                                    </p>
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="w-24 flex justify-start">
+                                        <TeamLogo team={homeTeam} align="start" bare />
+                                    </div>
+                                    <div className="text-center flex-1">
+                                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
+                                        <p className="text-[6rem] font-bold text-white tabular-nums">
+                                            {formatSeconds(effectiveSeconds)}
+                                        </p>
+                                        <p className="mx-auto text-xl font-bold text-slate-300 flex items-center justify-center gap-3">
+                                            <span>{totalSessions === 4 ? 'Q' : 'Session'} {currentSession}</span>
+                                            <span className="text-slate-500">/</span>
+                                            <span>{totalSessions ?? ''}</span>
+                                            {liveData?.is_break && !isFinished && (
+                                                <span className="rounded-full bg-amber-500/20 px-3 py-1 text-sm font-semibold text-amber-200 border border-amber-500/40">
+                                                    Break
+                                                </span>
+                                            )}
+                                            {isFinished && (
+                                                <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-semibold text-red-100 border border-red-500/40">
+                                                    Ended
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                    <div className="w-24 flex justify-end">
+                                        <TeamLogo team={awayTeam} align="end" bare />
+                                    </div>
                                 </div>
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
                                     <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
-                                        <span className="mb-5 text-3xl font-semibold">{liveData.team_a_name}</span>
+                                        <TeamLogo team={homeTeam} align="start" />
+                                        <span className="mb-3 mt-3 text-3xl font-semibold">{homeTeam?.name || liveData.team_a_name}</span>
                                         <span className="text-5xl font-bold">{liveData.team_a_score ?? (liveData.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
                                     </div>
                                     <div id="score-team-b" className="flex w-1/2 flex-col items-end justify-center text-right">
-                                        <span className="mb-5 text-3xl font-semibold">{liveData.team_b_name}</span>
+                                        <TeamLogo team={awayTeam} align="end" />
+                                        <span className="mb-3 mt-3 text-3xl font-semibold">{awayTeam?.name || liveData.team_b_name}</span>
                                         <span className="text-5xl font-bold">{liveData.team_b_score ?? (liveData.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
                                 </div>
@@ -233,6 +246,22 @@ export default function Ticker({ game, gameId }) {
         </PublicLayout>
     );
 }
+
+const TeamLogo = ({ team, align = 'center', bare = false }) => {
+    const justify = align === 'end' ? 'justify-end' : align === 'start' ? 'justify-start' : 'justify-center';
+
+    return (
+        <div className={`flex w-full ${justify}`}>
+            {team?.logo_url && (
+                <img
+                    src={team.logo_url}
+                    alt={`${team.name || 'Team'} logo`}
+                    className={`h-14 w-14 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-slate-800 bg-slate-900/60'}`}
+                />
+            )}
+        </div>
+    );
+};
 
 const eventBadge = (event) => {
     switch (event.event_type) {

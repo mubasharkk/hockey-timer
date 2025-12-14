@@ -43,11 +43,6 @@ export default function Summary({ auth, game }) {
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
                         <p className="text-xs uppercase tracking-wide text-gray-500">Summary</p>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <TeamBadge team={homeTeam} />
-                            <span className="text-sm font-semibold uppercase tracking-wide text-gray-500">vs</span>
-                            <TeamBadge team={awayTeam} />
-                        </div>
                         <h1 className="text-2xl font-semibold text-gray-900">
                             {homeTeam.name} vs {awayTeam.name}
                         </h1>
@@ -180,26 +175,6 @@ const PlayerList = ({ team }) => {
                 </li>
             ))}
         </ul>
-    );
-};
-
-const TeamBadge = ({ team }) => {
-    const initial = team?.name?.[0]?.toUpperCase() ?? '?';
-    return (
-        <div className="flex items-center gap-2">
-            {team?.logo_url ? (
-                <img
-                    src={team.logo_url}
-                    alt={`${team.name || 'Team'} logo`}
-                    className="h-10 w-10 rounded-md object-cover ring-1 ring-gray-200"
-                />
-            ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gray-100 text-sm font-semibold uppercase text-gray-500 ring-1 ring-gray-200">
-                    {initial}
-                </div>
-            )}
-            <span className="text-sm font-semibold text-gray-900">{team?.name || 'TBD'}</span>
-        </div>
     );
 };
 
