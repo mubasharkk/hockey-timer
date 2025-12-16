@@ -91,7 +91,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 {game?.team_a_name} vs {game?.team_b_name}
                             </h1>
                             <p className="text-sm text-gray-600">
-                                {formatDate(game?.game_date)} · {game?.game_time} · {game?.venue}
+                                {formatDate(game?.game_date)} · {formatTime(game?.game_time)} · {game?.venue}
                             </p>
                             {game?.excerpt && <p className="text-xs text-gray-700">{game.excerpt}</p>}
                             <p className="text-xs text-gray-500">Code: {game?.code || game?.id}</p>
@@ -134,7 +134,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Date</th>
                                         <td className="px-3 py-2">{formatDate(game?.game_date)}</td>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Time</th>
-                                        <td className="px-3 py-2">{game?.game_time || '—'}</td>
+                                        <td className="px-3 py-2">{formatTime(game?.game_time)}</td>
                                     </tr>
                                     <tr className="border-b border-gray-200">
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Venue</th>
@@ -359,7 +359,7 @@ const formatClock = (event) => {
     }
     if (event.occurred_at) {
         const m = moment(event.occurred_at);
-        if (m.isValid()) return m.format('HH:mm');
+        if (m.isValid()) return m.format('hh:mm A');
     }
     return '—';
 };
@@ -370,10 +370,16 @@ const formatDate = (value) => {
     return m.isValid() ? m.format('YYYY-MM-DD') : value;
 };
 
+const formatTime = (value) => {
+    if (!value) return '—';
+    const m = moment(value, 'HH:mm');
+    return m.isValid() ? m.format('hh:mm A') : value;
+};
+
 const formatDateTime = (value) => {
     if (!value) return '—';
     const m = moment(value);
-    return m.isValid() ? m.format('YYYY-MM-DD HH:mm') : value;
+    return m.isValid() ? m.format('YYYY-MM-DD hh:mm A') : value;
 };
 
 const eventLabel = (event) => {

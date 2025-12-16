@@ -10,11 +10,11 @@ export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const [currentTime, setCurrentTime] = useState(() => moment().format('DD.MM.YYYY HH:mm'));
+    const [currentTime, setCurrentTime] = useState(() => moment().format('DD.MM.YYYY hh:mm A'));
 
     useEffect(() => {
         const id = window.setInterval(() => {
-            setCurrentTime(moment().format('DD.MM.YYYY HH:mm'));
+            setCurrentTime(moment().format('DD.MM.YYYY hh:mm A'));
         }, 1000 * 60);
         return () => window.clearInterval(id);
     }, []);

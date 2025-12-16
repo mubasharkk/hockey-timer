@@ -158,7 +158,7 @@ const formatDateTime = (date, time) => {
     if (!value.isValid()) {
         return [date, time].filter(Boolean).join(' ') || 'TBD';
     }
-    return value.format('DD.MM.YYYY · HH:mm');
+    return value.format('DD.MM.YYYY · hh:mm A');
 };
 
 const formatRelativeStart = (date, time, nowIso, status, endedAt) => {

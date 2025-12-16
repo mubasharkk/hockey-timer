@@ -186,7 +186,7 @@ const formatDateTime = (date, time) => {
     if (!date || !time) return null;
     const value = moment(`${date} ${time}`, 'YYYY-MM-DD HH:mm');
     if (!value.isValid()) return `${date} ${time}`;
-    return value.format('DD.MM.YYYY HH:mm');
+    return value.format('DD.MM.YYYY hh:mm A');
 };
 
 const formatRelativeStart = (date, time, status, endedAt) => {

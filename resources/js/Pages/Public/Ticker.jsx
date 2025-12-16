@@ -232,7 +232,7 @@ export default function Ticker({ game, gameId }) {
                                                 )}
                                             </div>
                                             <p className="text-xs text-slate-400 whitespace-nowrap">
-                                                {e.occurred_at ? moment(e.occurred_at).format('HH:mm') : ''}
+                                                {e.occurred_at ? moment(e.occurred_at).format('hh:mm A') : ''}
                                             </p>
                                         </div>
                                     </div>

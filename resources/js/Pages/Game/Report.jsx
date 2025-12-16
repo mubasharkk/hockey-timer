@@ -56,7 +56,7 @@ export default function Report({ auth, game }) {
                             </h1>
                             {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
                             <p className="text-sm text-gray-600">
-                                {game.venue} · {formatLocalDate(game.game_date)} {game.game_time}
+                                {game.venue} · {formatLocalDate(game.game_date)} {formatTime(game.game_time)}
                             </p>
                             <p className="text-xs text-gray-500">Code: {game.code || game.id}</p>
                             {game.game_officials && (
@@ -187,6 +187,12 @@ const formatLocalDate = (date) => {
     if (!date) return '';
     const m = moment(date);
     return m.isValid() ? m.format('YYYY-MM-DD') : `${date}`;
+};
+
+const formatTime = (time) => {
+    if (!time) return '';
+    const m = moment(time, 'HH:mm');
+    return m.isValid() ? m.format('hh:mm A') : time;
 };
 
 const cardIcon = (type) => {

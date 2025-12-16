@@ -14,7 +14,7 @@ export default function GameMatchup({ game }) {
             {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600">
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
-                {game.game_time}
+                {formatTime(game.game_time)}
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
             </div>
         </div>
@@ -41,10 +41,16 @@ const Logo = ({ src, alt }) => {
     );
 };
 
+const formatTime = (time) => {
+    if (!time) return 'TBD';
+    const value = moment(time, 'HH:mm');
+    return value.isValid() ? value.format('hh:mm A') : time;
+};
+
 const formatDateTime = (date, time) => {
     const value = moment(`${date || ''} ${time || ''}`.trim(), 'YYYY-MM-DD HH:mm');
     if (!value.isValid()) {
         return [date, time].filter(Boolean).join(' ') || 'TBD';
     }
-    return value.format('DD.MM.YYYY · HH:mm');
+    return value.format('DD.MM.YYYY · hh:mm A');
 };
