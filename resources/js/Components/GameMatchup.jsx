@@ -1,4 +1,7 @@
 import moment from 'moment';
+import { Link } from '@inertiajs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 export default function GameMatchup({ game }) {
     const home = game.home_team || { name: game.team_a_name };
@@ -16,6 +19,19 @@ export default function GameMatchup({ game }) {
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
                 {formatTime(game.game_time)}
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
+                {(game.code || game.id) && (
+                    <Link
+                        href={
+                            game.code
+                                ? route('public.ticker.code', game.code)
+                                : `${route('public.ticker')}?game=${game.id}`
+                        }
+                        className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700 ring-1 ring-indigo-100 transition hover:bg-indigo-100"
+                    >
+                        <TickerIcon />
+                        <span className="text-[11px] uppercase tracking-wide">Ticker</span>
+                    </Link>
+                )}
             </div>
         </div>
     );
@@ -40,6 +56,10 @@ const Logo = ({ src, alt }) => {
         </div>
     );
 };
+
+const TickerIcon = () => (
+    <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5 text-indigo-700" />
+);
 
 const formatTime = (time) => {
     if (!time) return 'TBD';
