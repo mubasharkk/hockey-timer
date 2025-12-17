@@ -5,24 +5,25 @@ import { faSave } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 export default function Edit({ auth, tournament }) {
+    const currentTournament = tournament?.data ?? tournament;
     const { data, setData, post, processing, errors } = useForm({
         _method: 'put',
-        title: tournament.title || '',
-        slug: tournament.slug || '',
-        venue: tournament.venue || '',
-        start_date: formatDateForInput(tournament.start_date),
-        end_date: formatDateForInput(tournament.end_date),
-        win_points: tournament.win_points ?? 3,
-        draw_points: tournament.draw_points ?? 1,
-        loss_points: tournament.loss_points ?? 0,
-        pools_count: tournament.pools?.length || 1,
+        title: currentTournament.title || '',
+        slug: currentTournament.slug || '',
+        venue: currentTournament.venue || '',
+        start_date: formatDateForInput(currentTournament.start_date),
+        end_date: formatDateForInput(currentTournament.end_date),
+        win_points: currentTournament.win_points ?? 3,
+        draw_points: currentTournament.draw_points ?? 1,
+        loss_points: currentTournament.loss_points ?? 0,
+        pools_count: currentTournament.pools?.length || 1,
         logo: null,
         sponsor_logos: [],
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('tournaments.update', tournament.id));
+        post(route('tournaments.update', currentTournament.id));
     };
 
     return (

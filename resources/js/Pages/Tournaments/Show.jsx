@@ -11,31 +11,32 @@ import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
 
 export default function Show({ auth, tournament, poolResults = [] }) {
+    const currentTournament = tournament?.data ?? tournament;
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
-        destroy(route('tournaments.destroy', tournament.id), {
+        destroy(route('tournaments.destroy', currentTournament.id), {
             onSuccess: () => setConfirming(false),
         });
     };
 
     const upcomingGames = useMemo(() => {
-        return (tournament.games || []).filter((g) => {
+        return (currentTournament.games || []).filter((g) => {
             if (!g.game_date) return false;
             const date = moment(g.game_date).startOf('day');
             return date.isSameOrAfter(moment().startOf('day'));
         });
-    }, [tournament.games]);
+    }, [currentTournament.games]);
 
     const resultGames = useMemo(() => {
-        return (tournament.games || []).filter((g) => {
+        return (currentTournament.games || []).filter((g) => {
             if (!g.game_date) return true;
             const date = moment(g.game_date).startOf('day');
             return g.status === 'finished' || date.isBefore(moment().startOf('day'));
         });
-    }, [tournament.games]);
+    }, [currentTournament.games]);
 
     return (
         <AuthenticatedLayout
@@ -43,25 +44,25 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                 <div className="flex items-center justify-between">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Tournament</p>
-                        <h2 className="text-xl font-semibold leading-tight text-gray-800">{tournament.title}</h2>
+                        <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTournament.title}</h2>
                     </div>
                     <div className="flex items-center gap-2">
                         <Link
-                            href={route('tournaments.edit', tournament.id)}
+                            href={route('tournaments.edit', currentTournament.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
                             Edit
                         </Link>
                         <Link
-                            href={route('games.create', { tournament_id: tournament.id })}
+                            href={route('games.create', { tournament_id: currentTournament.id })}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
                             New Game
                         </Link>
                         <Link
-                            href={route('tournaments.pools.teams.edit', tournament.id)}
+                            href={route('tournaments.pools.teams.edit', currentTournament.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                         >
                             <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
@@ -83,7 +84,7 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                             Back
                         </Link>
                         <Link
-                            href={route('public.tournaments.show', tournament.slug)}
+                            href={route('public.tournaments.show', currentTournament.slug)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
                         >
                             Public view
@@ -92,33 +93,33 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                 </div>
             }
         >
-            <Head title={tournament.title} />
+            <Head title={currentTournament.title} />
 
             <div className="py-10">
                 <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
-                    {tournament.logo_url && (
+                    {currentTournament.logo_url && (
                         <div className="flex justify-center">
                             <img
-                                src={tournament.logo_url}
-                                alt={`${tournament.title} logo`}
+                                src={currentTournament.logo_url}
+                                alt={`${currentTournament.title} logo`}
                                 className="h-auto max-h-[100px] w-full rounded-lg object-contain"
                             />
                         </div>
                     )}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <Info label="Venue" value={tournament.venue} />
+                            <Info label="Venue" value={currentTournament.venue} />
                             <Info
                                 label="Dates"
-                                value={`${formatDate(tournament.start_date)}${tournament.end_date ? ` → ${formatDate(tournament.end_date)}` : ''}`}
+                                value={`${formatDate(currentTournament.start_date)}${currentTournament.end_date ? ` → ${formatDate(currentTournament.end_date)}` : ''}`}
                             />
-                            <Info label="Points (W/D/L)" value={`${tournament.win_points}/${tournament.draw_points}/${tournament.loss_points}`} />
+                            <Info label="Points (W/D/L)" value={`${currentTournament.win_points}/${currentTournament.draw_points}/${currentTournament.loss_points}`} />
                         </div>
-                        {tournament.pools && tournament.pools.length > 0 && (
+                        {currentTournament.pools && currentTournament.pools.length > 0 && (
                             <div className="mt-6 space-y-3">
                                 <h3 className="text-sm font-semibold text-gray-900">Pools</h3>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {tournament.pools.map((pool) => (
+                                    {currentTournament.pools.map((pool) => (
                                         <div key={pool.id} className="rounded-md border border-gray-100 bg-gray-50 p-3 shadow-sm">
                                             <div className="mb-2 flex items-center justify-between">
                                                 <span className="text-sm font-semibold text-gray-800">Pool {pool.name}</span>
@@ -151,11 +152,11 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                                 </div>
                             </div>
                         )}
-                        {tournament.sponsor_logo_urls && tournament.sponsor_logo_urls.length > 0 && (
+                        {currentTournament.sponsor_logo_urls && currentTournament.sponsor_logo_urls.length > 0 && (
                             <div className="mt-6 rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
                                 <h3 className="text-sm font-semibold text-gray-900">Sponsors</h3>
                                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                                    {tournament.sponsor_logo_urls.map((url, idx) => (
+                                    {currentTournament.sponsor_logo_urls.map((url, idx) => (
                                         <div key={idx} className="flex h-16 w-24 items-center justify-center rounded-md bg-white ring-1 ring-gray-200">
                                             <img src={url} alt={`Sponsor ${idx + 1}`} className="max-h-14 max-w-full object-contain" />
                                         </div>
@@ -208,7 +209,7 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                 <div className="p-6">
                     <h2 className="text-lg font-medium text-gray-900">Delete tournament?</h2>
                     <p className="mt-2 text-sm text-gray-600">
-                        This will delete {tournament.title}. Games linked to it will remain but without a tournament reference.
+                        This will delete {currentTournament.title}. Games linked to it will remain but without a tournament reference.
                     </p>
                     <div className="mt-4 flex justify-end gap-3">
                         <SecondaryButton onClick={() => setConfirming(false)}>Cancel</SecondaryButton>

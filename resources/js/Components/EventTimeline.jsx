@@ -9,8 +9,16 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
         (a, b) => new Date(b?.occurred_at || 0) - new Date(a?.occurred_at || 0)
     );
 
-    const teamA = teams.find((t) => t.side === 'home') ?? teams[0] ?? null;
-    const teamB = teams.find((t) => t.side === 'away') ?? teams[1] ?? null;
+    const normalizeTeam = (team) => {
+        if (!team) return null;
+        return {
+            ...team,
+            name: team.name || team.team_name || null,
+        };
+    };
+
+    const teamA = normalizeTeam(teams.find((t) => t.side === 'home') ?? teams[0] ?? null);
+    const teamB = normalizeTeam(teams.find((t) => t.side === 'away') ?? teams[1] ?? null);
     const teamAId = teamA?.id ?? null;
     const teamBId = teamB?.id ?? null;
     const teamById = (id) => teams.find((t) => t.id === id);

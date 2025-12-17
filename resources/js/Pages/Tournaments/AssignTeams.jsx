@@ -6,7 +6,9 @@ import { faRandom, faSave } from '@fortawesome/free-solid-svg-icons';
 import Select from 'react-select';
 
 export default function AssignTeams({ auth, tournament, teams = [] }) {
-    const pools = tournament.pools || [];
+    const currentTournament = tournament?.data ?? tournament;
+    const pools = currentTournament.pools || [];
+    const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const initialPools = pools.reduce((acc, pool) => {
         acc[pool.id] = (pool.teams || []).map((t) => t.id);
         return acc;
@@ -27,8 +29,8 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
     }, [data.randomize]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const teamOptions = useMemo(
-        () => teams.map((team) => ({ value: team.id, label: team.name })),
-        [teams]
+        () => teamList.map((team) => ({ value: team.id, label: team.name })),
+        [teamList]
     );
 
     const handlePoolChange = (poolId, selectedIds) => {
@@ -38,13 +40,13 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
     const submit = (e) => {
         e.preventDefault();
         setMessage(null);
-        post(route('tournaments.pools.teams.update', tournament.id), {
+        post(route('tournaments.pools.teams.update', currentTournament.id), {
             onError: () => setMessage('Please resolve the validation errors below.'),
         });
     };
 
     const handleRandom = () => {
-        const allTeamIds = teams.map((t) => t.id);
+        const allTeamIds = teamList.map((t) => t.id);
         setData({
             ...data,
             randomize: true,
@@ -60,7 +62,7 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
                 <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Pools</p>
-                        <h1 className="text-2xl font-semibold text-gray-900">Assign Teams to {tournament.title}</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900">Assign Teams to {currentTournament.title}</h1>
                         <p className="text-sm text-gray-600">
                             Minimum 4 teams required; teams must be evenly split across {pools.length} pool(s).
                         </p>

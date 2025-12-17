@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function Index({ auth, tournaments = [] }) {
+    const list = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
     return (
         <AuthenticatedLayout
             header={
@@ -27,10 +28,10 @@ export default function Index({ auth, tournaments = [] }) {
                         <div className="p-6 text-gray-900">
                             <p className="text-sm text-gray-600">Organize games under tournaments and pools.</p>
                             <div className="mt-4 space-y-3">
-                                {tournaments.length === 0 && (
+                                {list.length === 0 && (
                                     <p className="text-sm text-gray-600">No tournaments yet. Create one to get started.</p>
                                 )}
-                                {tournaments.map((tournament) => (
+                                {list.map((tournament) => (
                                     <div
                                         key={tournament.id}
                                         className="flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
