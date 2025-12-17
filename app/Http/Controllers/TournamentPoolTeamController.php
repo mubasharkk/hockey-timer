@@ -7,6 +7,7 @@ use App\Http\Resources\TeamResource;
 use App\Http\Resources\TournamentResource;
 use App\Models\Tournament;
 use App\Models\Team;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -18,7 +19,7 @@ class TournamentPoolTeamController extends Controller
     public function edit(Tournament $tournament): Response
     {
         $tournament->load('pools.teams');
-        $teams = Team::where('is_registered', true)->orderBy('name')->get();
+        $teams = Team::where('user_id', Auth::id())->orderBy('name')->get();
 
         return Inertia::render('Tournaments/AssignTeams', [
             'tournament' => TournamentResource::make($tournament),

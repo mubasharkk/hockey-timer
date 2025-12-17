@@ -27,7 +27,7 @@ class GameController extends Controller
     public function create(Request $request): Response
     {
         $registeredTeams = Team::query()
-            ->where('is_registered', true)
+            ->where('user_id', Auth::id())
             ->with([
                 'media',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
@@ -139,7 +139,7 @@ class GameController extends Controller
     {
         $game->load(['teams.players']);
 
-        $teams = Team::where('is_registered', true)
+        $teams = Team::where('user_id', Auth::id())
             ->orderBy('name')
             ->with('media')
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);

@@ -21,13 +21,13 @@ class AssignTournamentTeamsRequest extends FormRequest
             'team_ids' => ['required_if:randomize,true', 'array'],
             'team_ids.*' => [
                 'integer',
-                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('is_registered', true)),
+                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('user_id', auth()->id())),
             ],
             'pools' => ['required_unless:randomize,true', 'array'],
             'pools.*' => ['array'],
             'pools.*.*' => [
                 'integer',
-                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('is_registered', true)),
+                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('user_id', auth()->id())),
             ],
         ];
     }
