@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
-use App\Models\Player;
 use App\Models\Team;
 use App\Models\Tournament;
 use App\Services\GameService;
@@ -67,8 +66,6 @@ class GameController extends Controller
 
     public function showTimer(Game $game): Response|RedirectResponse
     {
-        $this->ensureGameTeams($game);
-
         $game->load([
             'teams.players',
             'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
@@ -176,53 +173,5 @@ class GameController extends Controller
             : ($total === 4 ? 'Q' : 'S'); // Quarter or Session
 
         return "{$prefix}{$number}";
-    }
-
-    /**
-     * Ensure a game has side-specific team records (with players) so timer/events work.
-     */
-    private function ensureGameTeams(Game $game): void
-    {
-        $game->loadMissing(['teams.players', 'homeTeam.players', 'awayTeam.players']);
-
-        $existingBySide = $game->teams->keyBy('side');
-
-        $sides = [
-            'home' => $game->homeTeam,
-            'away' => $game->awayTeam,
-        ];
-
-        foreach ($sides as $side => $template) {
-            if ($existingBySide->has($side) || ! $template) {
-                continue;
-            }
-
-            $team = Team::create([
-                'game_id' => $game->id,
-                'registered_team_id' => $template->id,
-                'is_registered' => $template->is_registered ?? true,
-                'name' => $template->name,
-                'side' => $side,
-                'score' => 0,
-                'coach' => $template->coach,
-                'manager' => $template->manager,
-            ]);
-
-            foreach ($template->players as $player) {
-                $team->players()->create([
-                    'registered_player_id' => $player->id,
-                    'name' => $player->name,
-                    'shirt_number' => $player->shirt_number,
-                    'player_pass_number' => $player->player_pass_number,
-                    'nic_number' => $player->nic_number,
-                    'date_of_birth' => $player->date_of_birth,
-                    'is_active' => $player->is_active,
-                ]);
-            }
-        }
-
-        // Refresh relations if we created new teams/players.
-        $game->unsetRelation('teams');
-        $game->load(['teams.players']);
     }
 }
