@@ -128,8 +128,33 @@ export default function Timer({ auth, game, config = {} }) {
     }, [status]);
 
     const teams = game.teams || [];
-    const home = teams.find((t) => t.side === 'home');
-    const away = teams.find((t) => t.side === 'away');
+    const registeredHomeTeam = game.home_team || game.homeTeam;
+    const registeredAwayTeam = game.away_team || game.awayTeam;
+
+    const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
+        if (sideTeam && registeredTeam) {
+            return {
+                ...registeredTeam,
+                ...sideTeam,
+                name: sideTeam.name || registeredTeam.name || fallbackName,
+                players: (sideTeam.players && sideTeam.players.length ? sideTeam.players : registeredTeam.players) || [],
+            };
+        }
+
+        const team = sideTeam || registeredTeam;
+        if (team) {
+            return {
+                ...team,
+                name: team.name || fallbackName,
+                players: team.players || [],
+            };
+        }
+
+        return { name: fallbackName, players: [], id: sideTeam?.id || registeredTeam?.id || null };
+    };
+
+    const home = resolveTeam(teams.find((t) => t.side === 'home'), registeredHomeTeam, game.team_a_name);
+    const away = resolveTeam(teams.find((t) => t.side === 'away'), registeredAwayTeam, game.team_b_name);
     const [events, setEvents] = useState(game.events || []);
     const scoreStorageKey = `game_scores_${game.id}`;
     const [scores, setScores] = useState(() => {
@@ -142,8 +167,8 @@ export default function Timer({ auth, game, config = {} }) {
         } catch (e) {
             // ignore parse errors
         }
-        if (home) initial[home.id] = home.score ?? 0;
-        if (away) initial[away.id] = away.score ?? 0;
+        if (home?.id) initial[home.id] = home.score ?? 0;
+        if (away?.id) initial[away.id] = away.score ?? 0;
         return initial;
     });
     useEffect(() => {
@@ -178,7 +203,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const syncGameScores = async (overrides = {}) => {
         const teamsPayload = [];
-        if (home) {
+        if (home?.id) {
             teamsPayload.push({
                 id: home.id,
                 name: home.name,
@@ -186,7 +211,7 @@ export default function Timer({ auth, game, config = {} }) {
                 score: scores[home.id] ?? 0,
             });
         }
-        if (away) {
+        if (away?.id) {
             teamsPayload.push({
                 id: away.id,
                 name: away.name,
@@ -366,7 +391,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const openGoalDialog = (team) => {
-        if (!team || isGameOver) return;
+        if (!team?.id || isGameOver) return;
         const shouldPause = !game.continue_timer_on_goal;
         if (shouldPause) {
             setStatus('paused');
@@ -388,7 +413,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const openCardDialog = (team, cardType) => {
-        if (!team || isGameOver) return;
+        if (!team?.id || isGameOver) return;
         setCardModal({
             team,
             cardType,
@@ -398,7 +423,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const handleAddGoal = ({ team, goalType, shirtNumber }) => {
-        if (!team || isGameOver) return;
+        if (!team?.id || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: (prev[team.id] ?? 0) + 1 }));
         const playerName = findPlayerName(team, shirtNumber);
         const newEvent = {
@@ -423,7 +448,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const handleRemoveGoal = (team) => {
-        if (!team || isGameOver) return;
+        if (!team?.id || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: Math.max((prev[team.id] ?? 0) - 1, 0) }));
         setEvents((prev) => {
             const idx = [...prev].reverse().findIndex((e) => e.event_type === 'goal' && e.team_id === team.id);
@@ -435,7 +460,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const handleQuickEvent = (event_type, team) => {
-        if (isGameOver || !team) return;
+        if (isGameOver || !team?.id) return;
         const id = `temp-${event_type}-${Date.now()}`;
         const newEvent = {
             id,
@@ -455,7 +480,7 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const handleAddCard = ({ team, cardType, shirtNumber, minutes }) => {
-        if (!team || isGameOver) return;
+        if (!team?.id || isGameOver) return;
         const timerValue = displaySeconds;
         const playerName = findPlayerName(team, shirtNumber);
         const minuteText = minutes
@@ -569,7 +594,7 @@ export default function Timer({ auth, game, config = {} }) {
                         <div className="space-y-1 sm:space-y-2 px-1 sm:px-0">
                             <p className="text-xs uppercase tracking-wide text-gray-500">{scheduledDisplay || 'Live Match'}</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                                {game.team_a_name} vs {game.team_b_name}
+                                {home?.name || game.team_a_name} vs {away?.name || game.team_b_name}
                             </h1>
                             {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
                             {game.code && (
@@ -691,33 +716,33 @@ export default function Timer({ auth, game, config = {} }) {
                                         score={scores[home?.id] ?? 0}
                                         onAdd={() => openGoalDialog(home)}
                                         onRemove={() => handleRemoveGoal(home)}
-                                        disabled={isGameOver}
+                                        disabled={isGameOver || !home?.id}
                                     />
                                     <TeamScoreCard
                                         team={away}
                                         score={scores[away?.id] ?? 0}
                                         onAdd={() => openGoalDialog(away)}
                                         onRemove={() => handleRemoveGoal(away)}
-                                        disabled={isGameOver}
+                                        disabled={isGameOver || !away?.id}
                                     />
                                 </div>
                             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                                 <div className="flex flex-col gap-2">
-                                    <QuickEventButton label="PC (Home)" onClick={() => handleQuickEvent('penalty_corner', home)} disabled={isGameOver || !home} />
-                                    <QuickEventButton label="PS (Home)" onClick={() => handleQuickEvent('penalty_stroke', home)} disabled={isGameOver || !home} />
+                                    <QuickEventButton label="PC (Home)" onClick={() => handleQuickEvent('penalty_corner', home)} disabled={isGameOver || !home?.id} />
+                                    <QuickEventButton label="PS (Home)" onClick={() => handleQuickEvent('penalty_stroke', home)} disabled={isGameOver || !home?.id} />
                                     <div className="flex items-center justify-center gap-2">
-                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(home, 'red')} disabled={isGameOver || !home} />
-                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(home, 'yellow')} disabled={isGameOver || !home} />
-                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(home, 'green')} disabled={isGameOver || !home} />
+                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(home, 'red')} disabled={isGameOver || !home?.id} />
+                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(home, 'yellow')} disabled={isGameOver || !home?.id} />
+                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(home, 'green')} disabled={isGameOver || !home?.id} />
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <QuickEventButton label="PC (Away)" onClick={() => handleQuickEvent('penalty_corner', away)} disabled={isGameOver || !away} />
-                                    <QuickEventButton label="PS (Away)" onClick={() => handleQuickEvent('penalty_stroke', away)} disabled={isGameOver || !away} />
+                                    <QuickEventButton label="PC (Away)" onClick={() => handleQuickEvent('penalty_corner', away)} disabled={isGameOver || !away?.id} />
+                                    <QuickEventButton label="PS (Away)" onClick={() => handleQuickEvent('penalty_stroke', away)} disabled={isGameOver || !away?.id} />
                                     <div className="flex items-center justify-center gap-2">
-                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(away, 'red')} disabled={isGameOver || !away} />
-                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(away, 'yellow')} disabled={isGameOver || !away} />
-                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(away, 'green')} disabled={isGameOver || !away} />
+                                        <IconButton icon="/icons/red-card.png" alt="Red card" onClick={() => openCardDialog(away, 'red')} disabled={isGameOver || !away?.id} />
+                                        <IconButton icon="/icons/yellow-card.png" alt="Yellow card" onClick={() => openCardDialog(away, 'yellow')} disabled={isGameOver || !away?.id} />
+                                        <IconButton icon="/icons/green-card.png" alt="Green card" onClick={() => openCardDialog(away, 'green')} disabled={isGameOver || !away?.id} />
                                     </div>
                                 </div>
                             </div>

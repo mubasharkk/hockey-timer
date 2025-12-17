@@ -66,7 +66,13 @@ class GameController extends Controller
 
     public function showTimer(Game $game): Response|RedirectResponse
     {
-        $game->load(['teams.players', 'sessions' => fn ($q) => $q->orderBy('number'), 'events' => fn ($q) => $q->orderBy('occurred_at')]);
+        $game->load([
+            'teams.players',
+            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'sessions' => fn ($q) => $q->orderBy('number'),
+            'events' => fn ($q) => $q->orderBy('occurred_at'),
+        ]);
 
         $isFinished = $game->status === 'finished' || $game->events->contains('event_type', 'game_end');
         if ($isFinished) {
