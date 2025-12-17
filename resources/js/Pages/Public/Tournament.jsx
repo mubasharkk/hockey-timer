@@ -6,34 +6,35 @@ import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
 
 export default function Tournament({ tournament, poolResults = [] }) {
+    const currentTournament = tournament?.data ?? tournament;
     const [tab, setTab] = useState('upcoming');
 
     const upcomingGames = useMemo(() => {
-        return (tournament.games || []).filter((g) => {
+        return (currentTournament.games || []).filter((g) => {
             if (!g.game_date) return false;
             const date = moment(g.game_date).startOf('day');
             return date.isSameOrAfter(moment().startOf('day'));
         });
-    }, [tournament.games]);
+    }, [currentTournament.games]);
 
     const resultGames = useMemo(() => {
-        return (tournament.games || []).filter((g) => {
+        return (currentTournament.games || []).filter((g) => {
             if (!g.game_date) return true;
             const date = moment(g.game_date).startOf('day');
             return g.status === 'finished' || date.isBefore(moment().startOf('day'));
         });
-    }, [tournament.games]);
+    }, [currentTournament.games]);
 
     return (
         <PublicLayout fullWidth>
-            <Head title={tournament.title} />
+            <Head title={currentTournament.title} />
             <div className="bg-gray-50 px-0 sm:px-[calc(50vw-50%)] py-10">
                 <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
-                    {tournament.logo_url && (
+                    {currentTournament.logo_url && (
                         <div className="flex justify-center">
                             <img
-                                src={tournament.logo_url}
-                                alt={`${tournament.title} logo`}
+                                src={currentTournament.logo_url}
+                                alt={`${currentTournament.title} logo`}
                                 className="h-auto max-h-[100px] w-full rounded-lg object-contain"
                             />
                         </div>
@@ -43,19 +44,19 @@ export default function Tournament({ tournament, poolResults = [] }) {
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Tournament</p>
-                                <h1 className="text-2xl font-semibold text-gray-900">{tournament.title}</h1>
-                                <p className="text-sm text-gray-600">{tournament.venue}</p>
+                                <h1 className="text-2xl font-semibold text-gray-900">{currentTournament.title}</h1>
+                                <p className="text-sm text-gray-600">{currentTournament.venue}</p>
                                 <p className="text-xs text-gray-500">
-                                    {formatDate(tournament.start_date)}
-                                    {tournament.end_date ? ` → ${formatDate(tournament.end_date)}` : ''}
+                                    {formatDate(currentTournament.start_date)}
+                                    {currentTournament.end_date ? ` → ${formatDate(currentTournament.end_date)}` : ''}
                                 </p>
                             </div>
                         </div>
-                        {tournament.sponsor_logo_urls && tournament.sponsor_logo_urls.length > 0 && (
+                        {currentTournament.sponsor_logo_urls && currentTournament.sponsor_logo_urls.length > 0 && (
                             <div className="mt-6 rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
                                 <h3 className="text-sm font-semibold text-gray-900">Sponsors</h3>
                                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                                    {tournament.sponsor_logo_urls.map((url, idx) => (
+                                    {currentTournament.sponsor_logo_urls.map((url, idx) => (
                                         <div key={idx} className="flex h-14 w-20 items-center justify-center rounded-md bg-white ring-1 ring-gray-200">
                                             <img src={url} alt={`Sponsor ${idx + 1}`} className="max-h-12 max-w-full object-contain" />
                                         </div>
