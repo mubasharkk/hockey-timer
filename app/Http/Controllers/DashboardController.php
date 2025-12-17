@@ -6,6 +6,7 @@ use App\Models\Game;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
+use App\Http\Resources\GameResource;
 
 class DashboardController extends Controller
 {
@@ -31,7 +32,7 @@ class DashboardController extends Controller
             ]);
 
         return Inertia::render('Dashboard', [
-            'games' => $games,
+            'games' => GameResource::collection($games),
             'now' => Carbon::now()->toIso8601String(),
         ]);
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GameResource;
 use App\Models\Game;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -34,7 +35,7 @@ class PublicTickerController extends Controller
         }
 
         return Inertia::render('Public/Ticker', [
-            'game' => $game,
+            'game' => $game ? GameResource::make($game) : null,
             'gameId' => $gameId,
         ]);
     }

@@ -21,7 +21,7 @@ class TournamentController extends Controller
         $tournaments = Tournament::orderByDesc('id')->get();
 
         return Inertia::render('Tournaments/Index', [
-            'tournaments' => TournamentResource::collection($tournaments)->resolve(),
+            'tournaments' => TournamentResource::collection($tournaments),
         ]);
     }
 
@@ -53,7 +53,7 @@ class TournamentController extends Controller
             ->all();
 
         return Inertia::render('Tournaments/Show', [
-            'tournament' => TournamentResource::make($tournament)->resolve(),
+            'tournament' => TournamentResource::make($tournament),
             'poolResults' => $poolResults,
         ]);
     }
@@ -63,7 +63,7 @@ class TournamentController extends Controller
         $tournament->load('pools');
 
         return Inertia::render('Tournaments/Edit', [
-            'tournament' => TournamentResource::make($tournament)->resolve(),
+            'tournament' => TournamentResource::make($tournament),
         ]);
     }
 

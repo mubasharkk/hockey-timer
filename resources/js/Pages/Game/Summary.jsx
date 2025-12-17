@@ -5,9 +5,12 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import moment from 'moment';
+import GameTeamSquad from '@/Components/GameTeamSquad';
 
 export default function Summary({ auth, game }) {
-    if (!game) {
+    const currentGame = game?.data ?? game;
+
+    if (!currentGame) {
         return (
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Match Summary" />
@@ -20,22 +23,22 @@ export default function Summary({ auth, game }) {
         );
     }
 
-    const scheduledAt = game.game_date && game.game_time ? new Date(`${game.game_date}T${game.game_time}`) : null;
-    const isFinished = game.status === 'finished' || !!game.ended_at;
-    const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
-    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status, game.ended_at);
-    const gameCode = game.code;
-    const sessions = game.sessions || [];
-    const teams = game.teams || [];
-    const homeTeam = teams.find((t) => t.side === 'home') || { name: game.team_a_name };
-    const awayTeam = teams.find((t) => t.side === 'away') || { name: game.team_b_name };
+    const scheduledAt = currentGame.game_date && currentGame.game_time ? new Date(`${currentGame.game_date}T${currentGame.game_time}`) : null;
+    const isFinished = currentGame.status === 'finished' || !!currentGame.ended_at;
+    const scheduledDisplay = formatDateTime(currentGame.game_date, currentGame.game_time);
+    const relativeStart = formatRelativeStart(currentGame.game_date, currentGame.game_time, currentGame.status, currentGame.ended_at);
+    const gameCode = currentGame.code;
+    const sessions = currentGame.sessions || [];
+    const teams = currentGame.teams || [];
+    const homeTeam = teams.find((t) => t.side === 'home') || { name: currentGame.team_a_name };
+    const awayTeam = teams.find((t) => t.side === 'away') || { name: currentGame.team_b_name };
     const sessionCount = sessions.length;
     const now = new Date();
     const canStart = !isFinished && (scheduledAt ? now >= scheduledAt : false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const { delete: destroy, processing } = useForm({});
-    const registeredHomeTeam = game.home_team || game.homeTeam;
-    const registeredAwayTeam = game.away_team || game.awayTeam;
+    const registeredHomeTeam = currentGame.home_team || currentGame.homeTeam;
+    const registeredAwayTeam = currentGame.away_team || currentGame.awayTeam;
 
     const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
         if (sideTeam && registeredTeam) {
@@ -59,8 +62,8 @@ export default function Summary({ auth, game }) {
         return { name: fallbackName, players: [] };
     };
 
-    const homeTeamResolved = resolveTeam(homeTeam, registeredHomeTeam, game.team_a_name);
-    const awayTeamResolved = resolveTeam(awayTeam, registeredAwayTeam, game.team_b_name);
+    const homeTeamResolved = resolveTeam(homeTeam, registeredHomeTeam, currentGame.team_a_name);
+    const awayTeamResolved = resolveTeam(awayTeam, registeredAwayTeam, currentGame.team_b_name);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -73,40 +76,40 @@ export default function Summary({ auth, game }) {
                         <h1 className="text-2xl font-semibold text-gray-900">
                             {homeTeamResolved.name} vs {awayTeamResolved.name}
                         </h1>
-                        {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
+                        {currentGame.excerpt && <p className="text-sm text-gray-700">{currentGame.excerpt}</p>}
                         {gameCode && <p className="text-xs font-semibold text-gray-500">Code: {gameCode}</p>}
                         <p className="text-sm text-gray-600">
-                            {game.venue} · {scheduledDisplay || `${game.game_date} ${game.game_time}`} ({game.timer_mode} timer)
+                            {currentGame.venue} · {scheduledDisplay || `${currentGame.game_date} ${currentGame.game_time}`} ({currentGame.timer_mode} timer)
                         </p>
                         {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
                     </header>
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Sessions</dt>
-                                <dd className="text-lg font-semibold text-gray-900">
-                                    {sessionCount} × {game.session_duration_minutes} min
-                                </dd>
-                            </div>
-                            <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Timer Mode</dt>
-                                <dd className="text-lg font-semibold text-gray-900">{game.timer_mode}</dd>
-                            </div>
-                            <div className="sm:col-span-2">
-                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Game Officials</dt>
-                                <dd className="text-sm text-gray-900">{game.game_officials || '—'}</dd>
-                            </div>
+                                    <div>
+                                        <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Sessions</dt>
+                                        <dd className="text-lg font-semibold text-gray-900">
+                                    {sessionCount} × {currentGame.session_duration_minutes} min
+                                        </dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Timer Mode</dt>
+                                        <dd className="text-lg font-semibold text-gray-900">{currentGame.timer_mode}</dd>
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Game Officials</dt>
+                                        <dd className="text-sm text-gray-900">{currentGame.game_officials || '—'}</dd>
+                                    </div>
                             <div>
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Home Squad</dt>
                                 <dd className="text-sm text-gray-900">
-                                    <TeamSquad team={homeTeamResolved} fallbackLabel="Home Team" />
+                                    <GameTeamSquad team={homeTeamResolved} fallbackLabel="Home Team" />
                                 </dd>
                             </div>
                             <div>
                                 <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Away Squad</dt>
                                 <dd className="text-sm text-gray-900">
-                                    <TeamSquad team={awayTeamResolved} fallbackLabel="Away Team" />
+                                    <GameTeamSquad team={awayTeamResolved} fallbackLabel="Away Team" />
                                 </dd>
                             </div>
                         </dl>
@@ -125,7 +128,7 @@ export default function Summary({ auth, game }) {
 
                     <div className="flex items-center justify-between">
                         <Link
-                            href={route('games.edit', game.id)}
+                            href={route('games.edit', currentGame.id)}
                             className="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-400"
                         >
                             Edit
@@ -133,7 +136,7 @@ export default function Summary({ auth, game }) {
 
                         <div className="flex items-center gap-2">
                             <Link
-                                href={route('public.ticker.code', game.code)}
+                                href={route('public.ticker.code', currentGame.code)}
                                 className="inline-flex items-center rounded-md border border-indigo-300 px-3 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-400"
                                 preserveScroll
                             >
@@ -141,7 +144,7 @@ export default function Summary({ auth, game }) {
                             </Link>
                             {isFinished ? (
                                 <Link
-                                    href={route('games.report', game.id)}
+                                    href={route('games.report', currentGame.id)}
                                     className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                                     preserveScroll
                                 >
@@ -149,7 +152,7 @@ export default function Summary({ auth, game }) {
                                 </Link>
                             ) : (
                                 <Link
-                                    href={route('games.timer', game.id)}
+                                    href={route('games.timer', currentGame.id)}
                                     className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition ${
                                         canStart
                                             ? 'bg-indigo-600 text-white hover:bg-indigo-500'
@@ -177,7 +180,7 @@ export default function Summary({ auth, game }) {
                         <SecondaryButton onClick={() => setConfirmDelete(false)}>Cancel</SecondaryButton>
                         <DangerButton
                             onClick={() => {
-                                destroy(route('games.destroy', game.id), {
+                                destroy(route('games.destroy', currentGame.id), {
                                     preserveScroll: true,
                                     onFinish: () => setConfirmDelete(false),
                                 });
@@ -203,7 +206,7 @@ const TeamSquad = ({ team, fallbackLabel }) => {
         );
     }
 
-    const players = team.players || [];
+    const players = Array.isArray(team.players) ? team.players : team.players?.data || [];
     const hasPlayers = players.length > 0;
 
     return (

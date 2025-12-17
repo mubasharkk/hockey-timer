@@ -6,6 +6,8 @@ use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
 use App\Models\Player;
 use App\Models\Team;
+use App\Http\Resources\PlayerResource;
+use App\Http\Resources\TeamResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -19,7 +21,7 @@ class PlayerController extends Controller
         $this->ensureTeamAccess($team);
 
         return Inertia::render('Players/Create', [
-            'team' => $team,
+            'team' => TeamResource::make($team),
         ]);
     }
 
@@ -28,13 +30,11 @@ class PlayerController extends Controller
         $this->ensureTeamAccess($team);
         abort_unless($player->team_id === $team->id, 404);
 
-        $address = $player->addresses()->first();
-        $player->setAttribute('address', $address);
-        $player->setAttribute('photo_url', $player->getFirstMediaUrl('photo'));
+        $player->load(['addresses', 'media']);
 
         return Inertia::render('Players/Edit', [
-            'team' => $team,
-            'player' => $player,
+            'team' => TeamResource::make($team),
+            'player' => PlayerResource::make($player),
         ]);
     }
 

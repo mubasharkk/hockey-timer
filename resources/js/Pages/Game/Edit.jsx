@@ -6,26 +6,34 @@ import { useEffect, useMemo } from 'react';
 const sessionOptions = [1, 2, 4, 6, 8];
 
 export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {} }) {
+    const currentGame = game?.data ?? game;
+    const teamList = Array.isArray(teams) ? teams : teams?.data || [];
+    const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
+    const normalizeTime = (time) => {
+        if (!time) return '';
+        const parsed = moment(time, ['HH:mm:ss', 'HH:mm'], true);
+        return parsed.isValid() ? parsed.format('HH:mm') : time;
+    };
     const { data, setData, put, processing, errors } = useForm({
-        home_team_id: game.home_team_id,
-        away_team_id: game.away_team_id,
-        tournament_id: game.tournament_id || '',
-        venue: game.venue || '',
-        excerpt: game.excerpt || '',
-        notes: game.notes || '',
-        game_date: game.game_date || '',
-        game_time: game.game_time || '',
-        sessions: game.sessions || 4,
-        session_duration_minutes: game.session_duration_minutes || 15,
-        timer_mode: game.timer_mode || 'DESC',
-        continue_timer_on_goal: game.continue_timer_on_goal ?? false,
-        sport_type: game.sport_type || 'field_hockey',
-        game_officials: game.game_officials || '',
+        home_team_id: currentGame.home_team_id,
+        away_team_id: currentGame.away_team_id,
+        tournament_id: currentGame.tournament_id || '',
+        venue: currentGame.venue || '',
+        excerpt: currentGame.excerpt || '',
+        notes: currentGame.notes || '',
+        game_date: currentGame.game_date || '',
+        game_time: normalizeTime(currentGame.game_time),
+        sessions: currentGame.sessions || 4,
+        session_duration_minutes: currentGame.session_duration_minutes || 15,
+        timer_mode: currentGame.timer_mode || 'DESC',
+        continue_timer_on_goal: currentGame.continue_timer_on_goal ?? false,
+        sport_type: currentGame.sport_type || 'field_hockey',
+        game_officials: currentGame.game_officials || '',
     });
 
     const selectedTournament = useMemo(
-        () => tournaments.find((t) => `${t.id}` === `${data.tournament_id}`),
-        [tournaments, data.tournament_id]
+        () => tournamentList.find((t) => `${t.id}` === `${data.tournament_id}`),
+        [tournamentList, data.tournament_id]
     );
 
     const tournamentTeamIds = useMemo(() => {
@@ -36,10 +44,10 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
 
     const filteredTeams = useMemo(() => {
         if (data.tournament_id) {
-            return teams.filter((team) => tournamentTeamIds.includes(team.id));
+            return teamList.filter((team) => tournamentTeamIds.includes(team.id));
         }
-        return teams;
-    }, [teams, tournamentTeamIds, data.tournament_id]);
+        return teamList;
+    }, [teamList, tournamentTeamIds, data.tournament_id]);
 
     useEffect(() => {
         if (selectedTournament?.venue) {
@@ -49,7 +57,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('games.update', game.id));
+        put(route('games.update', currentGame.id));
     };
 
     return (
@@ -93,7 +101,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                         <SelectField
                             label="Tournament (optional)"
                             value={data.tournament_id}
-                            options={[{ value: '', label: 'No tournament' }, ...tournaments.map((t) => ({ value: t.id, label: t.title }))]}
+                            options={[{ value: '', label: 'No tournament' }, ...tournamentList.map((t) => ({ value: t.id, label: t.title }))]}
                             onChange={(value) => setData('tournament_id', value)}
                             error={errors.tournament_id}
                         />
@@ -116,12 +124,12 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                                 <Field
                                     label="Time"
                                     type="time"
-                                    value={data.game_time}
-                                    onChange={(e) => setData('game_time', e.target.value)}
-                                    error={errors.game_time}
-                                />
-                            </div>
-                        </div>
+                            value={data.game_time}
+                            onChange={(e) => setData('game_time', e.target.value)}
+                            error={errors.game_time}
+                        />
+                    </div>
+                </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
                             <SelectField

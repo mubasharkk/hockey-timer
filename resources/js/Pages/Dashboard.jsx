@@ -6,9 +6,10 @@ import moment from 'moment';
 export default function Dashboard({ auth, games = [], now }) {
     const [tab, setTab] = useState('upcoming');
     const nowMoment = useMemo(() => (now ? moment(now) : moment()), [now]);
+    const gameList = useMemo(() => (Array.isArray(games) ? games : games?.data || []), [games]);
 
-    const upcomingGames = useMemo(() => partitionGames(games, nowMoment).upcoming, [games, nowMoment]);
-    const resultGames = useMemo(() => partitionGames(games, nowMoment).results, [games, nowMoment]);
+    const upcomingGames = useMemo(() => partitionGames(gameList, nowMoment).upcoming, [gameList, nowMoment]);
+    const resultGames = useMemo(() => partitionGames(gameList, nowMoment).results, [gameList, nowMoment]);
 
     return (
         <AuthenticatedLayout

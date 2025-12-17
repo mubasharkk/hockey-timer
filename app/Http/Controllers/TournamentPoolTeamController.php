@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignTournamentTeamsRequest;
+use App\Http\Resources\TeamResource;
+use App\Http\Resources\TournamentResource;
 use App\Models\Tournament;
-use App\Models\TournamentPool;
 use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Arr;
@@ -20,8 +21,8 @@ class TournamentPoolTeamController extends Controller
         $teams = Team::where('is_registered', true)->orderBy('name')->get();
 
         return Inertia::render('Tournaments/AssignTeams', [
-            'tournament' => $tournament,
-            'teams' => $teams,
+            'tournament' => TournamentResource::make($tournament),
+            'teams' => TeamResource::collection($teams),
         ]);
     }
 

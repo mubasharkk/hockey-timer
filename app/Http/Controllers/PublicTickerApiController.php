@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GameResource;
 use App\Models\Game;
 use Illuminate\Http\JsonResponse;
 
@@ -11,7 +12,7 @@ class PublicTickerApiController extends Controller
     {
         $game->load([
             'teams' => fn ($q) => $q->with('media')->orderBy('side'),
-            'tournament' => fn ($q) => $q->with('media')->select(['id', 'title']),
+            'tournament' => fn ($q) => $q->with('media'),
         ]);
         $sessionModels = $game->sessions()->orderBy('number')->get();
         $eventModels = $game->events()->orderByDesc('occurred_at')->limit(50)->get();
@@ -88,27 +89,12 @@ class PublicTickerApiController extends Controller
             ];
         });
 
-        return response()->json([
+        $gameData = GameResource::make($game)->resolve();
+
+        return response()->json(array_merge($gameData, [
             'game_id' => $game->id,
-            'team_a_name' => $game->team_a_name,
-            'team_b_name' => $game->team_b_name,
             'team_a_score' => $homeScore ?? 0,
             'team_b_score' => $awayScore ?? 0,
-            'teams' => $game->teams->map(function ($team) {
-                return [
-                    'id' => $team->id,
-                    'name' => $team->name,
-                    'side' => $team->side,
-                    'logo_url' => $team->logo_url,
-                ];
-            }),
-            'tournament' => $game->tournament
-                ? [
-                    'id' => $game->tournament->id,
-                    'title' => $game->tournament->title,
-                    'logo_url' => $game->tournament->getFirstMediaUrl('logo') ?: null,
-                ]
-                : null,
             'timer_seconds' => $timerSeconds,
             'current_period' => $currentSessionNumber,
             'session_count' => $sessionCount,
@@ -117,6 +103,6 @@ class PublicTickerApiController extends Controller
             'is_running' => $isRunning,
             'is_break' => $isBreak,
             'events' => $recentEvents,
-        ]);
+        ]));
     }
 }

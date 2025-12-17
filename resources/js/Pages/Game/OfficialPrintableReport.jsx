@@ -2,12 +2,18 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import moment from 'moment';
 
-export default function OfficialPrintableReport({ auth, game, sessionScores = [], events = [], sessionLabels = {} }) {
-    const home = (game?.teams || []).find((t) => t.side === 'home');
-    const away = (game?.teams || []).find((t) => t.side === 'away');
+export default function OfficialPrintableReport({ auth, game, sessionScores = [], events: incomingEvents = [], sessionLabels = {} }) {
+    const currentGame = game?.data ?? game;
+    const normalizeTeam = (team) => {
+        if (!team) return null;
+        const players = Array.isArray(team.players) ? team.players : team.players?.data || [];
+        return { ...team, players };
+    };
+    const home = normalizeTeam((currentGame?.teams || []).find((t) => t.side === 'home'));
+    const away = normalizeTeam((currentGame?.teams || []).find((t) => t.side === 'away'));
     const sessionTotal =
         sessionScores?.length ||
-        (Array.isArray(game?.sessions) ? game.sessions.length : Number(game?.sessions || 0));
+        (Array.isArray(currentGame?.sessions) ? currentGame.sessions.length : Number(currentGame?.sessions || 0));
 
     const sessionLabel = (number) => {
         if (!number) return '';
@@ -42,7 +48,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
           };
 
     const playerRows = Math.max(home?.players?.length || 0, away?.players?.length || 0);
-    const orderedEvents = [...(events || [])]
+    const safeEvents = Array.isArray(incomingEvents) ? incomingEvents : incomingEvents?.data || [];
+    const orderedEvents = [...(safeEvents || [])]
         .filter((e) => e.team_id)
         .sort((a, b) => new Date(a?.occurred_at || 0) - new Date(b?.occurred_at || 0));
     const cardEvents = orderedEvents.filter((e) => e.event_type === 'card' && e.team_id && e.player_shirt_number != null);
@@ -63,7 +70,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
 
     return (
         <AuthenticatedLayout user={auth?.user}>
-            <Head title={`Official Report-${game.code}`}/>
+            <Head title={`Official Report-${currentGame?.code}`}/>
             <div className="py-6 print:py-0">
                 <style>
                     {`
@@ -88,17 +95,17 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Official Report</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                                {game?.team_a_name} vs {game?.team_b_name}
+                                {currentGame?.team_a_name} vs {currentGame?.team_b_name}
                             </h1>
                             <p className="text-sm text-gray-600">
-                                {formatDate(game?.game_date)} · {formatTime(game?.game_time)} · {game?.venue}
+                                {formatDate(currentGame?.game_date)} · {formatTime(currentGame?.game_time)} · {currentGame?.venue}
                             </p>
-                            {game?.excerpt && <p className="text-xs text-gray-700">{game.excerpt}</p>}
-                            <p className="text-xs text-gray-500">Code: {game?.code || game?.id}</p>
+                            {currentGame?.excerpt && <p className="text-xs text-gray-700">{currentGame.excerpt}</p>}
+                            <p className="text-xs text-gray-500">Code: {currentGame?.code || currentGame?.id}</p>
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
                             <Link
-                                href={route('games.report', game?.id)}
+                                href={route('games.report', currentGame?.id)}
                                 className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
                             >
                                 Back to report
@@ -116,7 +123,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                     <div className="print-page bg-white px-4 py-5 sm:px-6 sm:py-6 print:px-0 print:py-0">
                         <section className="space-y-2">
                             <h1 className={'uppercase font-bold border-b border-indigo-600 pb-3 text-center'}>
-                                Official Report / {game.code} / {formatSport(game.sport_type)}
+                                Official Report / {currentGame?.code} / {formatSport(currentGame?.sport_type)}
                             </h1>
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
@@ -130,21 +137,21 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 <tbody>
                                     <tr className="border-b border-gray-200">
                                         <th className="w-32 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Match ID</th>
-                                        <td className="px-3 py-2">{game?.code || game?.id}</td>
+                                        <td className="px-3 py-2">{currentGame?.code || currentGame?.id}</td>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Date</th>
-                                        <td className="px-3 py-2">{formatDate(game?.game_date)}</td>
+                                        <td className="px-3 py-2">{formatDate(currentGame?.game_date)}</td>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Time</th>
-                                        <td className="px-3 py-2">{formatTime(game?.game_time)}</td>
+                                        <td className="px-3 py-2">{formatTime(currentGame?.game_time)}</td>
                                     </tr>
                                     <tr className="border-b border-gray-200">
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Venue</th>
-                                        <td colSpan={3} className="px-3 py-2">{game?.venue || '—'}</td>
+                                        <td colSpan={3} className="px-3 py-2">{currentGame?.venue || '—'}</td>
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Sessions</th>
-                                        <td className="px-3 py-2">{sessionTotal || '—'} × {game?.session_duration_minutes ?? '—'} min</td>
+                                        <td className="px-3 py-2">{sessionTotal || '—'} × {currentGame?.session_duration_minutes ?? '—'} min</td>
                                     </tr>
                                     <tr className="border-b border-gray-200">
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Officials</th>
-                                        <td colSpan={5}  className="px-3 py-2">{game?.game_officials || '—'}</td>
+                                        <td colSpan={5}  className="px-3 py-2">{currentGame?.game_officials || '—'}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -170,7 +177,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {(game?.sessions || []).map((session) => (
+                                    {(currentGame?.sessions || []).map((session) => (
                                         <tr key={session.id || session.number} className="border-t border-gray-200">
                                             <td className="bg-gray-50 px-3 py-2 font-semibold text-gray-700">
                                                 {sessionLabel(session.number)}

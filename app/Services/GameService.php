@@ -74,8 +74,7 @@ class GameService
                 'game_officials' => $data['game_officials'] ?? $game->game_officials,
             ]);
 
-            // Keep sessions aligned with new session count/duration.
-            $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
+            $this->syncSessionsCount($game, $data['sessions'], $data['session_duration_minutes']);
 
             return $game;
         });
@@ -88,6 +87,28 @@ class GameService
     {
         for ($i = 1; $i <= $sessionCount; $i++) {
             MatchSession::firstOrCreate(
+                ['game_id' => $game->id, 'number' => $i],
+                ['planned_duration_seconds' => $durationMinutes * 60]
+            );
+        }
+    }
+
+    /**
+     * Ensure sessions match the requested count:
+     * - Update planned duration for existing sessions up to the target count.
+     * - Create any missing sessions.
+     * - Remove sessions beyond the target count.
+     */
+    private function syncSessionsCount(Game $game, int $sessionCount, int $durationMinutes): void
+    {
+        // Drop sessions above the new count.
+        MatchSession::where('game_id', $game->id)
+            ->where('number', '>', $sessionCount)
+            ->delete();
+
+        // Ensure each session 1..N exists and has updated planned duration.
+        for ($i = 1; $i <= $sessionCount; $i++) {
+            MatchSession::updateOrCreate(
                 ['game_id' => $game->id, 'number' => $i],
                 ['planned_duration_seconds' => $durationMinutes * 60]
             );

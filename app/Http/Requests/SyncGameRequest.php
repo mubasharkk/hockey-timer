@@ -21,7 +21,7 @@ class SyncGameRequest extends FormRequest
             'game_date' => ['required', 'date'],
             // Accept HH:MM or HH:MM:SS (some clients send seconds).
             'game_time' => ['required', 'regex:/^\\d{2}:\\d{2}(?::\\d{2})?$/'],
-            'sessions' => ['required', 'integer', 'in:2,4,6,8'],
+            'sessions' => ['required', 'integer'],
             'session_duration_minutes' => ['required', 'integer', 'min:1'],
             'timer_mode' => ['required', 'in:ASC,DESC'],
             'sport_type' => ['nullable', 'string', 'max:50'],

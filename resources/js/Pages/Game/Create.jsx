@@ -6,6 +6,8 @@ const sessionOptions = [1, 2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
 export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [], prefillTournamentId = '' }) {
+    const teamList = Array.isArray(teams) ? teams : teams?.data || [];
+    const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
     const { data, setData, post, processing, errors } = useForm({
         home_team_id: '',
         away_team_id: '',
@@ -29,8 +31,8 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
     };
 
     const selectedTournament = useMemo(
-        () => tournaments.find((t) => `${t.id}` === `${data.tournament_id}`),
-        [tournaments, data.tournament_id]
+        () => tournamentList.find((t) => `${t.id}` === `${data.tournament_id}`),
+        [tournamentList, data.tournament_id]
     );
 
     const tournamentTeamIds = useMemo(() => {
@@ -41,10 +43,10 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
 
     const filteredTeams = useMemo(() => {
         if (data.tournament_id) {
-            return teams.filter((team) => tournamentTeamIds.includes(team.id));
+            return teamList.filter((team) => tournamentTeamIds.includes(team.id));
         }
-        return teams;
-    }, [teams, tournamentTeamIds, data.tournament_id]);
+        return teamList;
+    }, [teamList, tournamentTeamIds, data.tournament_id]);
 
     useEffect(() => {
         if (selectedTournament?.venue) {
@@ -61,7 +63,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
         }
     }, [filteredTeams, data.home_team_id, data.away_team_id, setData]);
 
-    const rosterFor = (teamId) => teams.find((t) => `${t.id}` === `${teamId}`);
+    const rosterFor = (teamId) => teamList.find((t) => `${t.id}` === `${teamId}`);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -100,7 +102,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                 onChange={(e) => setData('tournament_id', e.target.value)}
                             >
                                 <option value="">No tournament</option>
-                                {tournaments.map((tournament) => (
+                                {tournamentList.map((tournament) => (
                                     <option key={tournament.id} value={tournament.id}>
                                         {tournament.title}
                                     </option>

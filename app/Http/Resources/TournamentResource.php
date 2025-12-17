@@ -24,48 +24,8 @@ class TournamentResource extends JsonResource
             'loss_points' => $this->loss_points,
             'logo_url' => $this->getFirstMediaUrl('logo') ?: null,
             'sponsor_logo_urls' => $this->getMedia('sponsor_logos')->map->getUrl()->all(),
-            'pools' => $this->whenLoaded('pools', function () {
-                return $this->pools->map(function ($pool) {
-                    return [
-                        'id' => $pool->id,
-                        'name' => $pool->name,
-                        'order' => $pool->order,
-                        'teams' => $pool->relationLoaded('teams')
-                            ? $pool->teams->map(fn ($team) => [
-                                'id' => $team->id,
-                                'name' => $team->name,
-                            ])->values()->all()
-                            : [],
-                    ];
-                })->values()->all();
-            }),
-            'games' => $this->whenLoaded('games', function () {
-                return $this->games->map(function ($game) {
-                    return [
-                        'id' => $game->id,
-                        'team_a_name' => $game->team_a_name,
-                        'team_b_name' => $game->team_b_name,
-                        'home_team' => $game->homeTeam ? [
-                            'id' => $game->homeTeam->id,
-                            'name' => $game->homeTeam->name,
-                            'logo_url' => $game->homeTeam->getFirstMediaUrl('logo') ?: null,
-                        ] : null,
-                        'away_team' => $game->awayTeam ? [
-                            'id' => $game->awayTeam->id,
-                            'name' => $game->awayTeam->name,
-                            'logo_url' => $game->awayTeam->getFirstMediaUrl('logo') ?: null,
-                        ] : null,
-                        'game_date' => $game->game_date,
-                        'game_time' => $game->game_time,
-                        'venue' => $game->venue,
-                        'status' => $game->status,
-                        'ended_at' => $game->ended_at,
-                        'home_score' => $game->homeTeam?->score,
-                        'away_score' => $game->awayTeam?->score,
-                        'excerpt' => $game->excerpt,
-                    ];
-                })->values()->all();
-            }),
+            'pools' => TournamentPoolResource::collection($this->whenLoaded('pools')),
+            'games' => GameResource::collection($this->whenLoaded('games')),
         ];
     }
 }

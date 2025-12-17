@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Team;
+use App\Http\Resources\TeamResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -24,7 +25,7 @@ class TeamController extends Controller
             ->get();
 
         return Inertia::render('Teams/Index', [
-            'teams' => $teams,
+            'teams' => TeamResource::collection($teams),
         ]);
     }
 
@@ -62,7 +63,7 @@ class TeamController extends Controller
         ]);
 
         return Inertia::render('Teams/Show', [
-            'team' => $team,
+            'team' => TeamResource::make($team),
         ]);
     }
 
@@ -71,7 +72,7 @@ class TeamController extends Controller
         $this->ensureManageable($team);
 
         return Inertia::render('Teams/Edit', [
-            'team' => $team,
+            'team' => TeamResource::make($team),
         ]);
     }
 

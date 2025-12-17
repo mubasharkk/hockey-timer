@@ -4,27 +4,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 
 export default function Edit({ auth, team, player }) {
+    const currentTeam = team?.data ?? team;
+    const currentPlayer = player?.data ?? player;
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: 'put',
-        name: player.name || '',
-        shirt_number: player.shirt_number || '',
-        player_pass_number: player.player_pass_number || '',
-        nic_number: player.nic_number || '',
-        date_of_birth: player.date_of_birth || '',
-        is_active: player.is_active ?? true,
+        name: currentPlayer.name || '',
+        shirt_number: currentPlayer.shirt_number || '',
+        player_pass_number: currentPlayer.player_pass_number || '',
+        nic_number: currentPlayer.nic_number || '',
+        date_of_birth: currentPlayer.date_of_birth || '',
+        is_active: currentPlayer.is_active ?? true,
         address: {
-            street: player.address?.street || '',
-            street_extra: player.address?.street_extra || '',
-            city: player.address?.city || '',
-            state: player.address?.state || '',
-            post_code: player.address?.post_code || '',
+            street: currentPlayer.address?.street || '',
+            street_extra: currentPlayer.address?.street_extra || '',
+            city: currentPlayer.address?.city || '',
+            state: currentPlayer.address?.state || '',
+            post_code: currentPlayer.address?.post_code || '',
         },
         photo: null,
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.players.update', [team.id, player.id]), {
+        post(route('teams.players.update', [currentTeam.id, currentPlayer.id]), {
             forceFormData: true,
             onSuccess: () => reset('photo'),
         });
@@ -38,7 +40,7 @@ export default function Edit({ auth, team, player }) {
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Player</p>
-                        <h1 className="text-2xl font-semibold text-gray-900">Edit {player.name}</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900">Edit {currentPlayer.name}</h1>
                         <p className="text-sm text-gray-600">Update player details, status, and photo.</p>
                     </header>
 

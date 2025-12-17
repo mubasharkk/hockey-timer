@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 
 export default function Create({ auth, team }) {
+    const currentTeam = team?.data ?? team;
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         shirt_number: '',
@@ -23,7 +24,7 @@ export default function Create({ auth, team }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.players.store', team.id), {
+        post(route('teams.players.store', currentTeam.id), {
             forceFormData: true,
         });
     };
@@ -36,7 +37,7 @@ export default function Create({ auth, team }) {
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Player</p>
-                        <h1 className="text-2xl font-semibold text-gray-900">Add to {team.name}</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900">Add to {currentTeam.name}</h1>
                         <p className="text-sm text-gray-600">Capture player identity, pass number, and optional address/photo.</p>
                     </header>
 

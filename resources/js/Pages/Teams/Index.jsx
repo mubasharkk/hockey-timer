@@ -5,6 +5,7 @@ import { faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function Index({ auth, teams = [] }) {
     const userId = auth?.user?.id;
+    const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const ownsTeam = (team) => userId && team.user_id === userId;
 
     return (
@@ -39,9 +40,9 @@ export default function Index({ auth, teams = [] }) {
                             <p className="text-sm text-gray-600">Registered teams ready to be used when creating games.</p>
 
                             <div className="mt-4 space-y-3">
-                                {teams.length === 0 && <p className="text-sm text-gray-600">No teams yet. Register one to get started.</p>}
+                                {teamList.length === 0 && <p className="text-sm text-gray-600">No teams yet. Register one to get started.</p>}
 
-                                {teams.map((team) => (
+                                {teamList.map((team) => (
                                     <div
                                         key={team.id}
                                         className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"

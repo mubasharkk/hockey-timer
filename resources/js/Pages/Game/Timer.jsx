@@ -9,7 +9,8 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import EventTimeline from '@/Components/EventTimeline';
 
 export default function Timer({ auth, game, config = {} }) {
-    if (!game) {
+    const currentGame = game?.data ?? game;
+    if (!currentGame) {
         return (
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Live Timer" />
@@ -22,25 +23,25 @@ export default function Timer({ auth, game, config = {} }) {
         );
     }
 
-    const sessions = game.sessions || [];
+    const sessions = currentGame.sessions || [];
     const sessionCount = sessions.length || 1;
     const [sessionIndex, setSessionIndex] = useState(0);
     const plannedSecondsFor = (index) => {
         if (sessions.length > 0) {
             const current = sessions[index] ?? sessions[0];
-            return current?.planned_duration_seconds ?? game.session_duration_minutes * 60;
+            return current?.planned_duration_seconds ?? currentGame.session_duration_minutes * 60;
         }
-        return game.session_duration_minutes * 60;
+        return currentGame.session_duration_minutes * 60;
     };
 
-    const plannedSeconds = useMemo(() => plannedSecondsFor(sessionIndex), [sessions, sessionIndex, game.session_duration_minutes]);
+    const plannedSeconds = useMemo(() => plannedSecondsFor(sessionIndex), [sessions, sessionIndex, currentGame.session_duration_minutes]);
 
-    const storageKey = `game_timer_${game.id}`;
+    const storageKey = `game_timer_${currentGame.id}`;
     const [status, setStatus] = useState('ready'); // ready | running | paused | finished
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [lastTick, setLastTick] = useState(null);
     const latestElapsedRef = useRef(0);
-    const breakStorageKey = `game_break_${game.id}`;
+    const breakStorageKey = `game_break_${currentGame.id}`;
     const [breakStartAt, setBreakStartAt] = useState(() => {
         try {
             const saved = localStorage.getItem(breakStorageKey);
@@ -96,7 +97,7 @@ export default function Timer({ auth, game, config = {} }) {
                 const now = Date.now();
                 const delta = lastTick ? (now - lastTick) / 1000 : 0;
                 const next = prev + delta;
-                const reachedEnd = game.timer_mode === 'DESC' && next >= plannedSeconds;
+                const reachedEnd = currentGame.timer_mode === 'DESC' && next >= plannedSeconds;
 
                 if (reachedEnd) {
                     setLastTick(null);
@@ -111,7 +112,7 @@ export default function Timer({ auth, game, config = {} }) {
 
         const id = window.setInterval(tick, 250);
         return () => window.clearInterval(id);
-    }, [status, lastTick, plannedSeconds, game.timer_mode, storageKey]);
+    }, [status, lastTick, plannedSeconds, currentGame.timer_mode, storageKey]);
 
     useEffect(() => {
         latestElapsedRef.current = elapsedSeconds;
@@ -127,9 +128,9 @@ export default function Timer({ auth, game, config = {} }) {
         return () => window.clearInterval(id);
     }, [status]);
 
-    const teams = game.teams || [];
-    const registeredHomeTeam = game.home_team || game.homeTeam;
-    const registeredAwayTeam = game.away_team || game.awayTeam;
+    const teams = currentGame.teams || [];
+    const registeredHomeTeam = currentGame.home_team || currentGame.homeTeam;
+    const registeredAwayTeam = currentGame.away_team || currentGame.awayTeam;
 
     const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
         if (sideTeam || registeredTeam) {
@@ -148,10 +149,10 @@ export default function Timer({ auth, game, config = {} }) {
         return { id: null, name: fallbackName, players: [] };
     };
 
-    const home = resolveTeam(teams.find((t) => t.side === 'home'), registeredHomeTeam, game.team_a_name);
-    const away = resolveTeam(teams.find((t) => t.side === 'away'), registeredAwayTeam, game.team_b_name);
-    const [events, setEvents] = useState(game.events || []);
-    const scoreStorageKey = `game_scores_${game.id}`;
+    const home = resolveTeam(teams.find((t) => t.side === 'home'), registeredHomeTeam, currentGame.team_a_name);
+    const away = resolveTeam(teams.find((t) => t.side === 'away'), registeredAwayTeam, currentGame.team_b_name);
+    const [events, setEvents] = useState(currentGame.events || []);
+    const scoreStorageKey = `game_scores_${currentGame.id}`;
     const [scores, setScores] = useState(() => {
         const initial = {};
         try {
@@ -190,7 +191,7 @@ export default function Timer({ auth, game, config = {} }) {
         };
 
         try {
-            await axios.post(`/api/sync/game/${game.id}/sessions`, { sessions: [payload] });
+            await axios.post(`/api/sync/game/${currentGame.id}/sessions`, { sessions: [payload] });
         } catch (e) {
             console.error('Failed to sync session state', e);
         }
@@ -217,18 +218,18 @@ export default function Timer({ auth, game, config = {} }) {
 
         try {
             await axios.post('/api/sync/game', {
-                id: game.id,
-                team_a_name: game.team_a_name,
-                team_b_name: game.team_b_name,
-                venue: game.venue,
-                game_date: game.game_date,
-                game_time: game.game_time,
+                id: currentGame.id,
+                team_a_name: currentGame.team_a_name,
+                team_b_name: currentGame.team_b_name,
+                venue: currentGame.venue,
+                game_date: currentGame.game_date,
+                game_time: currentGame.game_time,
                 sessions: sessionCount,
-                session_duration_minutes: game.session_duration_minutes,
-                timer_mode: game.timer_mode,
-                continue_timer_on_goal: game.continue_timer_on_goal ?? false,
-                status: overrides.status ?? (isGameOver ? 'finished' : game.status),
-                ended_at: overrides.ended_at ?? (isGameOver ? new Date().toISOString() : game.ended_at ?? null),
+                session_duration_minutes: currentGame.session_duration_minutes,
+                timer_mode: currentGame.timer_mode,
+                continue_timer_on_goal: currentGame.continue_timer_on_goal ?? false,
+                status: overrides.status ?? (isGameOver ? 'finished' : currentGame.status),
+                ended_at: overrides.ended_at ?? (isGameOver ? new Date().toISOString() : currentGame.ended_at ?? null),
                 teams: teamsPayload,
             });
         } catch (e) {
@@ -237,11 +238,11 @@ export default function Timer({ auth, game, config = {} }) {
     };
 
     const timerLockEnabled = config.timer_lock ?? true;
-    const scheduledDisplay = formatDateTime(game.game_date, game.game_time);
-    const relativeStart = formatRelativeStart(game.game_date, game.game_time, game.status, game.ended_at);
+    const scheduledDisplay = formatDateTime(currentGame.game_date, currentGame.game_time);
+    const relativeStart = formatRelativeStart(currentGame.game_date, currentGame.game_time, currentGame.status, currentGame.ended_at);
 
     const displaySeconds =
-        game.timer_mode === 'DESC'
+        currentGame.timer_mode === 'DESC'
             ? Math.max(Math.round(plannedSeconds - elapsedSeconds), 0)
             : Math.round(elapsedSeconds);
     const isGameOver = status === 'game_over';
@@ -346,7 +347,7 @@ export default function Timer({ auth, game, config = {} }) {
             e.event_type === 'game_start' ? { ...e, event_type: 'highlight' } : e
         );
         try {
-            await axios.post(`/api/sync/game/${game.id}/events`, {
+            await axios.post(`/api/sync/game/${currentGame.id}/events`, {
                 events: payloadEvents,
             });
         } catch (e) {
@@ -361,14 +362,14 @@ export default function Timer({ auth, game, config = {} }) {
         if (hasGameStart) return;
 
         let occurred_at = new Date().toISOString();
-        if (game.game_date && game.game_time) {
-            const parsed = new Date(`${game.game_date}T${game.game_time}`);
+        if (currentGame.game_date && currentGame.game_time) {
+            const parsed = new Date(`${currentGame.game_date}T${currentGame.game_time}`);
             if (!Number.isNaN(parsed.getTime())) {
                 occurred_at = parsed.toISOString();
             }
         }
         const startEvent = {
-            id: `game-start-${game.id}`,
+            id: `game-start-${currentGame.id}`,
             session_number: 1,
             event_type: 'highlight',
             timer_value_seconds: 0,
@@ -377,7 +378,7 @@ export default function Timer({ auth, game, config = {} }) {
         };
         setEvents((prev) => [startEvent, ...prev]);
         persistEvents([startEvent]);
-    }, [events, game.game_date, game.game_time, game.id]);
+    }, [events, currentGame.game_date, currentGame.game_time, currentGame.id]);
 
     const findPlayerName = (team, shirtNumber) => {
         if (!team || !shirtNumber) return null;
@@ -387,7 +388,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const openGoalDialog = (team) => {
         if (!team?.id || isGameOver) return;
-        const shouldPause = !game.continue_timer_on_goal;
+        const shouldPause = !currentGame.continue_timer_on_goal;
         if (shouldPause) {
             setStatus('paused');
             setLastTick(null);
@@ -589,37 +590,37 @@ export default function Timer({ auth, game, config = {} }) {
                         <div className="space-y-1 sm:space-y-2 px-1 sm:px-0">
                             <p className="text-xs uppercase tracking-wide text-gray-500">{scheduledDisplay || 'Live Match'}</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                                {home?.name || game.team_a_name} vs {away?.name || game.team_b_name}
+                                {home?.name || currentGame.team_a_name} vs {away?.name || currentGame.team_b_name}
                             </h1>
-                            {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
-                            {game.code && (
+                            {currentGame.excerpt && <p className="text-sm text-gray-700">{currentGame.excerpt}</p>}
+                            {currentGame.code && (
                                 <div className="space-y-1 text-xs font-semibold text-gray-500">
                                     <p>
-                                        Code: {game.code}
+                                        Code: {currentGame.code}
                                     </p>
                                     <p>
                                         Public:{' '}
                                         <Link
-                                            href={route('public.ticker.code', game.code)}
+                                            href={route('public.ticker.code', currentGame.code)}
                                             className="text-indigo-600 hover:text-indigo-500"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
-                                            {route('public.ticker.code', game.code)}
+                                            {route('public.ticker.code', currentGame.code)}
                                         </Link>
                                     </p>
                                 </div>
                             )}
                             <p className="text-sm text-gray-600">
-                                Session length {game.session_duration_minutes} min · {sessionCount} sessions · {game.timer_mode}{' '}
+                                Session length {currentGame.session_duration_minutes} min · {sessionCount} sessions · {currentGame.timer_mode}{' '}
                                 timer
                             </p>
-                            {game.game_officials && <p className="text-sm text-gray-600">Officials: {game.game_officials}</p>}
+                            {currentGame.game_officials && <p className="text-sm text-gray-600">Officials: {currentGame.game_officials}</p>}
                             {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
                         </div>
                         <div className="flex flex-col items-start gap-1 sm:items-end sm:gap-0">
                             <Link
-                                href={route('games.report', game.id)}
+                                href={route('games.report', currentGame.id)}
                                 className="text-sm font-medium text-indigo-600 hover:text-indigo-500 sm:block"
                                 preserveScroll
                             >

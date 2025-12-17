@@ -2,9 +2,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import EventTimeline from '@/Components/EventTimeline';
 import moment from 'moment';
+import GameTeamSquad from '@/Components/GameTeamSquad';
 
 export default function Report({ auth, game }) {
-    if (!game) {
+    const currentGame = game?.data ?? game;
+    if (!currentGame) {
         return (
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Match Report" />
@@ -17,10 +19,17 @@ export default function Report({ auth, game }) {
         );
     }
 
-    const home = (game.teams || []).find((t) => t.side === 'home');
-    const away = (game.teams || []).find((t) => t.side === 'away');
-    const sessions = game.sessions || [];
-    const events = game.events || [];
+    const normalizeTeam = (team) => {
+        if (!team) return null;
+        const players = Array.isArray(team.players) ? team.players : team.players?.data || [];
+        return { ...team, players: players || [] };
+    };
+
+    const home = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'home'));
+    const away = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'away'));
+    const teamsNormalized = (currentGame.teams || []).map(normalizeTeam);
+    const sessions = currentGame.sessions || [];
+    const events = currentGame.events || [];
     const cardEventsByTeamAndNumber = (() => {
         const map = {};
         (events || [])
@@ -52,25 +61,25 @@ export default function Report({ auth, game }) {
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Match Report</p>
                             <h1 className="text-2xl font-semibold text-gray-900">
-                                {game.team_a_name} vs {game.team_b_name}
+                                {currentGame.team_a_name} vs {currentGame.team_b_name}
                             </h1>
-                            {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
+                            {currentGame.excerpt && <p className="text-sm text-gray-700">{currentGame.excerpt}</p>}
                             <p className="text-sm text-gray-600">
-                                {game.venue} · {formatLocalDate(game.game_date)} {formatTime(game.game_time)}
+                                {currentGame.venue} · {formatLocalDate(currentGame.game_date)} {formatTime(currentGame.game_time)}
                             </p>
-                            <p className="text-xs text-gray-500">Code: {game.code || game.id}</p>
-                            {game.game_officials && (
-                                <p className="text-xs text-gray-600">Game Officials: {game.game_officials}</p>
+                            <p className="text-xs text-gray-500">Code: {currentGame.code || currentGame.id}</p>
+                            {currentGame.game_officials && (
+                                <p className="text-xs text-gray-600">Game Officials: {currentGame.game_officials}</p>
                             )}
                         </div>
                         <div className="flex flex-col items-start gap-2 sm:items-end print:hidden">
-                            {game.status !== 'finished' && (
-                                <Link href={route('games.timer', game.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                            {currentGame.status !== 'finished' && (
+                                <Link href={route('games.timer', currentGame.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
                                     Back to Timer
                                 </Link>
                             )}
                             <Link
-                                href={route('games.official_report', game.id)}
+                                href={route('games.official_report', currentGame.id)}
                                 className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                                 target="_blank"
                                 rel="noopener noreferrer">
@@ -127,46 +136,15 @@ export default function Report({ auth, game }) {
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <h3 className="text-base font-semibold text-gray-900">Game Timeline</h3>
                         <div className="mt-4 bg-gradient-to-r from-red-600/10 via-red-600/10 to-transparent sm:bg-none" id="timeline-events">
-                            <EventTimeline events={events} teams={game.teams || []} sessionCount={game.sessions?.length || game.sessions || null} />
+                            <EventTimeline events={events} teams={teamsNormalized} sessionCount={currentGame.sessions?.length || currentGame.sessions || null} />
                         </div>
                     </section>
 
                     <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm print:border print:shadow-none print-section">
                         <h3 className="text-base font-semibold text-gray-900">Teams & Players</h3>
                         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            {[home, away].map((team, idx) => (
-                                <div key={team?.id || idx} className="rounded-md border border-gray-100 bg-gray-50 p-4">
-                                    <p className="text-sm font-semibold text-gray-800">{team?.name || (idx === 0 ? 'Team A' : 'Team B')}</p>
-                                    {(team?.coach || team?.manager) && (
-                                        <p className="mt-1 text-xs text-gray-600">
-                                            {team.coach ? `Coach: ${team.coach}` : ''}
-                                            {team.coach && team.manager ? ' · ' : ''}
-                                            {team.manager ? `Manager: ${team.manager}` : ''}
-                                        </p>
-                                    )}
-                                    <ul className="mt-3 space-y-1 text-sm text-gray-700">
-                                        {(team?.players || []).map((player) => {
-                                            const card = cardEventsByTeamAndNumber[`${team?.id}-${player.shirt_number}`];
-                                            return (
-                                                <li key={player.id || `${player.name}-${player.shirt_number || 'n'}`} className="flex items-center gap-2">
-                                                    {player.shirt_number ? `#${player.shirt_number} ` : ''}
-                                                    {player.name}
-                                                    {card && (
-                                                        <img
-                                                            src={cardIcon(card)}
-                                                            alt={`${card} card`}
-                                                            className="h-5 w-5 object-contain"
-                                                        />
-                                                    )}
-                                                </li>
-                                            );
-                                        })}
-                                        {(team?.players || []).length === 0 && (
-                                            <li className="text-xs text-gray-500">No players listed.</li>
-                                        )}
-                                    </ul>
-                                </div>
-                            ))}
+                            <GameTeamSquad team={home} fallbackLabel="Team A" />
+                            <GameTeamSquad team={away} fallbackLabel="Team B" />
                         </div>
                     </section>
                 </div>

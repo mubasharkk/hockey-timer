@@ -4,18 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
 
 export default function Edit({ auth, team }) {
+    const currentTeam = team?.data ?? team;
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: 'put',
-        name: team?.name ?? '',
-        coach: team?.coach ?? '',
-        manager: team?.manager ?? '',
+        name: currentTeam?.name ?? '',
+        coach: currentTeam?.coach ?? '',
+        manager: currentTeam?.manager ?? '',
         logo: null,
         remove_logo: false,
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.update', team.id), {
+        post(route('teams.update', currentTeam.id), {
             forceFormData: true,
             onSuccess: () => reset('logo'),
         });
@@ -23,18 +24,18 @@ export default function Edit({ auth, team }) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title={`Edit ${team.name}`} />
+            <Head title={`Edit ${currentTeam.name}`} />
 
             <div className="py-8">
                 <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
                     <header className="flex items-center justify-between gap-3">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Team</p>
-                            <h1 className="text-2xl font-semibold text-gray-900">Edit {team.name}</h1>
+                            <h1 className="text-2xl font-semibold text-gray-900">Edit {currentTeam.name}</h1>
                             <p className="text-sm text-gray-600">Update basic team details. Players stay unchanged.</p>
                         </div>
                         <Link
-                            href={route('teams.show', team.id)}
+                            href={route('teams.show', currentTeam.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />

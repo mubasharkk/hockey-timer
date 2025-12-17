@@ -8,6 +8,10 @@ use App\Models\Tournament;
 use App\Services\GameService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
+use App\Http\Resources\EventResource;
+use App\Http\Resources\GameResource;
+use App\Http\Resources\TeamResource;
+use App\Http\Resources\TournamentResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -36,9 +40,9 @@ class GameController extends Controller
             ->get(['id', 'title', 'slug', 'venue']);
 
         return Inertia::render('Game/Create', [
-            'teams' => $registeredTeams,
+            'teams' => TeamResource::collection($registeredTeams),
             'sportsOptions' => config('game.sports'),
-            'tournaments' => $tournaments,
+            'tournaments' => TournamentResource::collection($tournaments),
             'prefillTournamentId' => $request->input('tournament_id'),
         ]);
     }
@@ -60,7 +64,7 @@ class GameController extends Controller
         ]);
 
         return Inertia::render('Game/Summary', [
-            'game' => $game,
+            'game' => GameResource::make($game),
         ]);
     }
 
@@ -80,7 +84,7 @@ class GameController extends Controller
         }
 
         return Inertia::render('Game/Timer', [
-            'game' => $game,
+            'game' => GameResource::make($game),
             'config' => [
                 'timer_lock' => config('game.timer_lock'),
             ],
@@ -96,7 +100,7 @@ class GameController extends Controller
         ]);
 
         return Inertia::render('Game/Report', [
-            'game' => $game,
+            'game' => GameResource::make($game),
         ]);
     }
 
@@ -122,12 +126,12 @@ class GameController extends Controller
         }
 
         return Inertia::render('Game/OfficialPrintableReport', [
-            'game' => $game,
+            'game' => GameResource::make($game),
             'sessionScores' => $sessionScores,
             'sessionLabels' => $sessionCount > 0
                 ? collect(range(1, $sessionCount))->mapWithKeys(fn ($n) => [$n => $this->sessionLabel($n, $sessionCount)])->all()
                 : [],
-            'events' => $game->events,
+            'events' => EventResource::collection($game->events),
         ]);
     }
 
@@ -145,10 +149,10 @@ class GameController extends Controller
             ->get(['id', 'title', 'slug', 'venue']);
 
         return Inertia::render('Game/Edit', [
-            'game' => $game,
+            'game' => GameResource::make($game),
             'sportsOptions' => config('game.sports'),
-            'teams' => $teams,
-            'tournaments' => $tournaments,
+            'teams' => TeamResource::collection($teams),
+            'tournaments' => TournamentResource::collection($tournaments),
         ]);
     }
 
