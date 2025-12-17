@@ -132,25 +132,19 @@ export default function Timer({ auth, game, config = {} }) {
     const registeredAwayTeam = game.away_team || game.awayTeam;
 
     const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
-        if (sideTeam && registeredTeam) {
+        if (sideTeam || registeredTeam) {
+            const players = (sideTeam?.players && sideTeam.players.length ? sideTeam.players : registeredTeam?.players) || [];
             return {
                 ...registeredTeam,
                 ...sideTeam,
-                name: sideTeam.name || registeredTeam.name || fallbackName,
-                players: (sideTeam.players && sideTeam.players.length ? sideTeam.players : registeredTeam.players) || [],
+                id: sideTeam?.id ?? null, // only use game team id for events/scores
+                name: sideTeam?.name || registeredTeam?.name || fallbackName,
+                score: sideTeam?.score ?? registeredTeam?.score ?? 0,
+                players,
             };
         }
 
-        const team = sideTeam || registeredTeam;
-        if (team) {
-            return {
-                ...team,
-                name: team.name || fallbackName,
-                players: team.players || [],
-            };
-        }
-
-        return { name: fallbackName, players: [], id: sideTeam?.id || registeredTeam?.id || null };
+        return { id: null, name: fallbackName, players: [] };
     };
 
     const home = resolveTeam(teams.find((t) => t.side === 'home'), registeredHomeTeam, game.team_a_name);
