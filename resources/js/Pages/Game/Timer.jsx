@@ -137,7 +137,8 @@ export default function Timer({ auth, game, config = {} }) {
             return {
                 ...registeredTeam,
                 ...sideTeam,
-                id: sideTeam?.id ?? null, // only use game team id for events/scores
+                // Prefer the game-specific team id; fall back to registered team id so the UI stays interactive.
+                id: sideTeam?.id ?? registeredTeam?.id ?? null,
                 name: sideTeam?.name || registeredTeam?.name || fallbackName,
                 score: sideTeam?.score ?? registeredTeam?.score ?? 0,
                 players,
