@@ -34,6 +34,33 @@ export default function Summary({ auth, game }) {
     const canStart = !isFinished && (scheduledAt ? now >= scheduledAt : false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const { delete: destroy, processing } = useForm({});
+    const registeredHomeTeam = game.home_team || game.homeTeam;
+    const registeredAwayTeam = game.away_team || game.awayTeam;
+
+    const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
+        if (sideTeam && registeredTeam) {
+            return {
+                ...registeredTeam,
+                ...sideTeam,
+                name: sideTeam.name || registeredTeam.name || fallbackName,
+                players: (sideTeam.players && sideTeam.players.length ? sideTeam.players : registeredTeam.players) || [],
+            };
+        }
+
+        const team = sideTeam || registeredTeam;
+        if (team) {
+            return {
+                ...team,
+                name: team.name || fallbackName,
+                players: team.players || [],
+            };
+        }
+
+        return { name: fallbackName, players: [] };
+    };
+
+    const homeTeamResolved = resolveTeam(homeTeam, registeredHomeTeam, game.team_a_name);
+    const awayTeamResolved = resolveTeam(awayTeam, registeredAwayTeam, game.team_b_name);
 
     return (
         <AuthenticatedLayout user={auth.user}>
@@ -44,7 +71,7 @@ export default function Summary({ auth, game }) {
                     <header className="space-y-1">
                         <p className="text-xs uppercase tracking-wide text-gray-500">Summary</p>
                         <h1 className="text-2xl font-semibold text-gray-900">
-                            {homeTeam.name} vs {awayTeam.name}
+                            {homeTeamResolved.name} vs {awayTeamResolved.name}
                         </h1>
                         {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
                         {gameCode && <p className="text-xs font-semibold text-gray-500">Code: {gameCode}</p>}
@@ -71,15 +98,15 @@ export default function Summary({ auth, game }) {
                                 <dd className="text-sm text-gray-900">{game.game_officials || '—'}</dd>
                             </div>
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Home Players</dt>
+                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Home Squad</dt>
                                 <dd className="text-sm text-gray-900">
-                                    <PlayerList team={(game.teams || []).find((t) => t.side === 'home')} />
+                                    <TeamSquad team={homeTeamResolved} fallbackLabel="Home Team" />
                                 </dd>
                             </div>
                             <div>
-                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Away Players</dt>
+                                <dt className="text-xs font-medium uppercase tracking-wide text-gray-500">Away Squad</dt>
                                 <dd className="text-sm text-gray-900">
-                                    <PlayerList team={(game.teams || []).find((t) => t.side === 'away')} />
+                                    <TeamSquad team={awayTeamResolved} fallbackLabel="Away Team" />
                                 </dd>
                             </div>
                         </dl>
@@ -166,19 +193,53 @@ export default function Summary({ auth, game }) {
     );
 }
 
-const PlayerList = ({ team }) => {
-    if (!team || !team.players || team.players.length === 0) {
-        return <span>—</span>;
+const TeamSquad = ({ team, fallbackLabel }) => {
+    if (!team) {
+        return (
+            <div className="rounded-md border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+                <p className="font-semibold text-gray-700">{fallbackLabel}</p>
+                <p>No squad provided.</p>
+            </div>
+        );
     }
+
+    const players = team.players || [];
+    const hasPlayers = players.length > 0;
+
     return (
-        <ul className="list-inside list-disc space-y-1">
-            {team.players.map((p) => (
-                <li key={p.id || p.name} className="text-sm text-gray-800">
-                    {p.shirt_number ? `#${p.shirt_number} ` : ''}
-                    {p.name}
-                </li>
-            ))}
-        </ul>
+        <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+            <div className="mb-2 flex items-center justify-between">
+                <div>
+                    <p className="text-sm font-semibold text-gray-800">{team.name || fallbackLabel}</p>
+                </div>
+                <span className="rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-semibold uppercase text-indigo-700">
+                    {players.length} players
+                </span>
+            </div>
+            {hasPlayers ? (
+                <ul className="space-y-1 text-sm text-gray-700">
+                    {players.map((p) => (
+                        <li
+                            key={p.id || `${p.name}-${p.shirt_number || 'n'}`}
+                            className="flex items-center justify-between rounded bg-white px-2 py-1"
+                        >
+                            <span className="flex items-center gap-2">
+                                <span className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                                    {p.shirt_number ?? '—'}
+                                </span>
+                                <span>{p.name}</span>
+                            </span>
+                            {p.is_active === false && (
+                                <span className="text-[11px] font-semibold uppercase text-amber-600">Inactive</span>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p className="text-sm text-gray-500">No players listed for this team.</p>
+            )}
+            {team.coach && <p className="mt-3 text-xs text-gray-600">Coach: {team.coach}</p>}
+        </div>
     );
 };
 

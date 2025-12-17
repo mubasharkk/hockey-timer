@@ -52,7 +52,12 @@ class GameController extends Controller
 
     public function showSummary(Game $game): Response
     {
-        $game->load(['teams.players', 'sessions' => fn ($q) => $q->orderBy('number')]);
+        $game->load([
+            'teams.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'sessions' => fn ($q) => $q->orderBy('number'),
+        ]);
 
         return Inertia::render('Game/Summary', [
             'game' => $game,
