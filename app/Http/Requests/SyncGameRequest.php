@@ -19,7 +19,8 @@ class SyncGameRequest extends FormRequest
             'team_b_name' => ['required', 'string', 'max:255'],
             'venue' => ['required', 'string', 'max:255'],
             'game_date' => ['required', 'date'],
-            'game_time' => ['required', 'date_format:h:i:s'],
+            // Accept HH:MM or HH:MM:SS (some clients send seconds).
+            'game_time' => ['required', 'regex:/^\\d{2}:\\d{2}(?::\\d{2})?$/'],
             'sessions' => ['required', 'integer', 'in:2,4,6,8'],
             'session_duration_minutes' => ['required', 'integer', 'min:1'],
             'timer_mode' => ['required', 'in:ASC,DESC'],
