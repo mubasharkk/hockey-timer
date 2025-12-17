@@ -16,7 +16,7 @@ class TeamController extends Controller
     public function index(): Response
     {
         $teams = Team::query()
-            ->where('is_registered', true)
+            ->where('user_id', Auth::id())
             ->with([
                 'media',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
