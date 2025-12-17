@@ -59,6 +59,9 @@ class TournamentResource extends JsonResource
                         'game_time' => $game->game_time,
                         'venue' => $game->venue,
                         'status' => $game->status,
+                        'ended_at' => $game->ended_at,
+                        'home_score' => $game->homeTeam?->score,
+                        'away_score' => $game->awayTeam?->score,
                         'excerpt' => $game->excerpt,
                     ];
                 })->values()->all();

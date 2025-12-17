@@ -6,6 +6,11 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 export default function GameMatchup({ game }) {
     const home = game.home_team || { name: game.team_a_name };
     const away = game.away_team || { name: game.team_b_name };
+    const isFinished = game.status === 'finished' || !!game.ended_at;
+    const isToday = game.game_date ? moment(game.game_date).isSame(moment(), 'day') : false;
+    const homeScore = resolveScore(home, game, ['home_score', 'team_a_score']);
+    const awayScore = resolveScore(away, game, ['away_score', 'team_b_score']);
+    const showTicker = !isFinished && isToday && (game.code || game.id);
 
     return (
         <div className="space-y-3 rounded-md border border-gray-100 bg-gray-50 p-4 text-center shadow-sm">
@@ -17,20 +22,23 @@ export default function GameMatchup({ game }) {
             {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600">
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
-                {formatTime(game.game_time)}
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
-                {(game.code || game.id) && (
-                    <Link
-                        href={
-                            game.code
-                                ? route('public.ticker.code', game.code)
-                                : `${route('public.ticker')}?game=${game.id}`
-                        }
-                        className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700 ring-1 ring-indigo-100 transition hover:bg-indigo-100"
-                    >
-                        <TickerIcon />
-                        <span className="text-[11px] uppercase tracking-wide">Ticker</span>
-                    </Link>
+                {isFinished ? (
+                    <ResultBadge homeScore={homeScore} awayScore={awayScore} />
+                ) : (
+                    showTicker && (
+                        <Link
+                            href={
+                                game.code
+                                    ? route('public.ticker.code', game.code)
+                                    : `${route('public.ticker')}?game=${game.id}`
+                            }
+                            className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700 ring-1 ring-indigo-100 transition hover:bg-indigo-100"
+                        >
+                            <TickerIcon />
+                            <span className="text-[11px] uppercase tracking-wide">Ticker</span>
+                        </Link>
+                    )
                 )}
             </div>
         </div>
@@ -61,10 +69,31 @@ const TickerIcon = () => (
     <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5 text-indigo-700" />
 );
 
-const formatTime = (time) => {
-    if (!time) return 'TBD';
-    const value = moment(time, 'HH:mm');
-    return value.isValid() ? value.format('hh:mm A') : time;
+const ResultBadge = ({ homeScore, awayScore }) => {
+    const hasScores = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
+    return (
+        <span className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
+            <span>Final</span>
+            <span className="text-sm font-bold text-gray-900">
+                {hasScores ? `${homeScore} - ${awayScore}` : '—'}
+            </span>
+        </span>
+    );
+};
+
+const resolveScore = (team, game, fallbackKeys = []) => {
+    if (team && team.score !== null && team.score !== undefined && team.score !== '') {
+        return Number(team.score);
+    }
+
+    for (const key of fallbackKeys) {
+        if (game && game[key] !== null && game[key] !== undefined && game[key] !== '') {
+            const value = Number(game[key]);
+            return Number.isNaN(value) ? null : value;
+        }
+    }
+
+    return null;
 };
 
 const formatDateTime = (date, time) => {
