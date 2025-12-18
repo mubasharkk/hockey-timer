@@ -295,7 +295,7 @@ export default function Timer({ auth, game, config = {} }) {
             const sessionStartEvent = {
                 id: `session-start-${sessionIndex + 1}-${Date.now()}`,
                 session_number: sessionIndex + 1,
-                event_type: 'highlight',
+                event_type: 'session_start',
                 timer_value_seconds: 0,
                 occurred_at: new Date(now).toISOString(),
                 note: `Session ${sessionIndex + 1} start`,

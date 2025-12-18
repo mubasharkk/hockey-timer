@@ -137,7 +137,7 @@ class GameSyncService
 
             $occurredAt = !empty($event['occurred_at']) ? Carbon::parse($event['occurred_at']) : now();
             $timerSeconds = $event['timer_value_seconds'] ?? null;
-            if ($sessionModel?->started_at instanceof Carbon) {
+            if ($event['event_type'] !== 'session_start' && $sessionModel?->started_at instanceof Carbon) {
                 $timerSeconds = max(0, $occurredAt->diffInSeconds($sessionModel->started_at));
             }
 

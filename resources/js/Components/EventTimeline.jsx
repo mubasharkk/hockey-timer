@@ -51,7 +51,9 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
 
                     const noteLower = (event.note || '').toLowerCase();
                     const isGameStart = event.event_type === 'highlight' && noteLower.includes('game start');
-                    const isSessionStart = event.event_type === 'highlight' && noteLower.includes('session') && noteLower.includes('start');
+                    const isSessionStart =
+                        event.event_type === 'session_start' ||
+                        (event.event_type === 'highlight' && noteLower.includes('session') && noteLower.includes('start'));
                     const isBreak = event.event_type === 'highlight' && noteLower.includes('break');
                     const isCenter =
                         event.event_type === 'session_end' ||
@@ -166,6 +168,8 @@ const eventBadge = (event) => {
             return { icon: cardIcon(event.card_type), label: `${event.card_type || ''} Card`.trim() };
         case 'session_end':
             return { icon: '/icons/half-time.png', label: 'Session End' };
+        case 'session_start':
+            return { icon: '/icons/half-time.png', label: 'Session Start' };
         case 'game_end':
             return { icon: '/icons/full-time.png', label: 'Game End' };
         case 'highlight':
