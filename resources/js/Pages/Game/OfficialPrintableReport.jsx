@@ -47,13 +47,23 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
         return acc;
     }, {});
 
-    const finalScore = sessionRows.length
-        ? sessionRows[sessionRows.length - 1]
-        : {
-              homeScore: home?.score ?? 0,
-              awayScore: away?.score ?? 0,
-              label: 'Final',
-          };
+    const finalScore = (() => {
+        if (sessionRows.length) {
+            return sessionRows.reduce(
+                (totals, row) => ({
+                    homeScore: totals.homeScore + (row.homeScore ?? 0),
+                    awayScore: totals.awayScore + (row.awayScore ?? 0),
+                    label: 'Final',
+                }),
+                { homeScore: 0, awayScore: 0, label: 'Final' }
+            );
+        }
+        return {
+            homeScore: home?.score ?? 0,
+            awayScore: away?.score ?? 0,
+            label: 'Final',
+        };
+    })();
 
     const playerRows = Math.max(home?.players?.length || 0, away?.players?.length || 0);
     const safeEvents = Array.isArray(incomingEvents) ? incomingEvents : incomingEvents?.data || [];
@@ -335,7 +345,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="bg-gray-50 px-3 py-2">{idx + 1}</td>
                                             <td className="px-3 py-2">{sessionLabel(event.session_number)}</td>
                                             <td className="px-3 py-2">
-                                                {formatRemainingClock(event, sessionDurationMap)}
+                                                {formatRemainingClock(event, parseInt(currentGame.session_duration_minutes) * 60 * event.session_number)}
                                             </td>
                                             <td className="px-3 py-2">
                                                 {event.team_id === away.id ? away.name : home.name}
@@ -378,9 +388,8 @@ const formatClock = (event) => {
     return '—';
 };
 
-const formatRemainingClock = (event, durationMap = {}) => {
+const formatRemainingClock = (event, duration = {}) => {
     if (!event) return '—';
-    const duration = event.session_number != null ? durationMap?.[event.session_number] : null;
     if (duration != null && event.timer_value_seconds != null) {
         const diff = Math.abs(event.timer_value_seconds - duration);
         return formatSeconds(diff);
