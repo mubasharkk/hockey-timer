@@ -110,6 +110,7 @@ class GameController extends Controller
             'teams.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             'sessions' => fn ($q) => $q->orderBy('number'),
             'events' => fn ($q) => $q->orderBy('occurred_at')->orderBy('id'),
+            'tournament',
         ]);
 
         $sessionCount = $game->sessions instanceof \Illuminate\Support\Collection
