@@ -34,9 +34,19 @@ class PublicTournamentController extends Controller
             ->map(fn ($row) => (array) $row)
             ->all();
 
+        $topScorers = DB::table('tournament_top_scorers')
+            ->where('tournament_id', $tournament->id)
+            ->orderByDesc('goals')
+            ->orderBy('team_name')
+            ->limit(10)
+            ->get()
+            ->map(fn ($row) => (array) $row)
+            ->all();
+
         return Inertia::render('Public/Tournament', [
             'tournament' => TournamentResource::make($tournament),
             'poolResults' => $poolResults,
+            'topScorers' => $topScorers,
         ]);
     }
 }

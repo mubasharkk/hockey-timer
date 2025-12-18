@@ -9,8 +9,9 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import moment from 'moment';
 import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
+import TopScorers from '@/Components/TopScorers';
 
-export default function Show({ auth, tournament, poolResults = [] }) {
+export default function Show({ auth, tournament, poolResults = [], topScorers = [] }) {
     const currentTournament = tournament?.data ?? tournament;
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
@@ -173,6 +174,8 @@ export default function Show({ auth, tournament, poolResults = [] }) {
                         </div>
                         <PoolResults results={poolResults} />
                     </div>
+
+                    <TopScorers scorers={topScorers} />
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">

@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react';
 import moment from 'moment';
 import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
+import TopScorers from '@/Components/TopScorers';
 
-export default function Tournament({ tournament, poolResults = [] }) {
+export default function Tournament({ tournament, poolResults = [], topScorers = [] }) {
     const currentTournament = tournament?.data ?? tournament;
     const [tab, setTab] = useState('upcoming');
 
@@ -72,6 +73,8 @@ export default function Tournament({ tournament, poolResults = [] }) {
                         </div>
                         <PoolResults results={poolResults} />
                     </div>
+
+                    <TopScorers scorers={topScorers} />
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
