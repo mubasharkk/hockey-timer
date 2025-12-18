@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('game_id')->constrained('games')->cascadeOnDelete();
             $table->foreignId('team_id')->nullable()->constrained()->nullOnDelete();
             $table->unsignedTinyInteger('session_number');
-            $table->enum('event_type', ['goal', 'card', 'penalty_corner', 'penalty_stroke', 'highlight']);
+            $table->enum('event_type', ['goal', 'card', 'penalty_corner', 'penalty_stroke', 'highlight', 'session_start', 'session_end']);
             $table->enum('goal_type', ['FG', 'PG'])->nullable();
             $table->enum('card_type', ['green', 'yellow', 'red'])->nullable();
             $table->unsignedSmallInteger('player_shirt_number')->nullable();

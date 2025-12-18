@@ -350,7 +350,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="px-3 py-2">
                                                 {event.team_id === away.id ? away.name : home.name}
                                             </td>
-                                            <td className="px-3 py-2">{eventLabel(event)}</td>
+                                            <td className="px-3 py-2 capitalize">{eventLabel(event)}</td>
                                             <td className="px-3 py-2">{playerNote(event)}</td>
                                             <td className="px-3 py-2 text-gray-700">{formatDateTime(event.occurred_at)}</td>
                                         </tr>
