@@ -144,14 +144,23 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 Official Report / {currentGame?.code} / {formatSport(currentGame?.sport_type)}
                                 {tournamentName ? ` / ${tournamentName}` : ''}
                             </h1>
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-900">Match Details</p>
-                                </div>
-                                <div className="text-2xl font-extrabold text-indigo-700 final-score">
-                                    {finalScore.homeScore} – {finalScore.awayScore}
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-900">Match Details</p>
+                            </div>
+                            <div className="text-right text-indigo-700">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+                                    Final Score
+                                </p>
+                                <div className="text-lg font-semibold text-gray-900 flex items-center gap-2 justify-end">
+                                    <span className="uppercase text-gray-700">{home?.name || currentGame?.team_a_name}</span>
+                                    <span className="final-score text-2xl text-indigo-700">{finalScore.homeScore}</span>
+                                    <span className="text-gray-500">-</span>
+                                    <span className="final-score text-2xl text-indigo-700">{finalScore.awayScore}</span>
+                                    <span className="uppercase text-gray-700">{away?.name || currentGame?.team_b_name}</span>
                                 </div>
                             </div>
+                        </div>
                             <table className="print-table w-full table-fixed text-xs text-gray-800">
                                 <tbody>
                                     <tr className="border-b border-gray-200">
