@@ -81,6 +81,32 @@ class Game extends Model
         return $this->belongsTo(Tournament::class);
     }
 
+    public function homeFinalScore(): int
+    {
+        if (! $this->home_team_id) {
+            return 0;
+        }
+
+        return (int) Event::query()
+            ->where('game_id', $this->id)
+            ->where('team_id', $this->home_team_id)
+            ->where('event_type', 'goal')
+            ->count();
+    }
+
+    public function awayFinalScore(): int
+    {
+        if (! $this->away_team_id) {
+            return 0;
+        }
+
+        return (int) Event::query()
+            ->where('game_id', $this->id)
+            ->where('team_id', $this->away_team_id)
+            ->where('event_type', 'goal')
+            ->count();
+    }
+
     /**
      * Return per-team scores for a given session. If $aggregate is true,
      * scores include all sessions up to the requested session.

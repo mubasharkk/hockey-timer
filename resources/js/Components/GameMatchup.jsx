@@ -4,12 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 export default function GameMatchup({ game }) {
+    console.log(game);
     const home = game.home_team || { name: game.team_a_name };
     const away = game.away_team || { name: game.team_b_name };
     const isFinished = game.status === 'finished' || !!game.ended_at;
     const isToday = game.game_date ? moment(game.game_date).isSame(moment(), 'day') : false;
-    const homeScore = resolveScore(home, game, ['home_score', 'team_a_score']);
-    const awayScore = resolveScore(away, game, ['away_score', 'team_b_score']);
+    const homeScore = game?.home_score ?? 0;
+    const awayScore = game?.away_score ?? 0;
+
     const showTicker = !isFinished && isToday && (game.code || game.id);
 
     return (
@@ -70,11 +72,10 @@ const TickerIcon = () => (
 );
 
 const ResultBadge = ({ homeScore, awayScore }) => {
-    const hasScores = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
     return (
         <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
             <span>Final Score</span>
-            <span className="text-sm font-bold text-gray-900">{hasScores ? `${homeScore} - ${awayScore}` : '—'}</span>
+            <span className="text-sm font-bold text-gray-900">{`${homeScore} - ${awayScore}`}</span>
         </div>
     );
 };
