@@ -338,7 +338,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                                 {formatRemainingClock(event, sessionDurationMap)}
                                             </td>
                                             <td className="px-3 py-2">
-                                                {event.team_id ? teamName(event.team_id, currentGame?.teams) : '—'}
+                                                {event.team_id === away.id ? away.name : home.name}
                                             </td>
                                             <td className="px-3 py-2">{eventLabel(event)}</td>
                                             <td className="px-3 py-2">{playerNote(event)}</td>
@@ -382,8 +382,8 @@ const formatRemainingClock = (event, durationMap = {}) => {
     if (!event) return '—';
     const duration = event.session_number != null ? durationMap?.[event.session_number] : null;
     if (duration != null && event.timer_value_seconds != null) {
-        const remaining = Math.max(0, duration - event.timer_value_seconds);
-        return formatSeconds(remaining);
+        const diff = Math.abs(event.timer_value_seconds - duration);
+        return formatSeconds(diff);
     }
     if (event.timer_value_seconds != null) {
         return formatSeconds(event.timer_value_seconds);
