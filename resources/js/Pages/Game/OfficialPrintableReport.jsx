@@ -1,6 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import ReactMarkdown from 'react-markdown';
 import moment from 'moment';
 
 export default function OfficialPrintableReport({ auth, game, sessionScores = [], events: incomingEvents = [], sessionLabels = {} }) {
@@ -152,15 +151,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                     </tr>
                                     <tr className="border-b border-gray-200">
                                         <th className="bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700">Officials</th>
-                                        <td colSpan={5}  className="px-3 py-2">
-                                            {currentGame?.game_officials ? (
-                                                <div className="prose prose-sm max-w-none text-gray-900">
-                                                    <ReactMarkdown>{currentGame.game_officials}</ReactMarkdown>
-                                                </div>
-                                            ) : (
-                                                '—'
-                                            )}
-                                        </td>
+                                        <td colSpan={5}  className="px-3 py-2">{currentGame?.game_officials || '—'}</td>
                                     </tr>
                                 </tbody>
                             </table>
