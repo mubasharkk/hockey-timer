@@ -9,8 +9,8 @@ export default function GameMatchup({ game }) {
     const away = game.away_team || { name: game.team_b_name };
     const isFinished = game.status === 'finished' || !!game.ended_at;
     const isToday = game.game_date ? moment(game.game_date).isSame(moment(), 'day') : false;
-    const homeScore = game?.home_score ?? 0;
-    const awayScore = game?.away_score ?? 0;
+    const homeScore = game?.home_final_score ?? 0;
+    const awayScore = game?.away_final_score ?? 0;
 
     const showTicker = !isFinished && isToday && (game.code || game.id);
 
