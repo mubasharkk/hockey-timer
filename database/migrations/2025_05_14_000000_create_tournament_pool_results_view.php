@@ -85,13 +85,14 @@ SELECT
     COALESCE(a.losses, 0) AS losses,
     COALESCE(a.goals_for, 0) AS goals_for,
     COALESCE(a.goals_against, 0) AS goals_against,
+    COALESCE(a.goals_for, 0) - COALESCE(a.goals_against, 0) AS goal_diff,
     (COALESCE(a.wins, 0) * t.win_points) + (COALESCE(a.draws, 0) * t.draw_points) + (COALESCE(a.losses, 0) * t.loss_points) AS total_points
 FROM tournament_pools tp
 JOIN tournaments t ON t.id = tp.tournament_id
 JOIN tournament_pool_team tpt ON tpt.tournament_pool_id = tp.id
 JOIN teams reg ON reg.id = tpt.team_id
 LEFT JOIN aggregate a ON a.tournament_id = t.id AND a.team_id = reg.id
-ORDER BY t.id, tp.`order`, total_points DESC, team_name ASC;
+ORDER BY t.id, tp.`order`, total_points DESC, goal_diff DESC, team_name ASC;
 SQL);
     }
 

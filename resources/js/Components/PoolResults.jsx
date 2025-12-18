@@ -36,6 +36,7 @@ export default function PoolResults({ results = [] }) {
                                     <Th align="center">L</Th>
                                     <Th align="center">GF</Th>
                                     <Th align="center">GA</Th>
+                                    <Th align="center">GD</Th>
                                     <Th align="center">Pts</Th>
                                 </tr>
                             </thead>
@@ -49,6 +50,7 @@ export default function PoolResults({ results = [] }) {
                                         <Td align="center">{row.losses}</Td>
                                         <Td align="center">{row.goals_for}</Td>
                                         <Td align="center">{row.goals_against}</Td>
+                                        <Td align="center">{formatGoalDiff(row.goal_diff)}</Td>
                                         <Td align="center" className="font-semibold text-gray-900">
                                             {row.total_points}
                                         </Td>
@@ -70,3 +72,9 @@ const Th = ({ children, align = 'left' }) => (
 const Td = ({ children, align = 'left', className = '' }) => (
     <td className={`px-3 py-2 text-${align} text-gray-800 ${className}`}>{children}</td>
 );
+
+const formatGoalDiff = (value) => {
+    const num = Number(value ?? 0);
+    if (Number.isNaN(num) || num === 0) return '0';
+    return num > 0 ? `+${num}` : `${num}`;
+};
