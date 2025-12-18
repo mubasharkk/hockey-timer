@@ -4,8 +4,246 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3fad05b0f647a5e901a047c2e5de1743",
+    "content-hash": "f393ccff49fd4646bdfce1449e652255",
     "packages": [
+        {
+            "name": "backpack/basset",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laravel-Backpack/basset.git",
+                "reference": "1efadaf5e2352a4b6b21e8799a8e1b9029707da1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laravel-Backpack/basset/zipball/1efadaf5e2352a4b6b21e8799a8e1b9029707da1",
+                "reference": "1efadaf5e2352a4b6b21e8799a8e1b9029707da1",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.5",
+                "laravel/framework": "^10.15|^11|^12.0"
+            },
+            "require-dev": {
+                "nunomaduro/collision": "^6.0|^7.2|^8.0",
+                "orchestra/testbench": "^7.22|^8.5|^9.0|^10.0",
+                "pestphp/pest": "^1.22|^2.5|^3.7",
+                "pestphp/pest-plugin-laravel": "^1.4|^2.0|^3.1",
+                "phpstan/phpstan": "^1.10|^2.1",
+                "phpunit/phpunit": "~9.0|~10.0|^11.5.3"
+            },
+            "suggest": {
+                "ext-zip": "Required to use @bassetArchive with .zip archives."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Basset": "Backpack\\Basset\\Facades\\Basset"
+                    },
+                    "providers": [
+                        "Backpack\\Basset\\BassetServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Helpers/functions.php"
+                ],
+                "psr-4": {
+                    "Backpack\\Basset\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cristian Tabacitu",
+                    "email": "hello@tabacitu.ro",
+                    "homepage": "https://tabacitu.ro"
+                }
+            ],
+            "description": "Dead-simple way to load CSS or JS assets only once per page, when using Laravel 10+.",
+            "homepage": "https://github.com/laravel-backpack/basset",
+            "keywords": [
+                "Load CSS once",
+                "Load JS once",
+                "assets",
+                "basset",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/Laravel-Backpack/basset/issues",
+                "source": "https://github.com/Laravel-Backpack/basset/tree/2.0.0"
+            },
+            "time": "2025-11-21T07:27:01+00:00"
+        },
+        {
+            "name": "backpack/crud",
+            "version": "7.0.12",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laravel-Backpack/CRUD.git",
+                "reference": "13b06e934d7782033291348095f2581a71817c11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laravel-Backpack/CRUD/zipball/13b06e934d7782033291348095f2581a71817c11",
+                "reference": "13b06e934d7782033291348095f2581a71817c11",
+                "shasum": ""
+            },
+            "require": {
+                "backpack/basset": "^2.0.",
+                "creativeorange/gravatar": "^1.0",
+                "doctrine/dbal": "^4.0",
+                "guzzlehttp/guzzle": "^7.0",
+                "laravel/framework": "^12",
+                "prologue/alerts": "^1.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.0",
+                "phpunit/phpunit": "^11.0",
+                "spatie/laravel-translatable": "^6.0"
+            },
+            "suggest": {
+                "backpack/filemanager": "Required to use the browse and browse_multiple fields.",
+                "backpack/generators": "Required on localhost to easily generate CRUDs, models, controllers etc.",
+                "backpack/revise-operation": "Optional operation to remember all entry changes, undo and redo them (aka audit trait)."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "CRUD": "Backpack\\CRUD\\app\\Library\\CrudPanel\\CrudPanelFacade",
+                        "Widget": "Backpack\\CRUD\\app\\Library\\Widget"
+                    },
+                    "providers": [
+                        "Backpack\\CRUD\\BackpackServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Backpack\\CRUD\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cristian Tabacitu",
+                    "email": "cristian.tabacitu@backpackforlaravel.com",
+                    "homepage": "https://backpackforlaravel.com",
+                    "role": "Creator & Maintainer"
+                }
+            ],
+            "description": "Quickly build admin interfaces using Laravel, Bootstrap and JavaScript.",
+            "homepage": "https://github.com/laravel-backpack/CRUD",
+            "keywords": [
+                "Admin Interface",
+                "Content management system",
+                "admin panel",
+                "admin panel for laravel",
+                "admin template for laravel",
+                "backpack",
+                "base",
+                "bootstrap 5 admin panel laravel",
+                "bread",
+                "cms",
+                "content management framework",
+                "coreui for laravel",
+                "create",
+                "crud",
+                "dashboard for laravel",
+                "delete",
+                "laravel admin",
+                "read",
+                "tabler for laravel",
+                "update"
+            ],
+            "support": {
+                "issues": "https://github.com/Laravel-Backpack/CRUD/issues",
+                "source": "https://github.com/Laravel-Backpack/CRUD/tree/7.0.12"
+            },
+            "time": "2025-12-10T12:47:38+00:00"
+        },
+        {
+            "name": "backpack/theme-coreuiv4",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laravel-Backpack/theme-coreuiv4.git",
+                "reference": "33c84cf48ab41f42b4ec223dcf9c21a6df9494ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laravel-Backpack/theme-coreuiv4/zipball/33c84cf48ab41f42b4ec223dcf9c21a6df9494ac",
+                "reference": "33c84cf48ab41f42b4ec223dcf9c21a6df9494ac",
+                "shasum": ""
+            },
+            "require": {
+                "backpack/crud": "^6.0|^7.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8||^9||^10||^11",
+                "phpunit/phpunit": "^10.0|^11.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Backpack\\ThemeCoreuiv4\\AddonServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Backpack\\ThemeCoreuiv4\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Cristian Tabacitu",
+                    "email": "hello@backpackforlaravel.com",
+                    "homepage": "https://backpackforlaravel.com"
+                },
+                {
+                    "name": "Antonio Almeida",
+                    "email": "promatik@gmail.com",
+                    "homepage": "https://backpackforlaravel.com"
+                },
+                {
+                    "name": "Mauro Martinez",
+                    "email": "maurohmartinez@gmail.com",
+                    "homepage": "https://backpackforlaravel.com"
+                }
+            ],
+            "description": "UI for Backpack v6 that uses CoreUI v4 and Bootstrap v5.",
+            "homepage": "https://github.com/backpack/theme-coreuiv4",
+            "keywords": [
+                "Backpack Addon",
+                "Backpack for Laravel",
+                "ThemeCoreuiv4",
+                "backpack",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/Laravel-Backpack/theme-coreuiv4/issues",
+                "source": "https://github.com/Laravel-Backpack/theme-coreuiv4/tree/1.2.1"
+            },
+            "time": "2025-12-01T14:27:48+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.14.1",
@@ -211,6 +449,69 @@
                 }
             ],
             "time": "2025-08-20T19:15:30+00:00"
+        },
+        {
+            "name": "creativeorange/gravatar",
+            "version": "v1.0.25",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/brainpink/gravatar.git",
+                "reference": "21ba6cbe125d57965c58468047ea29dfa822b4d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/brainpink/gravatar/zipball/21ba6cbe125d57965c58468047ea29dfa822b4d3",
+                "reference": "21ba6cbe125d57965c58468047ea29dfa822b4d3",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^5|^6|^7|^8|^9|^10.0|^11.0|^12.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "nunomaduro/larastan": "^0.6.2|^2.4",
+                "orchestra/testbench": "^5.4|^8.0|^9.0|^10.0",
+                "php": ">=7.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Gravatar": "Creativeorange\\Gravatar\\Facades\\Gravatar"
+                    },
+                    "providers": [
+                        "Creativeorange\\Gravatar\\GravatarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Creativeorange\\Gravatar\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jaco Tijssen",
+                    "email": "jaco@creativeorange.nl",
+                    "homepage": "https://www.creativeorange.nl",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A Laravel Gravatar package for retrieving gravatar image URLs or checking the existance of an image.",
+            "keywords": [
+                "avatar",
+                "gravatar",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/brainpink/gravatar/issues",
+                "source": "https://github.com/brainpink/gravatar/tree/v1.0.25"
+            },
+            "time": "2025-02-22T19:11:54+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -3541,6 +3842,75 @@
                 }
             ],
             "time": "2025-10-06T01:07:24+00:00"
+        },
+        {
+            "name": "prologue/alerts",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/prologuephp/alerts.git",
+                "reference": "0a73c65c70d4838a79cc927e8c966a00b2cefcfc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/prologuephp/alerts/zipball/0a73c65c70d4838a79cc927e8c966a00b2cefcfc",
+                "reference": "0a73c65c70d4838a79cc927e8c966a00b2cefcfc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/config": "~9|^10|^11.0|^12.0",
+                "illuminate/session": "~9|^10|^11.0|^12.0",
+                "illuminate/support": "~9|^10|^11.0|^12.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^9|^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Alert": "Prologue\\Alerts\\Facades\\Alert"
+                    },
+                    "providers": [
+                        "Prologue\\Alerts\\AlertsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Prologue\\Alerts\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dries Vints",
+                    "email": "dries.vints@gmail.com",
+                    "homepage": "http://driesvints.com",
+                    "role": "Creator"
+                },
+                {
+                    "name": "Cristian Tabacitu",
+                    "email": "hello@tabacitu.ro",
+                    "homepage": "http://tabacitu.ro",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Prologue Alerts is a package that handles global site messages.",
+            "keywords": [
+                "alerts",
+                "laravel",
+                "messages"
+            ],
+            "support": {
+                "issues": "https://github.com/prologuephp/alerts/issues",
+                "source": "https://github.com/prologuephp/alerts/tree/1.3.0"
+            },
+            "time": "2025-02-24T15:15:54+00:00"
         },
         {
             "name": "psr/cache",
@@ -7589,6 +7959,72 @@
     ],
     "packages-dev": [
         {
+            "name": "backpack/generators",
+            "version": "v4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laravel-Backpack/Generators.git",
+                "reference": "b126a5b38035a1fb5ef803dff3c776311f9f2222"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laravel-Backpack/Generators/zipball/b126a5b38035a1fb5ef803dff3c776311f9f2222",
+                "reference": "b126a5b38035a1fb5ef803dff3c776311f9f2222",
+                "shasum": ""
+            },
+            "require": {
+                "backpack/crud": "^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Backpack\\Generators\\GeneratorsServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Backpack\\Generators\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Cristian Tabacitu",
+                    "email": "tabacitu@backpackforlaravel.com",
+                    "homepage": "https://backpackforlaravel.com",
+                    "role": "Lead Developer & Maintainer"
+                },
+                {
+                    "name": "Cristian Tone",
+                    "email": "cristitone@outlook.com",
+                    "homepage": "http://updivision.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Generate files for laravel projects",
+            "homepage": "https://github.com/laravel-backpack/generators",
+            "keywords": [
+                "config",
+                "generators",
+                "model",
+                "request",
+                "view"
+            ],
+            "support": {
+                "issues": "https://github.com/Laravel-Backpack/Generators/issues",
+                "source": "https://github.com/Laravel-Backpack/Generators/tree/v4.1.0"
+            },
+            "time": "2025-11-19T06:32:49+00:00"
+        },
+        {
             "name": "fakerphp/faker",
             "version": "v1.24.1",
             "source": {
@@ -10021,5 +10457,5 @@
         "php": "^8.2"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

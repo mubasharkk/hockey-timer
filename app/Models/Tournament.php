@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,7 @@ use Illuminate\Support\Str;
 
 class Tournament extends Model implements HasMedia
 {
+    use CrudTrait;
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
