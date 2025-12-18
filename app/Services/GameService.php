@@ -20,9 +20,9 @@ class GameService
         $homeTemplate = Team::with('players')->findOrFail($data['home_team_id']);
         $awayTemplate = Team::with('players')->findOrFail($data['away_team_id']);
 
-        if (! $homeTemplate->is_registered || ! $awayTemplate->is_registered) {
-            throw new \InvalidArgumentException('Teams must be registered before creating a game.');
-        }
+//        if (! $homeTemplate->is_registered || ! $awayTemplate->is_registered) {
+//            throw new \InvalidArgumentException('Teams must be registered before creating a game.');
+//        }
 
         return DB::transaction(function () use ($data, $user, $homeTemplate, $awayTemplate) {
             $game = Game::create([
