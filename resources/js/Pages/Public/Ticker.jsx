@@ -198,12 +198,10 @@ export default function Ticker({ game, gameId }) {
                                 </div>
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
                                     <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
-                                        <TeamLogo team={homeTeam} align="start" />
                                         <span className="mb-3 mt-3 text-3xl font-semibold">{homeTeam?.name || liveData.team_a_name}</span>
                                         <span className="text-5xl font-bold">{liveData.team_a_score ?? (liveData.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
                                     </div>
                                     <div id="score-team-b" className="flex w-1/2 flex-col items-end justify-center text-right">
-                                        <TeamLogo team={awayTeam} align="end" />
                                         <span className="mb-3 mt-3 text-3xl font-semibold">{awayTeam?.name || liveData.team_b_name}</span>
                                         <span className="text-5xl font-bold">{liveData.team_b_score ?? (liveData.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
                                     </div>
