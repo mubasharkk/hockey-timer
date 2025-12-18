@@ -55,8 +55,6 @@ class TeamController extends Controller
 
     public function show(Team $team): Response
     {
-        abort_unless($team->is_registered, 404);
-
         $team->load([
             'media',
             'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
@@ -111,7 +109,6 @@ class TeamController extends Controller
 
     private function ensureManageable(Team $team): void
     {
-        abort_unless($team->is_registered, 404);
         abort_unless($team->user_id === Auth::id(), 403);
     }
 }
