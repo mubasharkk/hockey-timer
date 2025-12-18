@@ -134,7 +134,6 @@ class PlayerController extends Controller
 
     private function ensureTeamAccess(Team $team): void
     {
-        abort_unless($team->is_registered, 404);
         abort_unless($team->user_id === Auth::id(), 403);
     }
 
