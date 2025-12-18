@@ -14,6 +14,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
     const sessionTotal =
         sessionScores?.length ||
         (Array.isArray(currentGame?.sessions) ? currentGame.sessions.length : Number(currentGame?.sessions || 0));
+    const tournamentName = currentGame?.tournament?.name || currentGame?.tournament_name;
     const sessionDurationMap =
         currentGame?.sessions?.reduce((acc, session) => {
             if (session?.number != null && session?.planned_duration_seconds != null) {
@@ -131,6 +132,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         <section className="space-y-2">
                             <h1 className={'uppercase font-bold border-b border-indigo-600 pb-3 text-center'}>
                                 Official Report / {currentGame?.code} / {formatSport(currentGame?.sport_type)}
+                                {tournamentName ? ` / ${tournamentName}` : ''}
                             </h1>
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
