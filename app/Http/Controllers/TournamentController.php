@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateTournamentRequest;
 use App\Models\Tournament;
 use App\Models\TournamentPool;
 use App\Http\Resources\TournamentResource;
+use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,24 @@ class TournamentController extends Controller
                     'awayTeam.media',
                 ]),
         ]);
+
+        $gameIds = $tournament->games->pluck('id');
+        $goalCounts = Event::query()
+            ->select('game_id', 'team_id', DB::raw('COUNT(*) as total'))
+            ->whereIn('game_id', $gameIds)
+            ->where('event_type', 'goal')
+            ->groupBy('game_id', 'team_id')
+            ->get()
+            ->groupBy('game_id');
+
+        $tournament->games->transform(function ($game) use ($goalCounts) {
+            $scores = $goalCounts->get($game->id) ?? collect();
+            $homeId = $game->home_team_id;
+            $awayId = $game->away_team_id;
+            $game->calculated_home_score = (int) ($scores->firstWhere('team_id', $homeId)?->total ?? 0);
+            $game->calculated_away_score = (int) ($scores->firstWhere('team_id', $awayId)?->total ?? 0);
+            return $game;
+        });
 
         $poolResults = DB::table('tournament_pool_results')
             ->where('tournament_id', $tournament->id)
