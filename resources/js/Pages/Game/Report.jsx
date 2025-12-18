@@ -30,6 +30,9 @@ export default function Report({ auth, game }) {
     const teamsNormalized = (currentGame.teams || []).map(normalizeTeam);
     const sessions = currentGame.sessions || [];
     const events = currentGame.events || [];
+    const scoreByTeam = calculateScoresFromEvents(events);
+    const homeScore = scoreByTeam[home?.id] ?? home?.score ?? 0;
+    const awayScore = scoreByTeam[away?.id] ?? away?.score ?? 0;
     const cardEventsByTeamAndNumber = (() => {
         const map = {};
         (events || [])
@@ -92,7 +95,7 @@ export default function Report({ auth, game }) {
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-semibold text-gray-900">Final Score</h2>
                             <div className="text-3xl font-bold text-gray-900">
-                                {(home?.score ?? 0)} – {(away?.score ?? 0)}
+                                {homeScore} – {awayScore}
                             </div>
                         </div>
                         <p className="mt-1 text-sm text-gray-600">
@@ -183,4 +186,13 @@ const cardIcon = (type) => {
     if (type === 'yellow') return '/icons/yellow-card.png';
     if (type === 'green') return '/icons/green-card.png';
     return '/icons/red-card.png';
+};
+
+const calculateScoresFromEvents = (events = []) => {
+    return (events || []).reduce((acc, event) => {
+        if (event.event_type === 'goal' && event.team_id) {
+            acc[event.team_id] = (acc[event.team_id] ?? 0) + 1;
+        }
+        return acc;
+    }, {});
 };

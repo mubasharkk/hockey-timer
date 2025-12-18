@@ -154,7 +154,6 @@ export default function Timer({ auth, game, config = {} }) {
     const [events, setEvents] = useState(currentGame.events || []);
     const scoreStorageKey = `game_scores_${currentGame.id}`;
     const [scores, setScores] = useState(() => {
-        const initial = {};
         try {
             const saved = localStorage.getItem(scoreStorageKey);
             if (saved) {
@@ -163,10 +162,25 @@ export default function Timer({ auth, game, config = {} }) {
         } catch (e) {
             // ignore parse errors
         }
+        const fromEvents = calculateScoresFromEvents(currentGame.events || []);
+        if (Object.keys(fromEvents).length) {
+            return fromEvents;
+        }
+        const initial = {};
         if (home?.id) initial[home.id] = home.score ?? 0;
         if (away?.id) initial[away.id] = away.score ?? 0;
         return initial;
     });
+
+    useEffect(() => {
+        const derived = calculateScoresFromEvents(events);
+        if (!home?.id && !away?.id && !Object.keys(derived).length) return;
+        setScores({
+            ...(home?.id ? { [home.id]: 0 } : {}),
+            ...(away?.id ? { [away.id]: 0 } : {}),
+            ...derived,
+        });
+    }, [events, home?.id, away?.id]);
     useEffect(() => {
         localStorage.setItem(scoreStorageKey, JSON.stringify(scores));
     }, [scores, scoreStorageKey]);
@@ -957,6 +971,15 @@ const formatSeconds = (seconds) => {
         .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
+};
+
+const calculateScoresFromEvents = (events = []) => {
+    return (events || []).reduce((acc, event) => {
+        if (event.event_type === 'goal' && event.team_id) {
+            acc[event.team_id] = (acc[event.team_id] ?? 0) + 1;
+        }
+        return acc;
+    }, {});
 };
 
 const formatDateTime = (date, time) => {
