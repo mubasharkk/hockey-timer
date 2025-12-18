@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GameResource;
+use App\Http\Resources\MatchSessionResource;
 use App\Models\Game;
 use Illuminate\Http\JsonResponse;
 
@@ -97,6 +98,7 @@ class PublicTickerApiController extends Controller
             'team_b_score' => $awayScore ?? 0,
             'timer_seconds' => $timerSeconds,
             'current_period' => $currentSessionNumber,
+            'current_session' => $currentSession ? MatchSessionResource::make($currentSession) : null,
             'session_count' => $sessionCount,
             'timer_mode' => $game->timer_mode,
             'status' => $game->status,
