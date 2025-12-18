@@ -74,8 +74,6 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                         <PoolResults results={poolResults} />
                     </div>
 
-                    <TopScorers scorers={topScorers} />
-
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
@@ -103,6 +101,9 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                             <GameList games={resultGames} emptyMessage="No finished games yet." />
                         )}
                     </div>
+
+                    <TopScorers scorers={topScorers} />
+
                 </div>
             </div>
         </PublicLayout>
