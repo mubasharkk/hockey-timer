@@ -97,7 +97,7 @@ export default function Timer({ auth, game, config = {} }) {
                 const now = Date.now();
                 const delta = lastTick ? (now - lastTick) / 1000 : 0;
                 const next = prev + delta;
-                const reachedEnd = currentGame.timer_mode === 'DESC' && next >= plannedSeconds;
+                const reachedEnd = next >= plannedSeconds;
 
                 if (reachedEnd) {
                     setLastTick(null);
