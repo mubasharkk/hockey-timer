@@ -112,7 +112,7 @@ class GameController extends Controller
             'homeTeam.players',
             'awayTeam.players',
             'sessions' => fn ($q) => $q->orderBy('number'),
-            'events' => fn ($q) => $q->whereNotNull('team_id')->orderBy('occurred_at')->orderBy('id'),
+            'events' => fn ($q) => $q->with('team')->whereNotNull('team_id')->orderBy('occurred_at')->orderBy('id'),
             'tournament',
         ]);
 
