@@ -27,9 +27,10 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
 
     const teamA = normalizeTeam(teams.find((t) => t.side === 'home') ?? teams[0] ?? null);
     const teamB = normalizeTeam(teams.find((t) => t.side === 'away') ?? teams[1] ?? null);
-    const teamAId = teamA?.id ?? null;
-    const teamBId = teamB?.id ?? null;
-    const teamById = (id) => teams.find((t) => t.id === id);
+    const normalizeId = (id) => (id == null ? null : `${id}`);
+    const teamAId = normalizeId(teamA?.id);
+    const teamBId = normalizeId(teamB?.id);
+    const teamById = (id) => teams.find((t) => normalizeId(t.id) === normalizeId(id));
 
     return (
         <div className="relative">
@@ -41,7 +42,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
             <div className="space-y-6">
                 {orderedEvents.map((event, idx) => {
                     const team = event.team_id ? teamById(event.team_id) : null;
-                    const side = event.team_id === teamBId ? 'teamB' : 'teamA';
+                    const side = normalizeId(event.team_id) === teamBId ? 'teamB' : 'teamA';
                     const badge = eventBadge(event);
                     const playerLabel =
                         event.player_shirt_number != null
