@@ -57,6 +57,7 @@ class TournamentController extends Controller
             ->where('tournament_id', $tournament->id)
             ->orderBy('pool_id')
             ->orderByDesc('total_points')
+            ->orderByDesc('goal_diff')
             ->orderBy('team_name')
             ->get()
             ->map(fn ($row) => (array) $row)

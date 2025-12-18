@@ -1,7 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCalendarAlt, faClock, faPen, faPlus, faTrash, faTrophy, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+    faArrowLeft,
+    faCalendarAlt,
+    faPen,
+    faPlus,
+    faTrash,
+    faTrophy,
+    faUsers
+} from '@fortawesome/free-solid-svg-icons';
 import { useMemo, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
@@ -178,7 +186,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-indigo-600" />
+                                <FontAwesomeIcon icon={faCalendarAlt} className="h-4 w-4 text-indigo-600" />
                                 <h3 className="text-sm font-semibold text-gray-900">Games</h3>
                             </div>
                             <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">

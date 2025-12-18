@@ -1,4 +1,6 @@
 import React from 'react';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faMedal} from "@fortawesome/free-solid-svg-icons";
 
 export default function TopScorers({ scorers = [] }) {
     if (!scorers || scorers.length === 0) {
@@ -6,9 +8,10 @@ export default function TopScorers({ scorers = [] }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-100 px-4 py-3">
-                <h4 className="text-sm font-semibold text-gray-900">Top Goal Scorers</h4>
+        <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm px-5">
+            <div className="mb-4 flex items-center gap-3 pt-5">
+                <FontAwesomeIcon icon={faMedal} className="h-4 w-4 text-indigo-600" />
+                <h3 className="text-sm font-semibold text-gray-900">Top Goal Scorers</h3>
             </div>
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 text-sm">
