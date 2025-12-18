@@ -130,7 +130,6 @@ class GameController extends Controller
             ];
         }
 
-        dd($sessionScores);
         return Inertia::render('Game/OfficialPrintableReport', [
             'game' => GameResource::make($game),
             'sessionScores' => $sessionScores,

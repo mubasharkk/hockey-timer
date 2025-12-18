@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Tournament;
+use App\Models\Event;
+use Illuminate\Support\Facades\DB;
 
 class Game extends Model
 {
@@ -87,20 +89,14 @@ class Game extends Model
     {
         $teams = $this->relationLoaded('teams') ? $this->teams : $this->teams()->get(['id', 'name', 'side']);
 
-        $eventsQuery = $this->events()->where('event_type', 'goal');
-        if ($aggregate) {
-            $eventsQuery->where('session_number', '<=', $sessionNumber);
-        } else {
-            $eventsQuery->where('session_number', $sessionNumber);
-        }
-
-        $events = $this->relationLoaded('events')
-            ? $this->events->where('event_type', 'goal')->filter(function ($evt) use ($sessionNumber, $aggregate) {
-                return $aggregate
-                    ? $evt->session_number <= $sessionNumber
-                    : $evt->session_number === $sessionNumber;
-            })
-            : $eventsQuery->get(['team_id', 'session_number']);
+        $goalCounts = Event::query()
+            ->select('team_id', DB::raw('COUNT(*) as total'))
+            ->where('game_id', $this->id)
+            ->where('event_type', 'goal')
+            ->when($aggregate, fn ($q) => $q->where('session_number', '<=', $sessionNumber))
+            ->when(! $aggregate, fn ($q) => $q->where('session_number', $sessionNumber))
+            ->groupBy('team_id')
+            ->pluck('total', 'team_id');
 
         $scores = [];
         foreach ($teams as $team) {
@@ -108,9 +104,11 @@ class Game extends Model
                 'team_id' => $team->id,
                 'team_name' => $team->name,
                 'side' => $team->side,
-                'score' => $events->where('team_id', $team->id)->count(),
+                'score' => (int) ($goalCounts[$team->id] ?? 0),
             ];
         }
+
+        dd($scores);
 
         return array_values($scores);
     }
