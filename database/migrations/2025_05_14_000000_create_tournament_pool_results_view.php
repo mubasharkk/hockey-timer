@@ -12,14 +12,13 @@ WITH game_goals AS (
     SELECT
         g.id AS game_id,
         g.tournament_id,
-        COALESCE(et.registered_team_id, e.team_id) AS registered_team_id,
+        e.team_id AS team_id,
         SUM(CASE WHEN e.event_type = 'goal' THEN 1 ELSE 0 END) AS goals
     FROM games g
     LEFT JOIN events e ON e.game_id = g.id
-    LEFT JOIN teams et ON et.id = e.team_id
     WHERE g.tournament_id IS NOT NULL
       AND g.status = 'finished'
-    GROUP BY g.id, g.tournament_id, et.registered_team_id, e.team_id
+    GROUP BY g.id, g.tournament_id, e.team_id
 ),
  game_scores AS (
     SELECT
@@ -30,8 +29,8 @@ WITH game_goals AS (
         COALESCE(h.goals, 0) AS home_goals,
         COALESCE(a.goals, 0) AS away_goals
     FROM games g
-    LEFT JOIN game_goals h ON h.game_id = g.id AND h.registered_team_id = g.home_team_id
-    LEFT JOIN game_goals a ON a.game_id = g.id AND a.registered_team_id = g.away_team_id
+    LEFT JOIN game_goals h ON h.game_id = g.id AND h.team_id = g.home_team_id
+    LEFT JOIN game_goals a ON a.game_id = g.id AND a.team_id = g.away_team_id
     WHERE g.tournament_id IS NOT NULL
       AND g.status = 'finished'
  ),
