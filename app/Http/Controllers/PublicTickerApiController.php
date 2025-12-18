@@ -30,8 +30,24 @@ class PublicTickerApiController extends Controller
 
         // Determine current session
         $sessionCount = max($sessionModels->count(), (int) ($game->getAttribute('sessions') ?? 0));
-        $endedSessions = $eventModels->where('event_type', 'session_end')->count();
-        $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
+        $sessionMarkers = $game->events()
+            ->whereIn('event_type', ['session_start', 'session_end'])
+            ->orderBy('occurred_at')
+            ->orderBy('id')
+            ->get(['id', 'event_type', 'session_number', 'occurred_at']);
+
+        $endedSessions = $sessionMarkers->where('event_type', 'session_end')->count();
+
+        $lastSessionEvent = $sessionMarkers->last();
+        if ($lastSessionEvent) {
+            if ($lastSessionEvent->event_type === 'session_end') {
+                $currentSessionNumber = min($sessionCount ?: ($lastSessionEvent->session_number ?? 1), ($lastSessionEvent->session_number ?? 0) + 1);
+            } else {
+                $currentSessionNumber = $lastSessionEvent->session_number ?? max(1, $endedSessions + 1);
+            }
+        } else {
+            $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
+        }
         $currentSession = $sessionModels->firstWhere('number', $currentSessionNumber)
             ?: $sessionModels->sortBy('number')->first();
 
