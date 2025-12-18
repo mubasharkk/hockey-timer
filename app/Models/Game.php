@@ -85,14 +85,22 @@ class Game extends Model
      */
     public function sessionScores(int $sessionNumber, bool $aggregate = false): array
     {
-        $teams = $this->relationLoaded('teams') ? $this->teams : $this->teams()->get();
-        $events = $this->relationLoaded('events')
-            ? $this->events
-            : $this->events()->get(['team_id', 'session_number', 'event_type']);
+        $teams = $this->relationLoaded('teams') ? $this->teams : $this->teams()->get(['id', 'name', 'side']);
 
-        $targetSessions = $aggregate
-            ? fn ($evt) => $evt->session_number <= $sessionNumber
-            : fn ($evt) => $evt->session_number === $sessionNumber;
+        $eventsQuery = $this->events()->where('event_type', 'goal');
+        if ($aggregate) {
+            $eventsQuery->where('session_number', '<=', $sessionNumber);
+        } else {
+            $eventsQuery->where('session_number', $sessionNumber);
+        }
+
+        $events = $this->relationLoaded('events')
+            ? $this->events->where('event_type', 'goal')->filter(function ($evt) use ($sessionNumber, $aggregate) {
+                return $aggregate
+                    ? $evt->session_number <= $sessionNumber
+                    : $evt->session_number === $sessionNumber;
+            })
+            : $eventsQuery->get(['team_id', 'session_number']);
 
         $scores = [];
         foreach ($teams as $team) {
@@ -100,11 +108,7 @@ class Game extends Model
                 'team_id' => $team->id,
                 'team_name' => $team->name,
                 'side' => $team->side,
-                'score' => $events
-                    ->where('team_id', $team->id)
-                    ->where('event_type', 'goal')
-                    ->filter($targetSessions)
-                    ->count(),
+                'score' => $events->where('team_id', $team->id)->count(),
             ];
         }
 

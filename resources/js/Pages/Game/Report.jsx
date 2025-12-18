@@ -25,9 +25,8 @@ export default function Report({ auth, game }) {
         return { ...team, players: players || [] };
     };
 
-    const home = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'home'));
-    const away = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'away'));
-    const teamsNormalized = (currentGame.teams || []).map(normalizeTeam);
+    const home = normalizeTeam(currentGame.home_team || []);
+    const away = normalizeTeam(currentGame.away_team || []);
     const sessions = currentGame.sessions || [];
     const events = currentGame.events || [];
     const scoreByTeam = calculateScoresFromEvents(events);
@@ -141,7 +140,7 @@ export default function Report({ auth, game }) {
                         <div className="mt-4 bg-gradient-to-r from-red-600/10 via-red-600/10 to-transparent sm:bg-none" id="timeline-events">
                             <EventTimeline
                                 events={events}
-                                teams={teamsNormalized}
+                                teams={[home, away]}
                                 sessionCount={sessions?.length || currentGame.sessions || null}
                                 sessions={sessions}
                             />

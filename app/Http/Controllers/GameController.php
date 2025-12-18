@@ -109,6 +109,8 @@ class GameController extends Controller
     public function showOfficialHtml(Game $game): Response
     {
         $game->load([
+            'homeTeam.players',
+            'awayTeam.players',
             'teams.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             'sessions' => fn ($q) => $q->orderBy('number'),
             'events' => fn ($q) => $q->orderBy('occurred_at')->orderBy('id'),
@@ -128,6 +130,7 @@ class GameController extends Controller
             ];
         }
 
+        dd($sessionScores);
         return Inertia::render('Game/OfficialPrintableReport', [
             'game' => GameResource::make($game),
             'sessionScores' => $sessionScores,
