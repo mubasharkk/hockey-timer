@@ -27,7 +27,6 @@ export default function Report({ auth, game }) {
 
     const home = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'home'));
     const away = normalizeTeam((currentGame.teams || []).find((t) => t.side === 'away'));
-    const teamsNormalized = (currentGame.teams || []).map(normalizeTeam);
     const sessions = currentGame.sessions || [];
     const events = currentGame.events || [];
     const scoreByTeam = calculateScoresFromEvents(events);
@@ -142,8 +141,8 @@ export default function Report({ auth, game }) {
                             <EventTimeline
                                 events={events}
                                 teams={teamsNormalized}
-                                sessionCount={currentGame.sessions?.length || currentGame.sessions || null}
-                                sessions={currentGame.sessions || []}
+                                sessionCount={sessions?.length || currentGame.sessions || null}
+                                sessions={sessions}
                             />
                         </div>
                     </section>
