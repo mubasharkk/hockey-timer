@@ -52,6 +52,8 @@ class GameResource extends JsonResource
             'away_score' => $awayScore,
             'team_a_score' => $homeScore,
             'team_b_score' => $awayScore,
+            'home_final_score' => $this->homeFinalScore(),
+            'away_final_score' => $this->awayFinalScore(),
             'home_team' => TeamResource::make($this->whenLoaded('homeTeam')),
             'away_team' => TeamResource::make($this->whenLoaded('awayTeam')),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),
