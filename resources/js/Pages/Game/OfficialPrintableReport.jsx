@@ -14,7 +14,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
     const sessionTotal =
         sessionScores?.length ||
         (Array.isArray(currentGame?.sessions) ? currentGame.sessions.length : Number(currentGame?.sessions || 0));
-    const tournamentName = currentGame?.tournament?.name || currentGame?.tournament_name;
+    const tournamentName = currentGame?.tournament?.title || '';
     const sessionDurationMap =
         currentGame?.sessions?.reduce((acc, session) => {
             if (session?.number != null && session?.planned_duration_seconds != null) {
