@@ -72,11 +72,9 @@ const TickerIcon = () => (
 const ResultBadge = ({ homeScore, awayScore }) => {
     const hasScores = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
     return (
-        <div className="flex flex-col items-center justify-center rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
+        <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
             <span>Final Score</span>
-            <span className="mt-0.5 text-sm font-bold text-gray-900">
-                {hasScores ? `${homeScore} - ${awayScore}` : '—'}
-            </span>
+            <span className="text-sm font-bold text-gray-900">{hasScores ? `${homeScore} - ${awayScore}` : '—'}</span>
         </div>
     );
 };
