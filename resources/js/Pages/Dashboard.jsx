@@ -9,7 +9,18 @@ export default function Dashboard({ auth, games = [], now }) {
     const gameList = useMemo(() => (Array.isArray(games) ? games : games?.data || []), [games]);
 
     const upcomingGames = useMemo(() => partitionGames(gameList, nowMoment).upcoming, [gameList, nowMoment]);
-    const resultGames = useMemo(() => partitionGames(gameList, nowMoment).results, [gameList, nowMoment]);
+    const resultGames = useMemo(() => {
+        const { results } = partitionGames(gameList, nowMoment);
+        return [...results].sort((a, b) => {
+            const aEnded = a.ended_at ? moment(a.ended_at) : null;
+            const bEnded = b.ended_at ? moment(b.ended_at) : null;
+            const aStart = moment(`${a.game_date} ${a.game_time}`, 'YYYY-MM-DD HH:mm');
+            const bStart = moment(`${b.game_date} ${b.game_time}`, 'YYYY-MM-DD HH:mm');
+            const aTs = aEnded?.isValid() ? aEnded.valueOf() : (aStart.isValid() ? aStart.valueOf() : 0);
+            const bTs = bEnded?.isValid() ? bEnded.valueOf() : (bStart.isValid() ? bStart.valueOf() : 0);
+            return bTs - aTs;
+        });
+    }, [gameList, nowMoment]);
 
     return (
         <AuthenticatedLayout
