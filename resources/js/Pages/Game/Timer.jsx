@@ -246,6 +246,7 @@ export default function Timer({ auth, game, config = {} }) {
             ? Math.max(Math.round(plannedSeconds - elapsedSeconds), 0)
             : Math.round(elapsedSeconds);
     const isGameOver = status === 'game_over';
+    const currentEventSeconds = Math.min(Math.round(elapsedSeconds), Math.round(plannedSeconds));
 
     const handleStart = () => {
         if (status === 'ready' || status === 'finished') {
@@ -429,7 +430,7 @@ export default function Timer({ auth, game, config = {} }) {
             event_type: 'goal',
             goal_type: goalType || null,
             player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
-            timer_value_seconds: displaySeconds,
+            timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
             note: playerName || null,
         };
@@ -462,7 +463,7 @@ export default function Timer({ auth, game, config = {} }) {
             id,
             session_number: sessionIndex + 1,
             event_type,
-            timer_value_seconds: displaySeconds,
+            timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
             team_id: team.id,
         };
@@ -477,7 +478,7 @@ export default function Timer({ auth, game, config = {} }) {
 
     const handleAddCard = ({ team, cardType, shirtNumber, minutes }) => {
         if (!team?.id || isGameOver) return;
-        const timerValue = displaySeconds;
+        const timerValue = currentEventSeconds;
         const playerName = findPlayerName(team, shirtNumber);
         const minuteText = minutes
             ? `${Math.max(parseInt(minutes, 10) || 0, 0)}m`
@@ -507,7 +508,7 @@ export default function Timer({ auth, game, config = {} }) {
             id: `temp-session-end-${Date.now()}`,
             session_number: sessionIndex + 1,
             event_type: 'session_end',
-            timer_value_seconds: displaySeconds,
+            timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
         };
         setEvents((prev) => [...prev, event]);
@@ -546,7 +547,7 @@ export default function Timer({ auth, game, config = {} }) {
             id: `temp-game-end-${Date.now()}`,
             session_number: sessionIndex + 1,
             event_type: 'game_end',
-            timer_value_seconds: displaySeconds,
+            timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
         };
         setEvents((prev) => [...prev, event]);

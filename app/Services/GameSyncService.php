@@ -65,7 +65,9 @@ class GameSyncService
 
     public function syncSessions(Game $game, array $sessions): Collection
     {
-        return collect($sessions)->map(function (array $session) use ($game) {
+        $sessionCollection = collect($sessions);
+
+        $ids = $sessionCollection->map(function (array $session) use ($game) {
             $attrs = [
                 'planned_duration_seconds' => $session['planned_duration_seconds'],
                 'actual_duration_seconds' => $session['actual_duration_seconds'] ?? null,
@@ -95,6 +97,34 @@ class GameSyncService
 
             return $record->id;
         });
+
+        // Ensure a session_end event exists whenever an end time is provided.
+        $sessionCollection
+            ->filter(fn (array $session) => ! empty($session['ended_at']) && ! empty($session['number']))
+            ->each(function (array $session) use ($game) {
+                $number = (int) $session['number'];
+                $hasEndEvent = $game->events()
+                    ->where('session_number', $number)
+                    ->where('event_type', 'session_end')
+                    ->exists();
+
+                if ($hasEndEvent) {
+                    return;
+                }
+
+                $occurredAt = Carbon::parse($session['ended_at']);
+                $timerSeconds = $session['actual_duration_seconds'] ?? $session['planned_duration_seconds'] ?? null;
+
+                Event::create([
+                    'game_id' => $game->id,
+                    'session_number' => $number,
+                    'event_type' => 'session_end',
+                    'timer_value_seconds' => $timerSeconds,
+                    'occurred_at' => $occurredAt,
+                ]);
+            });
+
+        return $ids;
     }
 
     public function syncEvents(Game $game, array $events): Collection
