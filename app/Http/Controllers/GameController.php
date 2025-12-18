@@ -111,9 +111,8 @@ class GameController extends Controller
         $game->load([
             'homeTeam.players',
             'awayTeam.players',
-            'teams.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             'sessions' => fn ($q) => $q->orderBy('number'),
-            'events' => fn ($q) => $q->orderBy('occurred_at')->orderBy('id'),
+            'events' => fn ($q) => $q->whereNotNull('team_id')->orderBy('occurred_at')->orderBy('id'),
             'tournament',
         ]);
 
@@ -126,7 +125,7 @@ class GameController extends Controller
             $sessionScores[] = [
                 'session_number' => $i,
                 'label' => $this->sessionLabel($i, $sessionCount),
-                'scores' => $game->sessionScores($i, true),
+                'scores' => $game->sessionScores($i),
             ];
         }
 

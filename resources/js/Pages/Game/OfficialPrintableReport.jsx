@@ -9,8 +9,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
         const players = Array.isArray(team.players) ? team.players : team.players?.data || [];
         return { ...team, players };
     };
-    const home = normalizeTeam((currentGame?.teams || []).find((t) => t.side === 'home'));
-    const away = normalizeTeam((currentGame?.teams || []).find((t) => t.side === 'away'));
+    const home = normalizeTeam(currentGame?.home_team || []);
+    const away = normalizeTeam(currentGame?.away_team || []);
     const sessionTotal =
         sessionScores?.length ||
         (Array.isArray(currentGame?.sessions) ? currentGame.sessions.length : Number(currentGame?.sessions || 0));

@@ -87,7 +87,8 @@ class Game extends Model
      */
     public function sessionScores(int $sessionNumber, bool $aggregate = false): array
     {
-        $teams = $this->relationLoaded('teams') ? $this->teams : $this->teams()->get(['id', 'name', 'side']);
+        $home = $this->homeTeam;
+        $away = $this->awayTeam;
 
         $goalCounts = Event::query()
             ->select('team_id', DB::raw('COUNT(*) as total'))
@@ -99,16 +100,14 @@ class Game extends Model
             ->pluck('total', 'team_id');
 
         $scores = [];
-        foreach ($teams as $team) {
+        foreach (collect([$home, $away]) as $team) {
             $scores[$team->id] = [
                 'team_id' => $team->id,
                 'team_name' => $team->name,
-                'side' => $team->side,
+                'side' => $team->id === $home->id ? 'home' : 'away',
                 'score' => (int) ($goalCounts[$team->id] ?? 0),
             ];
         }
-
-        dd($scores);
 
         return array_values($scores);
     }
