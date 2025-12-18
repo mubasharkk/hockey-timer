@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
+const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions = [] }) => {
     if (!events.length) {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
@@ -8,6 +8,14 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
     const orderedEvents = [...events].sort(
         (a, b) => new Date(b?.occurred_at || 0) - new Date(a?.occurred_at || 0)
     );
+
+    const sessionDurationMap =
+        sessions?.reduce((acc, session) => {
+            if (session?.number != null && session?.planned_duration_seconds != null) {
+                acc[session.number] = session.planned_duration_seconds;
+            }
+            return acc;
+        }, {}) || {};
 
     const normalizeTeam = (team) => {
         if (!team) return null;
@@ -125,7 +133,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null }) => {
                                     <div className="space-y-1 text-left">
                                         <p className="text-xs uppercase tracking-wide text-gray-500 flex items-center flex-wrap gap-1">
                                             <span className="text-[14px] font-bold text-black">
-                                                {event.timer_value_seconds != null ? formatSeconds(event.timer_value_seconds) : '--:--'}
+                                                {formatRemainingClock(event, sessionDurationMap)}
                                             </span>
                                             <span className="font-semibold">
                                                 {badge.label} {sessionLabel ? `(${sessionLabel})` : ''}
@@ -184,11 +192,25 @@ const formatSessionAbbrev = (number, total) => {
 };
 
 const formatSeconds = (seconds) => {
+    if (seconds == null) return '--:--';
     const mins = Math.floor(seconds / 60)
         .toString()
         .padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
     return `${mins}:${secs}`;
+};
+
+const formatRemainingClock = (event, durationMap = {}) => {
+    if (!event) return '--:--';
+    const planned = event.session_number != null ? durationMap?.[event.session_number] : null;
+    if (planned != null && event.timer_value_seconds != null) {
+        const remaining = Math.max(0, planned - event.timer_value_seconds);
+        return formatSeconds(remaining);
+    }
+    if (event.timer_value_seconds != null) {
+        return formatSeconds(event.timer_value_seconds);
+    }
+    return '--:--';
 };
 
 export default EventTimeline;

@@ -751,7 +751,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 <span className="text-xs text-gray-500">{events.length} events</span>
                             </summary>
                             <div className="mt-4 space-y-4">
-                                <EventTimeline events={events} teams={[home, away]} sessionCount={sessionCount} />
+                                <EventTimeline events={events} teams={[home, away]} sessionCount={sessionCount} sessions={sessions} />
                             </div>
                         </details>
                     </div>
