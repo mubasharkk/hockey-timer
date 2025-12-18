@@ -94,6 +94,8 @@ class GameController extends Controller
     public function showReport(Game $game): Response
     {
         $game->load([
+            'homeTeam.players',
+            'awayTeam.players',
             'teams.players',
             'sessions' => fn ($q) => $q->orderBy('number'),
             'events' => fn ($q) => $q->orderBy('occurred_at'),
