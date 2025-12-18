@@ -10,6 +10,12 @@ export default function Ticker({ game, gameId }) {
     const [liveData, setLiveData] = useState(game || null);
     const [loading, setLoading] = useState(false);
     const [displaySeconds, setDisplaySeconds] = useState(game?.timer_seconds ?? game?.current_seconds ?? 0);
+    const currentSessionData = useMemo(() => {
+        const raw = liveData?.current_session;
+        if (raw && typeof raw === 'object' && raw.data) return raw.data;
+        return raw || null;
+    }, [liveData?.current_session]);
+
     const isFinished = useMemo(
         () => liveData?.status === 'finished',
         [liveData?.status]
@@ -23,15 +29,25 @@ export default function Ticker({ game, gameId }) {
 
     const effectiveSeconds = useMemo(() => {
         if (!liveData) return displaySeconds ?? 0;
-        if (isFinished) return 0;
-        if (liveData.is_break) return 0;
+
+        if (isFinished) {
+            const finishedValue = currentSessionData?.actual_duration_seconds ?? currentSessionData?.planned_duration_seconds;
+            if (finishedValue != null) return finishedValue;
+        }
+
+        if (liveData.is_break) {
+            const pausedValue = displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
+            if (pausedValue) return pausedValue;
+            if (currentSessionData?.actual_duration_seconds != null) return currentSessionData.actual_duration_seconds;
+        }
+
         return displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
-    }, [displaySeconds, liveData, isFinished]);
+    }, [displaySeconds, liveData, isFinished, currentSessionData?.actual_duration_seconds, currentSessionData?.planned_duration_seconds]);
 
     const events = liveData?.events || [];
 
     const resolveSessionNumber = () => {
-        const raw = liveData?.current_session ?? liveData?.current_period;
+        const raw = currentSessionData ?? liveData?.current_period;
         if (typeof raw === 'number') return raw;
         if (raw && typeof raw === 'object' && raw.number) return raw.number;
         const ended = events.filter((e) => e.event_type === 'session_end').length;
@@ -91,8 +107,10 @@ export default function Ticker({ game, gameId }) {
             setDisplaySeconds(liveData.timer_seconds);
         } else if (liveData?.current_seconds !== undefined && liveData?.current_seconds !== null) {
             setDisplaySeconds(liveData.current_seconds);
+        } else if (currentSessionData?.actual_duration_seconds !== undefined && currentSessionData?.actual_duration_seconds !== null) {
+            setDisplaySeconds(currentSessionData.actual_duration_seconds);
         }
-    }, [liveData?.timer_seconds, liveData?.current_seconds]);
+    }, [liveData?.timer_seconds, liveData?.current_seconds, currentSessionData?.actual_duration_seconds]);
 
     // Keep timer display in lockstep with the authoritative value coming from the server
     // (avoid drifting when the main timer is paused or adjusted).
