@@ -14,6 +14,13 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
     const sessionTotal =
         sessionScores?.length ||
         (Array.isArray(currentGame?.sessions) ? currentGame.sessions.length : Number(currentGame?.sessions || 0));
+    const sessionDurationMap =
+        currentGame?.sessions?.reduce((acc, session) => {
+            if (session?.number != null && session?.planned_duration_seconds != null) {
+                acc[session.number] = session.planned_duration_seconds;
+            }
+            return acc;
+        }, {}) || {};
 
     const sessionLabel = (number) => {
         if (!number) return '';
@@ -326,12 +333,10 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="bg-gray-50 px-3 py-2">{idx + 1}</td>
                                             <td className="px-3 py-2">{sessionLabel(event.session_number)}</td>
                                             <td className="px-3 py-2">
-                                                {event.timer_value_seconds != null
-                                                    ? formatSeconds(event.timer_value_seconds)
-                                                    : '—'}
+                                                {formatRemainingClock(event, sessionDurationMap)}
                                             </td>
                                             <td className="px-3 py-2">
-                                                {event.team_id ? teamName(event.team_id, game?.teams) : '—'}
+                                                {event.team_id ? teamName(event.team_id, currentGame?.teams) : '—'}
                                             </td>
                                             <td className="px-3 py-2">{eventLabel(event)}</td>
                                             <td className="px-3 py-2">{playerNote(event)}</td>
@@ -367,6 +372,19 @@ const formatClock = (event) => {
     if (event.occurred_at) {
         const m = moment(event.occurred_at);
         if (m.isValid()) return m.format('hh:mm A');
+    }
+    return '—';
+};
+
+const formatRemainingClock = (event, durationMap = {}) => {
+    if (!event) return '—';
+    const duration = event.session_number != null ? durationMap?.[event.session_number] : null;
+    if (duration != null && event.timer_value_seconds != null) {
+        const remaining = Math.max(0, duration - event.timer_value_seconds);
+        return formatSeconds(remaining);
+    }
+    if (event.timer_value_seconds != null) {
+        return formatSeconds(event.timer_value_seconds);
     }
     return '—';
 };
