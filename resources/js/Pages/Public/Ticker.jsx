@@ -168,7 +168,7 @@ export default function Ticker({ game, gameId }) {
                         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">
                             <div className="my-5">
                                 <div className="flex items-center justify-between gap-4">
-                                    <div className="w-24 flex justify-start">
+                                    <div className="w-48 flex justify-start">
                                         <TeamLogo team={homeTeam} align="start" bare />
                                     </div>
                                     <div className="text-center flex-1">
@@ -192,7 +192,7 @@ export default function Ticker({ game, gameId }) {
                                             )}
                                         </p>
                                     </div>
-                                    <div className="w-24 flex justify-end">
+                                    <div className="w-48 flex justify-end">
                                         <TeamLogo team={awayTeam} align="end" bare />
                                     </div>
                                 </div>
