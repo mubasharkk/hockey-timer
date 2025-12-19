@@ -354,7 +354,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="bg-gray-50 px-3 py-2">{idx + 1}</td>
                                             <td className="px-3 py-2">{sessionLabel(event.session_number)}</td>
                                             <td className="px-3 py-2">
-                                                {formatRemainingClock(event, parseInt(currentGame.session_duration_minutes) * 60 * event.session_number)}
+                                                {formatRemainingClock(event, parseInt(currentGame.session_duration_minutes), event.session_number)}
                                             </td>
                                             <td className="px-3 py-2">
                                                 {event.team_id === away.id ? away.name : home.name}
@@ -397,16 +397,9 @@ const formatClock = (event) => {
     return '—';
 };
 
-const formatRemainingClock = (event, duration = {}) => {
-    if (!event) return '—';
-    if (duration != null && event.timer_value_seconds != null) {
-        const diff = Math.abs(event.timer_value_seconds - duration);
-        return formatSeconds(diff);
-    }
-    if (event.timer_value_seconds != null) {
-        return formatSeconds(event.timer_value_seconds);
-    }
-    return '—';
+const formatRemainingClock = (event, duration_in_min, current_session ) => {
+    console.log(event, duration_in_min, current_session);
+    return formatSeconds(event.timer_value_seconds + (duration_in_min * 60 * (current_session-1)));
 };
 
 const formatDate = (value) => {
