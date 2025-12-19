@@ -16,7 +16,6 @@ class DashboardController extends Controller
             ->with('tournament:id,title')
             ->orderBy('game_date')
             ->orderBy('game_time')
-            ->take(10)
             ->get([
                 'id',
                 'team_a_name',
