@@ -3,24 +3,11 @@ import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import moment from 'moment';
 
-export default function Dashboard({ auth, games = [], now }) {
+export default function Dashboard({ auth, upcoming = [], results = [], now }) {
     const [tab, setTab] = useState('upcoming');
     const nowMoment = useMemo(() => (now ? moment(now) : moment()), [now]);
-    const gameList = useMemo(() => (Array.isArray(games) ? games : games?.data || []), [games]);
-
-    const upcomingGames = useMemo(() => partitionGames(gameList, nowMoment).upcoming, [gameList, nowMoment]);
-    const resultGames = useMemo(() => {
-        const { results } = partitionGames(gameList, nowMoment);
-        return [...results].sort((a, b) => {
-            const aEnded = a.ended_at ? moment(a.ended_at) : null;
-            const bEnded = b.ended_at ? moment(b.ended_at) : null;
-            const aStart = moment(`${a.game_date} ${a.game_time}`, 'YYYY-MM-DD HH:mm');
-            const bStart = moment(`${b.game_date} ${b.game_time}`, 'YYYY-MM-DD HH:mm');
-            const aTs = aEnded?.isValid() ? aEnded.valueOf() : (aStart.isValid() ? aStart.valueOf() : 0);
-            const bTs = bEnded?.isValid() ? bEnded.valueOf() : (bStart.isValid() ? bStart.valueOf() : 0);
-            return bTs - aTs;
-        });
-    }, [gameList, nowMoment]);
+    const upcomingGames = useMemo(() => (Array.isArray(upcoming) ? upcoming : upcoming?.data || []), [upcoming]);
+    const resultGames = useMemo(() => (Array.isArray(results) ? results : results?.data || []), [results]);
 
     return (
         <AuthenticatedLayout
@@ -205,25 +192,6 @@ const deriveStatus = (game) => {
     return game.status || 'scheduled';
 };
 
-const partitionGames = (games, now) => {
-    const upcoming = [];
-    const results = [];
-
-    games.forEach((game) => {
-        const status = deriveStatus(game);
-        const start = moment(`${game.game_date} ${game.game_time}`, 'YYYY-MM-DD HH:mm');
-
-        const isResult = status === 'finished' || game.ended_at || (start.isValid() && start.isBefore(now));
-
-        if (isResult) {
-            results.push(game);
-        } else {
-            upcoming.push(game);
-        }
-    });
-
-    return { upcoming, results };
-};
 
 const sportIcon = (sport) => {
     switch (sport) {
