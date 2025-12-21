@@ -21,6 +21,7 @@ class DashboardController extends Controller
             'team_b_name',
             'tournament_id',
             'venue',
+            'excerpt',
             'sport_type',
             'code',
             'game_date',

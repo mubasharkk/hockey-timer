@@ -26,7 +26,7 @@ export default function GameRow({ game, now }) {
                     {game.code && <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Code: {game.code}</div>}
                     <div className="text-xs text-gray-600">
                         <strong>{formatDateTime(game.game_date, game.game_time)}</strong> · {game.venue}
-                        {relative ? ` · ${relative}` : ''} { game.excerpt ? ` . ${game.excerpt}` : ''}
+                        {relative ? ` · ${relative}` : ''}
                     </div>
                 </div>
             </div>
