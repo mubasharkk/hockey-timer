@@ -22,8 +22,13 @@ class TeamResource extends JsonResource
             'score' => $this->score,
             'coach' => $this->coach,
             'manager' => $this->manager,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'website' => $this->website,
+            'description' => $this->description,
             'logo_url' => $this->logo_url ?? $this->getFirstMediaUrl('logo') ?: null,
             'players' => PlayerResource::collection($this->whenLoaded('players')),
+            'contact_persons' => TeamContactPersonResource::collection($this->whenLoaded('contactPersons')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

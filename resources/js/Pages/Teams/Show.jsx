@@ -5,7 +5,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEnvelope, faGlobe, faPen, faPhone, faPlus, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function Show({ auth, team }) {
     const currentTeam = team?.data ?? team;
@@ -14,6 +14,7 @@ export default function Show({ auth, team }) {
     const { delete: deletePlayer, processing: deletingPlayer } = useForm();
     const { delete: deleteTeam, processing: deletingTeam } = useForm();
     const players = Array.isArray(currentTeam?.players) ? currentTeam.players : currentTeam?.players?.data || [];
+    const contactPersons = Array.isArray(currentTeam?.contact_persons) ? currentTeam.contact_persons : currentTeam?.contact_persons?.data || [];
 
     const canManage = currentTeam?.user_id === auth?.user?.id;
 
@@ -93,13 +94,113 @@ export default function Show({ auth, team }) {
 
             <div className="py-10">
                 <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                    {/* Team Info */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 className="mb-4 text-lg font-semibold text-gray-900">Team Information</h3>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <Info label="Coach" value={currentTeam.coach || '—'} />
                             <Info label="Manager" value={currentTeam.manager || '—'} />
                             <Info label="Players" value={`${players.length}`} />
                         </div>
+
+                        {/* Contact Info */}
+                        <div className="mt-6 border-t border-gray-100 pt-6">
+                            <h4 className="mb-3 text-sm font-semibold text-gray-700">Contact Details</h4>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
+                                        <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Email</p>
+                                        {currentTeam.email ? (
+                                            <a href={`mailto:${currentTeam.email}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                {currentTeam.email}
+                                            </a>
+                                        ) : (
+                                            <p className="text-sm text-gray-400">—</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
+                                        <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Phone</p>
+                                        {currentTeam.phone ? (
+                                            <a href={`tel:${currentTeam.phone}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600">
+                                                {currentTeam.phone}
+                                            </a>
+                                        ) : (
+                                            <p className="text-sm text-gray-400">—</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
+                                        <FontAwesomeIcon icon={faGlobe} className="h-4 w-4 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-gray-500">Website</p>
+                                        {currentTeam.website ? (
+                                            <a href={currentTeam.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                {currentTeam.website.replace(/^https?:\/\//, '')}
+                                            </a>
+                                        ) : (
+                                            <p className="text-sm text-gray-400">—</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Description */}
+                        {currentTeam.description && (
+                            <div className="mt-6 border-t border-gray-100 pt-6">
+                                <h4 className="mb-2 text-sm font-semibold text-gray-700">Description</h4>
+                                <p className="whitespace-pre-wrap text-sm text-gray-600">{currentTeam.description}</p>
+                            </div>
+                        )}
                     </div>
+
+                    {/* Contact Persons */}
+                    {contactPersons.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 text-lg font-semibold text-gray-900">Contact Persons</h3>
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {contactPersons.map((contact) => (
+                                    <div key={contact.id} className="rounded-lg border border-gray-100 bg-gray-50 p-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+                                                <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-indigo-600" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-gray-900">{contact.name}</p>
+                                                {contact.role && (
+                                                    <p className="text-xs text-indigo-600">{contact.role}</p>
+                                                )}
+                                                <div className="mt-2 space-y-1">
+                                                    {contact.email && (
+                                                        <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-indigo-600">
+                                                            <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
+                                                            <span className="truncate">{contact.email}</span>
+                                                        </a>
+                                                    )}
+                                                    {contact.phone && (
+                                                        <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-indigo-600">
+                                                            <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
+                                                            {contact.phone}
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-3 flex items-center justify-between">
@@ -129,7 +230,14 @@ export default function Show({ auth, team }) {
                                     {players.map((player) => (
                                         <tr key={player.id}>
                                             <td className="px-3 py-2 text-gray-800">{player.shirt_number ?? '—'}</td>
-                                            <td className="px-3 py-2 text-gray-800">{player.name}</td>
+                                            <td className="px-3 py-2 text-gray-800">
+                                                <Link
+                                                    href={route('players.show', player.id)}
+                                                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                >
+                                                    {player.name}
+                                                </Link>
+                                            </td>
                                             <td className="px-3 py-2 font-mono text-xs text-gray-700">{player.player_pass_number}</td>
                                             <td className="px-3 py-2">
                                                 {player.is_active ? (

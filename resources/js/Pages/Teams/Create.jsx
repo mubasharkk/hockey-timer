@@ -1,15 +1,40 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         coach: '',
         manager: '',
+        email: '',
+        phone: '',
+        website: '',
+        description: '',
         logo: null,
+        contact_persons: [],
     });
+
+    const addContactPerson = () => {
+        setData('contact_persons', [
+            ...data.contact_persons,
+            { name: '', role: '', phone: '', email: '' },
+        ]);
+    };
+
+    const removeContactPerson = (index) => {
+        setData(
+            'contact_persons',
+            data.contact_persons.filter((_, i) => i !== index)
+        );
+    };
+
+    const updateContactPerson = (index, field, value) => {
+        const updated = [...data.contact_persons];
+        updated[index] = { ...updated[index], [field]: value };
+        setData('contact_persons', updated);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -39,6 +64,56 @@ export default function Create({ auth }) {
                                 required
                             />
                             {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></label>
+                            <input
+                                type="email"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                placeholder="team@example.com"
+                                required
+                            />
+                            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Phone (optional)</label>
+                                <input
+                                    type="tel"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.phone}
+                                    onChange={(e) => setData('phone', e.target.value)}
+                                    placeholder="+1 234 567 890"
+                                />
+                                {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Website (optional)</label>
+                                <input
+                                    type="url"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.website}
+                                    onChange={(e) => setData('website', e.target.value)}
+                                    placeholder="https://example.com"
+                                />
+                                {errors.website && <p className="mt-1 text-xs text-red-600">{errors.website}</p>}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Brief description about your team..."
+                                rows={3}
+                            />
+                            {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -74,6 +149,87 @@ export default function Create({ auth }) {
                             />
                             <p className="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 5MB.</p>
                             {errors.logo && <p className="mt-1 text-xs text-red-600">{errors.logo}</p>}
+                        </div>
+
+                        {/* Contact Persons */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <label className="block text-sm font-medium text-gray-700">Contact Persons (optional)</label>
+                                <button
+                                    type="button"
+                                    onClick={addContactPerson}
+                                    className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+                                >
+                                    <FontAwesomeIcon icon={faPlus} className="h-3 w-3" />
+                                    Add Contact
+                                </button>
+                            </div>
+
+                            {data.contact_persons.map((contact, index) => (
+                                <div key={index} className="rounded-md border border-gray-200 bg-gray-50 p-4">
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <span className="text-xs font-medium text-gray-500">Contact #{index + 1}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeContactPerson(index)}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600">Name <span className="text-red-500">*</span></label>
+                                            <input
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                value={contact.name}
+                                                onChange={(e) => updateContactPerson(index, 'name', e.target.value)}
+                                                placeholder="Full name"
+                                                required
+                                            />
+                                            {errors[`contact_persons.${index}.name`] && (
+                                                <p className="mt-1 text-xs text-red-600">{errors[`contact_persons.${index}.name`]}</p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600">Role (optional)</label>
+                                            <input
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                value={contact.role}
+                                                onChange={(e) => updateContactPerson(index, 'role', e.target.value)}
+                                                placeholder="e.g. Team Captain, Coordinator"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600">Phone (optional)</label>
+                                            <input
+                                                type="tel"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                value={contact.phone}
+                                                onChange={(e) => updateContactPerson(index, 'phone', e.target.value)}
+                                                placeholder="+1 234 567 890"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600">Email (optional)</label>
+                                            <input
+                                                type="email"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                value={contact.email}
+                                                onChange={(e) => updateContactPerson(index, 'email', e.target.value)}
+                                                placeholder="contact@example.com"
+                                            />
+                                            {errors[`contact_persons.${index}.email`] && (
+                                                <p className="mt-1 text-xs text-red-600">{errors[`contact_persons.${index}.email`]}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+
+                            {data.contact_persons.length === 0 && (
+                                <p className="text-xs text-gray-500">No contact persons added yet.</p>
+                            )}
                         </div>
 
                         <div className="flex items-center justify-between">

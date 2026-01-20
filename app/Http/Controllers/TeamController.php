@@ -20,6 +20,7 @@ class TeamController extends Controller
             ->with([
                 'media',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+                'contactPersons',
             ])
             ->orderBy('name')
             ->get();
@@ -41,6 +42,10 @@ class TeamController extends Controller
             'name' => $request->string('name'),
             'coach' => $request->string('coach') ?: null,
             'manager' => $request->string('manager') ?: null,
+            'email' => $request->string('email'),
+            'phone' => $request->string('phone') ?: null,
+            'website' => $request->string('website') ?: null,
+            'description' => $request->string('description') ?: null,
             'is_registered' => true,
         ]);
 
@@ -48,6 +53,18 @@ class TeamController extends Controller
             $team
                 ->addMediaFromRequest('logo')
                 ->toMediaCollection('logo');
+        }
+
+        // Create contact persons
+        if ($request->has('contact_persons')) {
+            foreach ($request->input('contact_persons', []) as $contactPerson) {
+                $team->contactPersons()->create([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+            }
         }
 
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
@@ -58,6 +75,7 @@ class TeamController extends Controller
         $team->load([
             'media',
             'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'contactPersons',
         ]);
 
         return Inertia::render('Teams/Show', [
@@ -68,6 +86,8 @@ class TeamController extends Controller
     public function edit(Team $team): Response
     {
         $this->ensureManageable($team);
+
+        $team->load('contactPersons');
 
         return Inertia::render('Teams/Edit', [
             'team' => TeamResource::make($team),
@@ -82,6 +102,10 @@ class TeamController extends Controller
             'name' => $request->string('name'),
             'coach' => $request->string('coach') ?: null,
             'manager' => $request->string('manager') ?: null,
+            'email' => $request->string('email'),
+            'phone' => $request->string('phone') ?: null,
+            'website' => $request->string('website') ?: null,
+            'description' => $request->string('description') ?: null,
         ]);
 
         if ($request->boolean('remove_logo')) {
@@ -93,6 +117,37 @@ class TeamController extends Controller
             $team
                 ->addMediaFromRequest('logo')
                 ->toMediaCollection('logo');
+        }
+
+        // Sync contact persons
+        if ($request->has('contact_persons')) {
+            $existingIds = [];
+            foreach ($request->input('contact_persons', []) as $contactPerson) {
+                if (isset($contactPerson['id'])) {
+                    // Update existing
+                    $team->contactPersons()->where('id', $contactPerson['id'])->update([
+                        'name' => $contactPerson['name'],
+                        'role' => $contactPerson['role'] ?? null,
+                        'phone' => $contactPerson['phone'] ?? null,
+                        'email' => $contactPerson['email'] ?? null,
+                    ]);
+                    $existingIds[] = $contactPerson['id'];
+                } else {
+                    // Create new
+                    $newContact = $team->contactPersons()->create([
+                        'name' => $contactPerson['name'],
+                        'role' => $contactPerson['role'] ?? null,
+                        'phone' => $contactPerson['phone'] ?? null,
+                        'email' => $contactPerson['email'] ?? null,
+                    ]);
+                    $existingIds[] = $newContact->id;
+                }
+            }
+            // Delete removed contact persons
+            $team->contactPersons()->whereNotIn('id', $existingIds)->delete();
+        } else {
+            // If no contact_persons provided, remove all
+            $team->contactPersons()->delete();
         }
 
         return redirect()->route('teams.show', $team)->with('success', 'Team updated.');

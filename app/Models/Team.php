@@ -29,6 +29,10 @@ class Team extends Model implements HasMedia
         'score',
         'coach',
         'manager',
+        'email',
+        'phone',
+        'website',
+        'description',
     ];
 
     protected $appends = [
@@ -48,6 +52,11 @@ class Team extends Model implements HasMedia
     public function pools(): BelongsToMany
     {
         return $this->belongsToMany(TournamentPool::class, 'tournament_pool_team')->withTimestamps();
+    }
+
+    public function contactPersons(): HasMany
+    {
+        return $this->hasMany(TeamContactPerson::class);
     }
 
     public function registerMediaCollections(): void
