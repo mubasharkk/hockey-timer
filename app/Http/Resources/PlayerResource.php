@@ -15,6 +15,13 @@ class PlayerResource extends JsonResource
             ? $this->addresses->first()
             : null;
 
+        // Get ID document URLs
+        $idDocuments = $this->getMedia('id_document')->map(fn($media) => [
+            'id' => $media->id,
+            'url' => $media->getUrl(),
+            'name' => $media->file_name,
+        ])->toArray();
+
         return [
             'id' => $this->id,
             'team_id' => $this->team_id,
@@ -23,7 +30,7 @@ class PlayerResource extends JsonResource
             'shirt_number' => $this->shirt_number,
             'player_pass_number' => $this->player_pass_number,
             'nic_number' => $this->nic_number,
-            'date_of_birth' => $this->date_of_birth,
+            'date_of_birth' => $this->date_of_birth?->format('Y-m-d'),
             'is_active' => (bool) $this->is_active,
             'address' => $address ? [
                 'street' => $address->street,
@@ -34,6 +41,7 @@ class PlayerResource extends JsonResource
                 'country_id' => $address->country_id,
             ] : null,
             'photo_url' => $this->getFirstMediaUrl('photo') ?: null,
+            'id_documents' => $idDocuments,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

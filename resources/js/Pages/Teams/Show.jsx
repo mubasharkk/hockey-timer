@@ -5,7 +5,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faEnvelope, faGlobe, faPen, faPhone, faPlus, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faBuilding, faEnvelope, faPen, faPhone, faPlus, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function Show({ auth, team }) {
     const currentTeam = team?.data ?? team;
@@ -46,14 +46,24 @@ export default function Show({ auth, team }) {
                             />
                         )}
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Team</p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                                {currentTeam.type_label || 'Team'}
+                            </p>
                             <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTeam.name}</h2>
+                            {currentTeam.club && (
+                                <Link
+                                    href={route('clubs.show', currentTeam.club.id)}
+                                    className="text-sm text-gray-500 hover:text-indigo-600"
+                                >
+                                    {currentTeam.club.name}
+                                </Link>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
                         {canManage && (
                             <Link
-                                href={route('teams.players.create', currentTeam.id)}
+                                href={route('teams.players.scan', currentTeam.id)}
                                 className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                             >
                                 <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
@@ -94,66 +104,80 @@ export default function Show({ auth, team }) {
 
             <div className="py-10">
                 <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                    {/* Club Info */}
+                    {currentTeam.club && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <Link
+                                href={route('clubs.show', currentTeam.club.id)}
+                                className="flex items-center gap-4 group"
+                            >
+                                {currentTeam.club.logo_url ? (
+                                    <img
+                                        src={currentTeam.club.logo_url}
+                                        alt={`${currentTeam.club.name} logo`}
+                                        className="h-12 w-12 rounded-lg border border-gray-200 object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-50">
+                                        <FontAwesomeIcon icon={faBuilding} className="h-6 w-6 text-indigo-600" />
+                                    </div>
+                                )}
+                                <div>
+                                    <p className="text-xs text-gray-500">Club</p>
+                                    <p className="font-semibold text-gray-900 group-hover:text-indigo-600">{currentTeam.club.name}</p>
+                                </div>
+                            </Link>
+                        </div>
+                    )}
+
                     {/* Team Info */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <h3 className="mb-4 text-lg font-semibold text-gray-900">Team Information</h3>
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                            <Info label="Type" value={currentTeam.type_label || '—'} />
                             <Info label="Coach" value={currentTeam.coach || '—'} />
                             <Info label="Manager" value={currentTeam.manager || '—'} />
                             <Info label="Players" value={`${players.length}`} />
                         </div>
 
                         {/* Contact Info */}
-                        <div className="mt-6 border-t border-gray-100 pt-6">
-                            <h4 className="mb-3 text-sm font-semibold text-gray-700">Contact Details</h4>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
-                                        <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-indigo-600" />
+                        {(currentTeam.email || currentTeam.phone) && (
+                            <div className="mt-6 border-t border-gray-100 pt-6">
+                                <h4 className="mb-3 text-sm font-semibold text-gray-700">Contact Details</h4>
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
+                                            <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Email</p>
+                                            {currentTeam.email ? (
+                                                <a href={`mailto:${currentTeam.email}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                    {currentTeam.email}
+                                                </a>
+                                            ) : (
+                                                <p className="text-sm text-gray-400">—</p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Email</p>
-                                        {currentTeam.email ? (
-                                            <a href={`mailto:${currentTeam.email}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                                {currentTeam.email}
-                                            </a>
-                                        ) : (
-                                            <p className="text-sm text-gray-400">—</p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
-                                        <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Phone</p>
-                                        {currentTeam.phone ? (
-                                            <a href={`tel:${currentTeam.phone}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600">
-                                                {currentTeam.phone}
-                                            </a>
-                                        ) : (
-                                            <p className="text-sm text-gray-400">—</p>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
-                                        <FontAwesomeIcon icon={faGlobe} className="h-4 w-4 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Website</p>
-                                        {currentTeam.website ? (
-                                            <a href={currentTeam.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                                {currentTeam.website.replace(/^https?:\/\//, '')}
-                                            </a>
-                                        ) : (
-                                            <p className="text-sm text-gray-400">—</p>
-                                        )}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
+                                            <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500">Phone</p>
+                                            {currentTeam.phone ? (
+                                                <a href={`tel:${currentTeam.phone}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600">
+                                                    {currentTeam.phone}
+                                                </a>
+                                            ) : (
+                                                <p className="text-sm text-gray-400">—</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Description */}
                         {currentTeam.description && (
@@ -207,7 +231,7 @@ export default function Show({ auth, team }) {
                             <h3 className="text-lg font-semibold text-gray-900">Players</h3>
                                     {canManage && (
                                         <Link
-                                            href={route('teams.players.create', currentTeam.id)}
+                                            href={route('teams.players.scan', currentTeam.id)}
                                             className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
                                         >
                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ClubController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TeamController;
@@ -22,6 +23,20 @@ Route::get('/dashboard', DashboardController::class)
     ->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Clubs
+    Route::get('/clubs', [ClubController::class, 'index'])->name('clubs.index');
+    Route::get('/clubs/create', [ClubController::class, 'create'])->name('clubs.create');
+    Route::post('/clubs', [ClubController::class, 'store'])->name('clubs.store');
+    Route::get('/clubs/{club}', [ClubController::class, 'show'])->name('clubs.show');
+    Route::get('/clubs/{club}/edit', [ClubController::class, 'edit'])->name('clubs.edit');
+    Route::put('/clubs/{club}', [ClubController::class, 'update'])->name('clubs.update');
+    Route::delete('/clubs/{club}', [ClubController::class, 'destroy'])->name('clubs.destroy');
+
+    // Club Teams (create team within a club)
+    Route::get('/clubs/{club}/teams/create', [TeamController::class, 'createForClub'])->name('clubs.teams.create');
+    Route::post('/clubs/{club}/teams', [TeamController::class, 'storeForClub'])->name('clubs.teams.store');
+
+    // Teams
     Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
     Route::get('/teams/create', [TeamController::class, 'create'])->name('teams.create');
     Route::post('/teams', [TeamController::class, 'store'])->name('teams.store');
@@ -29,6 +44,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
     Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
     Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.destroy');
+    Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
+
+    // Player creation flow - Step 1: Scan ID
+    Route::get('/teams/{team}/players/scan', [PlayerController::class, 'scan'])->name('teams.players.scan');
+    Route::post('/teams/{team}/players/scan', [PlayerController::class, 'processScan'])->name('teams.players.scan.process');
+
+    // Player creation flow - Step 2: Manual entry (or skip scan)
     Route::get('/teams/{team}/players/create', [PlayerController::class, 'create'])->name('teams.players.create');
     Route::post('/teams/{team}/players', [PlayerController::class, 'store'])->name('teams.players.store');
     Route::get('/teams/{team}/players/{player}/edit', [PlayerController::class, 'edit'])->name('teams.players.edit');

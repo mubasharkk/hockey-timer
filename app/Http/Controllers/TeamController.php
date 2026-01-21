@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
+use App\Models\Club;
 use App\Models\Team;
+use App\Http\Resources\ClubResource;
 use App\Http\Resources\TeamResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +21,7 @@ class TeamController extends Controller
             ->where('user_id', Auth::id())
             ->with([
                 'media',
+                'club',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
                 'contactPersons',
             ])
@@ -32,19 +35,77 @@ class TeamController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Teams/Create');
+        $clubs = Club::query()
+            ->where('user_id', Auth::id())
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return Inertia::render('Teams/Create', [
+            'clubs' => ClubResource::collection($clubs),
+            'teamTypes' => Team::TYPES,
+        ]);
+    }
+
+    public function createForClub(Club $club): Response
+    {
+        $this->ensureClubAccess($club);
+
+        return Inertia::render('Teams/Create', [
+            'club' => ClubResource::make($club),
+            'clubs' => ClubResource::collection(collect([$club])),
+            'teamTypes' => Team::TYPES,
+        ]);
     }
 
     public function store(StoreTeamRequest $request): RedirectResponse
     {
         $team = Team::create([
             'user_id' => Auth::id(),
+            'club_id' => $request->input('club_id') ?: null,
             'name' => $request->string('name'),
+            'type' => $request->string('type') ?: null,
             'coach' => $request->string('coach') ?: null,
             'manager' => $request->string('manager') ?: null,
-            'email' => $request->string('email'),
+            'email' => $request->string('email') ?: null,
             'phone' => $request->string('phone') ?: null,
-            'website' => $request->string('website') ?: null,
+            'description' => $request->string('description') ?: null,
+            'is_registered' => true,
+        ]);
+
+        if ($request->hasFile('logo')) {
+            $team
+                ->addMediaFromRequest('logo')
+                ->toMediaCollection('logo');
+        }
+
+        // Create contact persons
+        if ($request->has('contact_persons')) {
+            foreach ($request->input('contact_persons', []) as $contactPerson) {
+                $team->contactPersons()->create([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+            }
+        }
+
+        return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
+    }
+
+    public function storeForClub(StoreTeamRequest $request, Club $club): RedirectResponse
+    {
+        $this->ensureClubAccess($club);
+
+        $team = Team::create([
+            'user_id' => Auth::id(),
+            'club_id' => $club->id,
+            'name' => $request->string('name'),
+            'type' => $request->string('type') ?: null,
+            'coach' => $request->string('coach') ?: null,
+            'manager' => $request->string('manager') ?: null,
+            'email' => $request->string('email') ?: null,
+            'phone' => $request->string('phone') ?: null,
             'description' => $request->string('description') ?: null,
             'is_registered' => true,
         ]);
@@ -74,6 +135,7 @@ class TeamController extends Controller
     {
         $team->load([
             'media',
+            'club',
             'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             'contactPersons',
         ]);
@@ -87,10 +149,17 @@ class TeamController extends Controller
     {
         $this->ensureManageable($team);
 
-        $team->load('contactPersons');
+        $team->load(['contactPersons', 'club']);
+
+        $clubs = Club::query()
+            ->where('user_id', Auth::id())
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return Inertia::render('Teams/Edit', [
             'team' => TeamResource::make($team),
+            'clubs' => ClubResource::collection($clubs),
+            'teamTypes' => Team::TYPES,
         ]);
     }
 
@@ -99,12 +168,13 @@ class TeamController extends Controller
         $this->ensureManageable($team);
 
         $team->update([
+            'club_id' => $request->input('club_id') ?: null,
             'name' => $request->string('name'),
+            'type' => $request->string('type') ?: null,
             'coach' => $request->string('coach') ?: null,
             'manager' => $request->string('manager') ?: null,
-            'email' => $request->string('email'),
+            'email' => $request->string('email') ?: null,
             'phone' => $request->string('phone') ?: null,
-            'website' => $request->string('website') ?: null,
             'description' => $request->string('description') ?: null,
         ]);
 
@@ -165,5 +235,10 @@ class TeamController extends Controller
     private function ensureManageable(Team $team): void
     {
         abort_unless($team->user_id === Auth::id(), 403);
+    }
+
+    private function ensureClubAccess(Club $club): void
+    {
+        abort_unless($club->user_id === Auth::id(), 403);
     }
 }

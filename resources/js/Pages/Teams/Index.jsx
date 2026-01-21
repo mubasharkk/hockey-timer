@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function Index({ auth, teams = [] }) {
     const userId = auth?.user?.id;
@@ -22,10 +22,11 @@ export default function Index({ auth, teams = [] }) {
                             Register Team
                         </Link>
                         <Link
-                            href={route('public.tournaments.show', 'latest')}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                            href={route('clubs.index')}
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
-                            Public view
+                            <FontAwesomeIcon icon={faBuilding} className="h-4 w-4" />
+                            Clubs
                         </Link>
                     </div>
                 </div>
@@ -40,7 +41,18 @@ export default function Index({ auth, teams = [] }) {
                             <p className="text-sm text-gray-600">Registered teams ready to be used when creating games.</p>
 
                             <div className="mt-4 space-y-3">
-                                {teamList.length === 0 && <p className="text-sm text-gray-600">No teams yet. Register one to get started.</p>}
+                                {teamList.length === 0 && (
+                                    <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center">
+                                        <p className="text-sm text-gray-600">No teams yet. Register one to get started.</p>
+                                        <Link
+                                            href={route('teams.create')}
+                                            className="mt-4 inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
+                                            Register Team
+                                        </Link>
+                                    </div>
+                                )}
 
                                 {teamList.map((team) => (
                                     <div
@@ -63,16 +75,21 @@ export default function Index({ auth, teams = [] }) {
                                             <div>
                                                 <div className="text-sm font-semibold text-gray-900">{team.name}</div>
                                                 <div className="text-xs text-gray-600">
-                                                    {team.players?.length ?? 0} player(s)
-                                                    {team.coach ? ` · Coach: ${team.coach}` : ''}
-                                                    {team.manager ? ` · Manager: ${team.manager}` : ''}
+                                                    {team.club && (
+                                                        <Link href={route('clubs.show', team.club.id)} className="text-indigo-600 hover:text-indigo-500">
+                                                            {team.club.name}
+                                                        </Link>
+                                                    )}
+                                                    {team.club && ' · '}
+                                                    {team.type_label || 'Team'}
+                                                    {' · '}{team.players?.length ?? 0} player(s)
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             {ownsTeam(team) && (
                                                 <Link
-                                                    href={route('teams.players.create', team.id)}
+                                                    href={route('teams.players.scan', team.id)}
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
                                                 >
                                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />

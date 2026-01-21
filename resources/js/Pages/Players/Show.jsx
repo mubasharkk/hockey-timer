@@ -4,11 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-export default function Show({ auth, team, player, statistics, recentGames = [] }) {
-    const currentTeam = team?.data ?? team;
+export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [] }) {
     const currentPlayer = player?.data ?? player;
+    const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
     const playerGames = Array.isArray(recentGames) ? recentGames : recentGames?.data || [];
-    const canManage = currentTeam?.user_id === auth?.user?.id;
+    const playerEvents = Array.isArray(events) ? events : events?.data || [];
 
     const age = currentPlayer.date_of_birth 
         ? moment().diff(moment(currentPlayer.date_of_birth), 'years')
@@ -35,21 +35,12 @@ export default function Show({ auth, team, player, statistics, recentGames = [] 
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        {canManage && (
-                            <Link
-                                href={route('teams.players.edit', [currentTeam.id, currentPlayer.id])}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
-                            >
-                                <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
-                                Edit Player
-                            </Link>
-                        )}
                         <Link
-                            href={route('teams.show', currentTeam.id)}
+                            href={playerTeams.length > 0 ? route('teams.show', playerTeams[0].id) : route('teams.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-                            Back to Team
+                            Back
                         </Link>
                     </div>
                 </div>
@@ -61,7 +52,25 @@ export default function Show({ auth, team, player, statistics, recentGames = [] 
                 <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
                     {/* Player Info Card */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                            {/* Column 1: Photo */}
+                            <div className="space-y-4">
+                                {currentPlayer.photo_url ? (
+                                    <div className="flex justify-center md:justify-start">
+                                        <img
+                                            src={currentPlayer.photo_url}
+                                            alt={currentPlayer.name}
+                                            className="h-48 w-48 rounded-lg border-2 border-gray-200 object-cover shadow-sm"
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="flex h-48 w-48 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
+                                        <span className="text-sm text-gray-400">No photo</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Column 2: Player Information */}
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-gray-900">Player Information</h3>
                                 <div className="space-y-3">
@@ -108,30 +117,61 @@ export default function Show({ auth, team, player, statistics, recentGames = [] 
                                         }
                                     />
                                 </div>
+                                {currentPlayer.address && (
+                                    <div className="mt-6 space-y-2">
+                                        <h4 className="text-sm font-semibold text-gray-700">Address</h4>
+                                        <div className="space-y-1 text-sm text-gray-600">
+                                            {currentPlayer.address.street && (
+                                                <p>{currentPlayer.address.street}</p>
+                                            )}
+                                            {currentPlayer.address.street_extra && (
+                                                <p>{currentPlayer.address.street_extra}</p>
+                                            )}
+                                            <p>
+                                                {[
+                                                    currentPlayer.address.city,
+                                                    currentPlayer.address.state,
+                                                    currentPlayer.address.post_code,
+                                                ]
+                                                    .filter(Boolean)
+                                                    .join(', ')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
-                            {currentPlayer.address && (
-                                <div className="space-y-4">
-                                    <h3 className="text-lg font-semibold text-gray-900">Address</h3>
-                                    <div className="space-y-2 text-sm text-gray-700">
-                                        {currentPlayer.address.street && (
-                                            <p>{currentPlayer.address.street}</p>
-                                        )}
-                                        {currentPlayer.address.street_extra && (
-                                            <p>{currentPlayer.address.street_extra}</p>
-                                        )}
-                                        <p>
-                                            {[
-                                                currentPlayer.address.city,
-                                                currentPlayer.address.state,
-                                                currentPlayer.address.post_code,
-                                            ]
-                                                .filter(Boolean)
-                                                .join(', ')}
-                                        </p>
+                            {/* Column 3: Teams */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-gray-900">Teams</h3>
+                                {playerTeams.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {playerTeams.map((team) => (
+                                            <Link
+                                                key={team.id}
+                                                href={route('teams.show', team.id)}
+                                                className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 transition hover:bg-gray-100"
+                                            >
+                                                {team.logo_url && (
+                                                    <img
+                                                        src={team.logo_url}
+                                                        alt={team.name}
+                                                        className="h-8 w-8 rounded object-cover"
+                                                    />
+                                                )}
+                                                <span className="text-sm font-medium text-gray-900">{team.name}</span>
+                                                {team.players && team.players.length > 0 && (
+                                                    <span className="ml-auto text-xs text-gray-500">
+                                                        #{team.players[0].shirt_number || '—'}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        ))}
                                     </div>
-                                </div>
-                            )}
+                                ) : (
+                                    <p className="text-sm text-gray-500">No teams assigned</p>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -232,6 +272,73 @@ export default function Show({ auth, team, player, statistics, recentGames = [] 
                             </div>
                         </div>
                     )}
+
+                    {/* Player Events Card */}
+                    {playerEvents.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 text-lg font-semibold text-gray-900">Player Events</h3>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-700">Event</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-700">Game</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-700">Date</th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-700">Session</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 bg-white">
+                                        {playerEvents.map((event) => (
+                                            <tr key={event.id}>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <img
+                                                            src={getEventIcon(event.event_type, event.card_type)}
+                                                            alt={getEventLabel(event)}
+                                                            className="h-5 w-5"
+                                                        />
+                                                        <span className="text-sm font-medium text-gray-900">
+                                                            {getEventLabel(event)}
+                                                        </span>
+                                                    </div>
+                                                    {event.note && (
+                                                        <p className="mt-1 text-xs text-gray-500">{event.note}</p>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    {event.game ? (
+                                                        <Link
+                                                            href={route('games.summary', event.game.id)}
+                                                            className="text-sm text-indigo-600 hover:text-indigo-500"
+                                                        >
+                                                            <div className="font-medium">
+                                                                {event.team?.name || 'Team'} vs {event.opponent_team || 'Opponent'}
+                                                            </div>
+                                                            {event.game.code && (
+                                                                <div className="text-xs text-gray-500">{event.game.code}</div>
+                                                            )}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-500">—</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                    {event.occurred_at
+                                                        ? moment(event.occurred_at).format('DD MMM YYYY · hh:mm A')
+                                                        : event.game
+                                                            ? moment(`${event.game.game_date} ${event.game.game_time}`).format('DD MMM YYYY')
+                                                            : '—'}
+                                                </td>
+                                                <td className="px-4 py-3 text-sm text-gray-600">
+                                                    {event.session_number ? `S${event.session_number}` : '—'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </AuthenticatedLayout>
@@ -259,3 +366,50 @@ const StatCard = ({ icon, label, value, color }) => (
         <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</p>
     </div>
 );
+
+const getEventIcon = (eventType, cardType) => {
+    switch (eventType) {
+        case 'goal':
+            return '/icons/goal.png';
+        case 'penalty_corner':
+            return '/icons/foul.png';
+        case 'penalty_stroke':
+            return '/icons/foul.png';
+        case 'card':
+            if (cardType === 'red') return '/icons/red-card.png';
+            if (cardType === 'yellow') return '/icons/yellow-card.png';
+            if (cardType === 'green') return '/icons/green-card.png';
+            return '/icons/red-card.png';
+        case 'session_end':
+            return '/icons/half-time.png';
+        case 'session_start':
+            return '/icons/half-time.png';
+        case 'game_end':
+            return '/icons/full-time.png';
+        default:
+            return '/icons/foul.png';
+    }
+};
+
+const getEventLabel = (event) => {
+    switch (event.event_type) {
+        case 'goal':
+            return event.goal_type ? `${event.goal_type} Goal` : 'Goal';
+        case 'penalty_corner':
+            return 'Penalty Corner';
+        case 'penalty_stroke':
+            return 'Penalty Stroke';
+        case 'card':
+            return `${event.card_type || ''} Card`.trim() || 'Card';
+        case 'session_end':
+            return 'Session End';
+        case 'session_start':
+            return 'Session Start';
+        case 'game_end':
+            return 'Game End';
+        case 'highlight':
+            return event.note || 'Highlight';
+        default:
+            return event.event_type || 'Event';
+    }
+};

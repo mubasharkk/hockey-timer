@@ -1,10 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
 
 export default function Create({ auth, team }) {
     const currentTeam = team?.data ?? team;
+    const [photoPreview, setPhotoPreview] = useState(null);
+
     const { data, setData, post, processing, errors } = useForm({
         name: '',
         shirt_number: '',
@@ -14,7 +17,6 @@ export default function Create({ auth, team }) {
         is_active: true,
         address: {
             street: '',
-            street_extra: '',
             city: '',
             state: '',
             post_code: '',
@@ -107,12 +109,6 @@ export default function Create({ auth, team }) {
                                     error={errors['address.street']}
                                 />
                                 <TextField
-                                    label="Street Extra"
-                                    value={data.address.street_extra}
-                                    onChange={(val) => setData('address', { ...data.address, street_extra: val })}
-                                    error={errors['address.street_extra']}
-                                />
-                                <TextField
                                     label="City"
                                     value={data.address.city}
                                     onChange={(val) => setData('address', { ...data.address, city: val })}
@@ -136,12 +132,51 @@ export default function Create({ auth, team }) {
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Photo (optional)</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="mt-1 block w-full text-sm text-gray-700"
-                                    onChange={(e) => setData('photo', e.target.files[0])}
-                                />
+                                <div className="mt-1 flex items-start gap-4">
+                                    {/* Photo Preview */}
+                                    <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                        {photoPreview ? (
+                                            <>
+                                                <img
+                                                    src={photoPreview}
+                                                    alt="Preview"
+                                                    className="h-full w-full object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setPhotoPreview(null);
+                                                        setData('photo', null);
+                                                    }}
+                                                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600"
+                                                >
+                                                    <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center">
+                                                <FontAwesomeIcon icon={faUser} className="h-8 w-8 text-gray-400" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="block w-full text-sm text-gray-700"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    setData('photo', file);
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => setPhotoPreview(reader.result);
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                        <p className="mt-1 text-xs text-gray-500">JPG, PNG, GIF up to 5MB</p>
+                                    </div>
+                                </div>
                                 {errors.photo && <p className="mt-1 text-xs text-red-600">{errors.photo}</p>}
                             </div>
                             <div className="flex items-center gap-2 pt-6">

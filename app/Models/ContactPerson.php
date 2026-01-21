@@ -4,24 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class TeamContactPerson extends Model
+class ContactPerson extends Model
 {
     use HasFactory;
 
-    protected $table = 'team_contact_persons';
+    protected $table = 'contact_persons';
 
     protected $fillable = [
-        'team_id',
+        'contactable_id',
+        'contactable_type',
         'name',
         'role',
         'phone',
         'email',
     ];
 
-    public function team(): BelongsTo
+    public function contactable(): MorphTo
     {
-        return $this->belongsTo(Team::class);
+        return $this->morphTo();
     }
 }

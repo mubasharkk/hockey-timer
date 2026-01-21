@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions = [] }) => {
+const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions = [], onUpdate, onDelete }) => {
     if (!events.length) {
         return <p className="text-sm text-gray-500">No events yet.</p>;
     }
@@ -89,7 +89,35 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
                                                 : 'border-gray-200 bg-gray-50 text-gray-700'
                                     }`}
                                 >
-                                    <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
+                                    <div className="flex w-full items-center justify-center gap-2">
+                                        <p className="text-xs font-semibold uppercase tracking-wide">{label}</p>
+                                        {(onUpdate || onDelete) && (
+                                            <div className="flex items-center gap-1">
+                                                {onUpdate && (
+                                                    <button
+                                                        onClick={() => onUpdate(event)}
+                                                        className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                        title="Update event"
+                                                    >
+                                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                                {onDelete && (
+                                                    <button
+                                                        onClick={() => onDelete(event)}
+                                                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                                        title="Delete event"
+                                                    >
+                                                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                     {/*{event.timer_value_seconds != null && (*/}
                                     {/*    <p className="text-[11px] font-medium text-gray-500">*/}
                                     {/*        {formatSeconds(event.timer_value_seconds)}*/}
@@ -133,7 +161,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
                                     <div className="flex flex-col items-center">
                                             <img src={badge.icon} alt={badge.label} className="h-6 w-6" />
                                     </div>
-                                    <div className="space-y-1 text-left">
+                                    <div className="flex-1 space-y-1 text-left">
                                         <p className="text-xs uppercase tracking-wide text-gray-500 flex items-center flex-wrap gap-1">
                                             <span className="text-[14px] font-bold text-black">
                                                 {formatRemainingClock(event, sessionDurationMap)}
@@ -146,6 +174,32 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
                                             {team?.name || '—'} {playerLabel && `· ${playerLabel}`}
                                         </p>
                                     </div>
+                                    {(onUpdate || onDelete) && (
+                                        <div className="flex items-center gap-1">
+                                            {onUpdate && (
+                                                <button
+                                                    onClick={() => onUpdate(event)}
+                                                    className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                    title="Update event"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            {onDelete && (
+                                                <button
+                                                    onClick={() => onDelete(event)}
+                                                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                                    title="Delete event"
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
