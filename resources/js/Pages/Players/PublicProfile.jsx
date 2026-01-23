@@ -47,13 +47,11 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                             </div>
 
                             {/* Column 3: Shirt Number - shrink right */}
-                            {currentPlayer.shirt_number && (
-                                <div className="flex-shrink-0 text-right">
-                                    <span className="font-bold text-white/90" style={{ fontSize: '48px' }}>
-                                        #{currentPlayer.shirt_number}
-                                    </span>
-                                </div>
-                            )}
+                            <div className="flex-shrink-0 text-right">
+                                <span className="font-bold text-white/90" style={{ fontSize: '48px' }}>
+                                    # {currentPlayer.shirt_number}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

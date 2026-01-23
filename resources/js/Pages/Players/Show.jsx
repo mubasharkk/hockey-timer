@@ -30,9 +30,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                             <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentPlayer.name}</h2>
-                            {currentPlayer.shirt_number && (
-                                <p className="text-sm text-gray-600">#{currentPlayer.shirt_number}</p>
-                            )}
+                            <p className="text-sm text-gray-600"># {currentPlayer.shirt_number}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
