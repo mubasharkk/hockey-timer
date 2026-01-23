@@ -166,7 +166,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                                 id="continue_timer_on_goal"
                                 name="continue_timer_on_goal"
                                 type="checkbox"
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                className="h-4 w-4 rounded border-gray-300 text-green-700 focus:ring-green-500"
                                 checked={data.continue_timer_on_goal}
                                 onChange={(e) => setData('continue_timer_on_goal', e.target.checked)}
                             />
@@ -186,7 +186,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             <label className="block text-sm font-medium text-gray-700">Notes (admin only, optional)</label>
                             <textarea
                                 rows={3}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.notes}
                                 onChange={(e) => setData('notes', e.target.value)}
                             />
@@ -197,7 +197,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 {processing ? 'Saving...' : 'Save Changes'}
                             </button>
@@ -213,7 +213,7 @@ const Field = ({ label, error, ...props }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <input
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             {...props}
         />
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -231,7 +231,7 @@ const SelectField = ({ label, value, options, onChange, error }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <select
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         >
@@ -258,7 +258,7 @@ const TeamSelect = ({ label, value, onChange, teams, error, disabled = false }) 
             </p>
         )}
         <select
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}

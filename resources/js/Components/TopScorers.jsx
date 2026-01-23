@@ -10,7 +10,7 @@ export default function TopScorers({ scorers = [] }) {
     return (
         <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm px-5">
             <div className="mb-4 flex items-center gap-3 pt-5">
-                <FontAwesomeIcon icon={faMedal} className="h-4 w-4 text-indigo-600" />
+                <FontAwesomeIcon icon={faMedal} className="h-4 w-4 text-green-700" />
                 <h3 className="text-sm font-semibold text-gray-900">Top Goal Scorers</h3>
             </div>
             <div className="overflow-x-auto">

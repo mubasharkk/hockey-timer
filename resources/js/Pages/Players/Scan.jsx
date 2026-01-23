@@ -98,7 +98,7 @@ export default function Scan({ auth, team }) {
             <div className="py-8">
                 <div className="mx-auto max-w-2xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Step 1 of 2</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Step 1 of 2</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Scan ID Document</h1>
                         <p className="text-sm text-gray-600">
                             Upload a player's ID document to automatically extract their information.
@@ -163,7 +163,7 @@ export default function Scan({ auth, team }) {
                                 <div
                                     className={`relative rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
                                         dragActive
-                                            ? 'border-indigo-500 bg-indigo-50'
+                                            ? 'border-green-500 bg-green-50'
                                             : 'border-gray-300 hover:border-gray-400'
                                     }`}
                                     onDragEnter={handleDrag}
@@ -179,7 +179,7 @@ export default function Scan({ auth, team }) {
                                         <div>
                                             <label
                                                 htmlFor="id_documents"
-                                                className="cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                                                className="cursor-pointer text-sm font-medium text-green-700 hover:text-green-600"
                                             >
                                                 Click to upload
                                             </label>
@@ -221,7 +221,7 @@ export default function Scan({ auth, team }) {
                                 <textarea
                                     id="additional_info"
                                     rows={5}
-                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
                                     placeholder="Enter any player information you know. This takes precedence over scanned data.
 
 Example:
@@ -257,7 +257,7 @@ Father Phone: 0321-9876543"
                                 <button
                                     type="submit"
                                     disabled={data.id_documents.length === 0 || processing}
-                                    className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                    className="inline-flex items-center gap-2 rounded-md bg-green-700 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                                 >
                                     {processing ? (
                                         <>

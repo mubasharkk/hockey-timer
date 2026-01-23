@@ -52,7 +52,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
             header={
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Tournament</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Tournament</p>
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTournament.title}</h2>
                     </div>
                     <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                         </Link>
                         <Link
                             href={route('tournaments.pools.teams.edit', currentTournament.id)}
-                            className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                         >
                             <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
                             Assign Teams
@@ -94,7 +94,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                         </Link>
                         <Link
                             href={route('public.tournaments.show', currentTournament.slug)}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
                         >
                             Public view
                         </Link>
@@ -177,7 +177,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center gap-3">
-                            <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-indigo-600" />
+                            <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-green-700" />
                             <h3 className="text-sm font-semibold text-gray-900">Pool Standings</h3>
                         </div>
                         <PoolResults results={poolResults} />
@@ -186,18 +186,18 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <FontAwesomeIcon icon={faCalendarAlt} className="h-4 w-4 text-indigo-600" />
+                                <FontAwesomeIcon icon={faCalendarAlt} className="h-4 w-4 text-green-700" />
                                 <h3 className="text-sm font-semibold text-gray-900">Games</h3>
                             </div>
                             <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
                                 <button
-                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                     onClick={() => setTab('upcoming')}
                                 >
                                     Upcoming
                                 </button>
                                 <button
-                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                     onClick={() => setTab('results')}
                                 >
                                     Results

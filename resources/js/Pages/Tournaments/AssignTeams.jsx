@@ -61,7 +61,7 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
             <div className="py-8">
                 <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Pools</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Pools</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Assign Teams to {currentTournament.title}</h1>
                         <p className="text-sm text-gray-600">
                             Minimum 4 teams required; teams must be evenly split across {pools.length} pool(s).
@@ -73,7 +73,7 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
                             <button
                                 type="button"
                                 onClick={handleRandom}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                             >
                                 <FontAwesomeIcon icon={faRandom} className="h-4 w-4" />
                                 Randomly distribute all teams
@@ -81,14 +81,14 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
                             <label className="inline-flex items-center gap-2 text-sm text-gray-700">
                                 <input
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-green-700 focus:ring-green-500"
                                     checked={data.randomize}
                                     onChange={(e) => setData('randomize', e.target.checked)}
                                 />
                                 Randomize on save
                             </label>
                         </div>
-                        {message && <div className="rounded-md bg-indigo-50 px-3 py-2 text-sm text-indigo-800">{message}</div>}
+                        {message && <div className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800">{message}</div>}
                         {errors.teams && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{errors.teams}</div>}
                         {errors.pools && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{errors.pools}</div>}
 
@@ -121,7 +121,7 @@ export default function AssignTeams({ auth, tournament, teams = [] }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Assignments'}

@@ -61,7 +61,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
             <div className="py-8">
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Player</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Add to {currentTeam.name}</h1>
                         <p className="text-sm text-gray-600">Capture player identity, pass number, and optional address/photo.</p>
                     </header>
@@ -71,7 +71,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Name</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
@@ -81,7 +81,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Shirt Number</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.shirt_number}
                                     onChange={(e) => setData('shirt_number', e.target.value)}
                                     placeholder="Optional"
@@ -94,7 +94,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player Pass Number</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.player_pass_number}
                                     onChange={(e) => setData('player_pass_number', e.target.value)}
                                     placeholder="Leave empty to auto-generate"
@@ -104,7 +104,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player NIC (optional)</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.nic_number}
                                     onChange={(e) => setData('nic_number', e.target.value)}
                                 />
@@ -114,7 +114,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                                 <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
                                 <input
                                     type="date"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.date_of_birth || ''}
                                     onChange={(e) => setData('date_of_birth', e.target.value)}
                                 />
@@ -127,7 +127,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Gender</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.gender}
                                     onChange={(e) => setData('gender', e.target.value)}
                                 >
@@ -147,7 +147,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Blood Group</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.blood_group}
                                     onChange={(e) => setData('blood_group', e.target.value)}
                                 >
@@ -161,7 +161,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player Type</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.player_type}
                                     onChange={(e) => setData('player_type', e.target.value)}
                                 >
@@ -181,7 +181,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                                 <button
                                     type="button"
                                     onClick={addContactPerson}
-                                    className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-100"
+                                    className="inline-flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-100"
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="h-3 w-3" />
                                     Add Contact
@@ -237,7 +237,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
                             <textarea
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 rows={3}
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
@@ -332,7 +332,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                                     id="is_active"
                                     name="is_active"
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-green-700 focus:ring-green-500"
                                     checked={data.is_active}
                                     onChange={(e) => setData('is_active', e.target.checked)}
                                 />
@@ -348,7 +348,7 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Player'}
@@ -365,7 +365,7 @@ const TextField = ({ label, value, onChange, error }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <input
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         />

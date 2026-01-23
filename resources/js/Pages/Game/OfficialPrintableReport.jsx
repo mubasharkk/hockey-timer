@@ -124,14 +124,14 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         <div className="flex flex-wrap items-center gap-2">
                             <Link
                                 href={route('games.report', currentGame?.id)}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                                className="text-sm font-medium text-green-700 hover:text-green-600"
                             >
                                 Back to report
                             </Link>
                             <button
                                 type="button"
                                 onClick={() => window.print()}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                             >
                                 Print
                             </button>
@@ -140,7 +140,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
 
                     <div className="print-page bg-white px-4 py-5 sm:px-6 sm:py-6 print:px-0 print:py-0">
                         <section className="space-y-2">
-                            <h1 className={'uppercase font-bold border-b border-indigo-600 pb-3 text-center'}>
+                            <h1 className={'uppercase font-bold border-b border-green-600 pb-3 text-center'}>
                                 Official Report / {currentGame?.code} / {formatSport(currentGame?.sport_type)}
                                 {tournamentName ? ` / ${tournamentName}` : ''}
                             </h1>
@@ -148,15 +148,15 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                             <div>
                                 <p className="text-sm font-semibold text-gray-900">Match Details</p>
                             </div>
-                            <div className="text-right text-indigo-700">
+                            <div className="text-right text-green-700">
                                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
                                     Final Score
                                 </p>
                                 <div className="text-lg font-semibold text-gray-900 flex items-center gap-2 justify-end">
                                     <span className="uppercase text-gray-700">{home?.name || currentGame?.team_a_name}</span>
-                                    <span className="final-score text-2xl text-indigo-700">{finalScore.homeScore}</span>
+                                    <span className="final-score text-2xl text-green-700">{finalScore.homeScore}</span>
                                     <span className="text-gray-500">-</span>
-                                    <span className="final-score text-2xl text-indigo-700">{finalScore.awayScore}</span>
+                                    <span className="final-score text-2xl text-green-700">{finalScore.awayScore}</span>
                                     <span className="uppercase text-gray-700">{away?.name || currentGame?.team_b_name}</span>
                                 </div>
                             </div>

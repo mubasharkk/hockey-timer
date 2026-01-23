@@ -57,7 +57,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                 <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
                     <header className="flex items-center justify-between gap-3">
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Team</p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Team</p>
                             <h1 className="text-2xl font-semibold text-gray-900">Edit {currentTeam.name}</h1>
                             <p className="text-sm text-gray-600">Update basic team details. Players stay unchanged.</p>
                         </div>
@@ -76,7 +76,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Club (optional)</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.club_id || ''}
                                     onChange={(e) => setData('club_id', e.target.value || null)}
                                 >
@@ -93,7 +93,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Team Name <span className="text-red-500">*</span></label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.name}
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
@@ -103,7 +103,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Team Type (optional)</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.type}
                                     onChange={(e) => setData('type', e.target.value)}
                                 >
@@ -121,7 +121,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                 <label className="block text-sm font-medium text-gray-700">Email (optional)</label>
                                 <input
                                     type="email"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.email}
                                     onChange={(e) => setData('email', e.target.value)}
                                     placeholder="team@example.com"
@@ -132,7 +132,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                 <label className="block text-sm font-medium text-gray-700">Phone (optional)</label>
                                 <input
                                     type="tel"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.phone}
                                     onChange={(e) => setData('phone', e.target.value)}
                                     placeholder="+1 234 567 890"
@@ -144,7 +144,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
                             <textarea
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
                                 placeholder="Brief description about your team..."
@@ -157,7 +157,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Coach (optional)</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.coach}
                                     onChange={(e) => setData('coach', e.target.value)}
                                     placeholder="Name"
@@ -167,7 +167,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Manager (optional)</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.manager}
                                     onChange={(e) => setData('manager', e.target.value)}
                                     placeholder="Name"
@@ -215,7 +215,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                         <p>Logo will be removed on save. Upload a new file to replace instead.</p>
                                         <button
                                             type="button"
-                                            className="mt-1 font-semibold text-indigo-600 hover:text-indigo-500"
+                                            className="mt-1 font-semibold text-green-700 hover:text-green-600"
                                             onClick={() => setData('remove_logo', false)}
                                         >
                                             Keep existing logo
@@ -257,7 +257,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600">Name <span className="text-red-500">*</span></label>
                                             <input
-                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
                                                 value={contact.name}
                                                 onChange={(e) => updateContactPerson(index, 'name', e.target.value)}
                                                 placeholder="Full name"
@@ -270,7 +270,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600">Role (optional)</label>
                                             <input
-                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
                                                 value={contact.role || ''}
                                                 onChange={(e) => updateContactPerson(index, 'role', e.target.value)}
                                                 placeholder="e.g. Team Captain, Coordinator"
@@ -280,7 +280,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                             <label className="block text-xs font-medium text-gray-600">Phone (optional)</label>
                                             <input
                                                 type="tel"
-                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
                                                 value={contact.phone || ''}
                                                 onChange={(e) => updateContactPerson(index, 'phone', e.target.value)}
                                                 placeholder="+1 234 567 890"
@@ -290,7 +290,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                                             <label className="block text-xs font-medium text-gray-600">Email (optional)</label>
                                             <input
                                                 type="email"
-                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
                                                 value={contact.email || ''}
                                                 onChange={(e) => updateContactPerson(index, 'email', e.target.value)}
                                                 placeholder="contact@example.com"
@@ -313,7 +313,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 <FontAwesomeIcon icon={faFloppyDisk} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Changes'}

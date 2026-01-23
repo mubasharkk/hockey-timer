@@ -27,7 +27,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             />
                         )}
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Player</p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                             <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentPlayer.name}</h2>
                             {currentPlayer.shirt_number && (
                                 <p className="text-sm text-gray-600">#{currentPlayer.shirt_number}</p>
@@ -39,7 +39,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             href={`/player/${currentPlayer.player_pass_number || currentPlayer.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
                         >
                             <FontAwesomeIcon icon={faExternalLinkAlt} className="h-3 w-3" />
                             Public Profile
@@ -47,7 +47,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                         {playerTeams.length > 0 && (
                             <Link
                                 href={route('teams.players.edit', [playerTeams[0].id, currentPlayer.id])}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                             >
                                 <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
                                 Edit
@@ -142,7 +142,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                                         <FontAwesomeIcon icon={faUserShield} className="h-4 w-4 text-gray-400" />
                                                         <span className="text-sm font-medium text-gray-900">{contact.name}</span>
                                                         {contact.role && (
-                                                            <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700">{contact.role}</span>
+                                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">{contact.role}</span>
                                                         )}
                                                     </div>
                                                     <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-600">
@@ -248,7 +248,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                 icon={faTrophy}
                                 label="Games Played"
                                 value={statistics.total_games || 0}
-                                color="text-indigo-600"
+                                color="text-green-700"
                             />
                         </div>
                         {(statistics.green_cards > 0 || statistics.penalty_corners > 0 || statistics.penalty_strokes > 0) && (
@@ -297,7 +297,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                                 {game.team_a_name} vs {game.team_b_name}
                                             </div>
                                             {game.tournament?.title && (
-                                                <div className="text-xs text-indigo-600">{game.tournament.title}</div>
+                                                <div className="text-xs text-green-700">{game.tournament.title}</div>
                                             )}
                                             <div className="text-xs text-gray-600">
                                                 {moment(`${game.game_date} ${game.game_time}`).format('DD MMM YYYY · hh:mm A')} · {game.venue}
@@ -356,7 +356,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                                     {event.game ? (
                                                         <Link
                                                             href={route('games.summary', event.game.id)}
-                                                            className="text-sm text-indigo-600 hover:text-indigo-500"
+                                                            className="text-sm text-green-700 hover:text-green-600"
                                                         >
                                                             <div className="font-medium">
                                                                 {event.team?.name || 'Team'} vs {event.opponent_team || 'Opponent'}

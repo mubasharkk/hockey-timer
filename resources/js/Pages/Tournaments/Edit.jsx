@@ -40,7 +40,7 @@ export default function Edit({ auth, tournament }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Title</label>
                             <input
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.title}
                                 onChange={(e) => setData('title', e.target.value)}
                                 required
@@ -50,7 +50,7 @@ export default function Edit({ auth, tournament }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Slug (optional)</label>
                             <input
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.slug}
                                 onChange={(e) => setData('slug', e.target.value)}
                                 placeholder="auto-generated if left blank"
@@ -60,7 +60,7 @@ export default function Edit({ auth, tournament }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Venue</label>
                             <input
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.venue}
                                 onChange={(e) => setData('venue', e.target.value)}
                                 required
@@ -73,7 +73,7 @@ export default function Edit({ auth, tournament }) {
                                 <label className="block text-sm font-medium text-gray-700">Start Date</label>
                                 <input
                                     type="date"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.start_date}
                                     onChange={(e) => setData('start_date', e.target.value)}
                                     required
@@ -84,7 +84,7 @@ export default function Edit({ auth, tournament }) {
                                 <label className="block text-sm font-medium text-gray-700">End Date (optional)</label>
                                 <input
                                     type="date"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.end_date}
                                     onChange={(e) => setData('end_date', e.target.value)}
                                     min={data.start_date || undefined}
@@ -126,7 +126,7 @@ export default function Edit({ auth, tournament }) {
                                 <input
                                     type="file"
                                     accept=".jpg,.jpeg,.png,.gif"
-                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"
                                     onChange={(e) => setData('logo', e.target.files[0] || null)}
                                 />
                                 {errors.logo && <p className="mt-1 text-xs text-red-600">{errors.logo}</p>}
@@ -137,7 +137,7 @@ export default function Edit({ auth, tournament }) {
                                     type="file"
                                     multiple
                                     accept=".jpg,.jpeg,.png,.gif"
-                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100"
+                                    className="mt-1 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-green-50 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"
                                     onChange={(e) => setData('sponsor_logos', Array.from(e.target.files || []))}
                                 />
                                 {errors.sponsor_logos && <p className="mt-1 text-xs text-red-600">{errors.sponsor_logos}</p>}
@@ -149,7 +149,7 @@ export default function Edit({ auth, tournament }) {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Changes'}
@@ -167,7 +167,7 @@ const NumberField = ({ label, value, onChange, error }) => (
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <input
             type="number"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             min={0}

@@ -46,14 +46,14 @@ export default function Show({ auth, team }) {
                             />
                         )}
                         <div>
-                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
                                 {currentTeam.type_label || 'Team'}
                             </p>
                             <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTeam.name}</h2>
                             {currentTeam.club && (
                                 <Link
                                     href={route('clubs.show', currentTeam.club.id)}
-                                    className="text-sm text-gray-500 hover:text-indigo-600"
+                                    className="text-sm text-gray-500 hover:text-green-700"
                                 >
                                     {currentTeam.club.name}
                                 </Link>
@@ -64,7 +64,7 @@ export default function Show({ auth, team }) {
                         {canManage && (
                             <Link
                                 href={route('teams.players.scan', currentTeam.id)}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                             >
                                 <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
                                 Add Player
@@ -118,13 +118,13 @@ export default function Show({ auth, team }) {
                                         className="h-12 w-12 rounded-lg border border-gray-200 object-cover"
                                     />
                                 ) : (
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-50">
-                                        <FontAwesomeIcon icon={faBuilding} className="h-6 w-6 text-indigo-600" />
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-50">
+                                        <FontAwesomeIcon icon={faBuilding} className="h-6 w-6 text-green-700" />
                                     </div>
                                 )}
                                 <div>
                                     <p className="text-xs text-gray-500">Club</p>
-                                    <p className="font-semibold text-gray-900 group-hover:text-indigo-600">{currentTeam.club.name}</p>
+                                    <p className="font-semibold text-gray-900 group-hover:text-green-700">{currentTeam.club.name}</p>
                                 </div>
                             </Link>
                         </div>
@@ -146,13 +146,13 @@ export default function Show({ auth, team }) {
                                 <h4 className="mb-3 text-sm font-semibold text-gray-700">Contact Details</h4>
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
-                                            <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-indigo-600" />
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50">
+                                            <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-green-700" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500">Email</p>
                                             {currentTeam.email ? (
-                                                <a href={`mailto:${currentTeam.email}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                                <a href={`mailto:${currentTeam.email}`} className="text-sm font-medium text-green-700 hover:text-green-600">
                                                     {currentTeam.email}
                                                 </a>
                                             ) : (
@@ -161,13 +161,13 @@ export default function Show({ auth, team }) {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50">
-                                            <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-indigo-600" />
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50">
+                                            <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-green-700" />
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500">Phone</p>
                                             {currentTeam.phone ? (
-                                                <a href={`tel:${currentTeam.phone}`} className="text-sm font-medium text-gray-900 hover:text-indigo-600">
+                                                <a href={`tel:${currentTeam.phone}`} className="text-sm font-medium text-gray-900 hover:text-green-700">
                                                     {currentTeam.phone}
                                                 </a>
                                             ) : (
@@ -196,23 +196,23 @@ export default function Show({ auth, team }) {
                                 {contactPersons.map((contact) => (
                                     <div key={contact.id} className="rounded-lg border border-gray-100 bg-gray-50 p-4">
                                         <div className="flex items-start gap-3">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
-                                                <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-indigo-600" />
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+                                                <FontAwesomeIcon icon={faUser} className="h-5 w-5 text-green-700" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-medium text-gray-900">{contact.name}</p>
                                                 {contact.role && (
-                                                    <p className="text-xs text-indigo-600">{contact.role}</p>
+                                                    <p className="text-xs text-green-700">{contact.role}</p>
                                                 )}
                                                 <div className="mt-2 space-y-1">
                                                     {contact.email && (
-                                                        <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-indigo-600">
+                                                        <a href={`mailto:${contact.email}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-green-700">
                                                             <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
                                                             <span className="truncate">{contact.email}</span>
                                                         </a>
                                                     )}
                                                     {contact.phone && (
-                                                        <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-indigo-600">
+                                                        <a href={`tel:${contact.phone}`} className="flex items-center gap-2 text-xs text-gray-600 hover:text-green-700">
                                                             <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
                                                             {contact.phone}
                                                         </a>
@@ -232,7 +232,7 @@ export default function Show({ auth, team }) {
                                     {canManage && (
                                         <Link
                                             href={route('teams.players.scan', currentTeam.id)}
-                                            className="inline-flex items-center gap-1 text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                                            className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 hover:text-green-600"
                                         >
                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
                                     Add Player
@@ -257,7 +257,7 @@ export default function Show({ auth, team }) {
                                             <td className="px-3 py-2 text-gray-800">
                                                 <Link
                                                     href={route('players.show', player.id)}
-                                                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                    className="font-medium text-green-700 hover:text-green-600"
                                                 >
                                                     {player.name}
                                                 </Link>
@@ -279,7 +279,7 @@ export default function Show({ auth, team }) {
                                                     <div className="flex justify-end gap-2">
                                                         <Link
                                                             href={route('teams.players.edit', [currentTeam.id, player.id])}
-                                                            className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-500"
+                                                            className="inline-flex items-center gap-1 text-green-700 hover:text-green-600"
                                                         >
                                                             <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
                                                             Edit

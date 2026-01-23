@@ -118,7 +118,7 @@ export default function Summary({ auth, game }) {
                             <span>{isFinished ? 'Game has ended. View the report for details.' : 'Match can start when browser time reaches the scheduled start.'}</span>
                             <span
                                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                    isFinished ? 'bg-indigo-100 text-indigo-800' : canStart ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800'
+                                    isFinished ? 'bg-green-100 text-green-800' : canStart ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-800'
                                 }`}
                             >
                                 {isFinished ? 'Finished' : canStart ? 'Ready' : 'Waiting for start time'}
@@ -137,7 +137,7 @@ export default function Summary({ auth, game }) {
                         <div className="flex items-center gap-2">
                             <Link
                                 href={route('public.ticker.code', currentGame.code)}
-                                className="inline-flex items-center rounded-md border border-indigo-300 px-3 py-2 text-sm font-semibold text-indigo-700 shadow-sm transition hover:border-indigo-400"
+                                className="inline-flex items-center rounded-md border border-green-300 px-3 py-2 text-sm font-semibold text-green-700 shadow-sm transition hover:border-green-400"
                                 preserveScroll
                             >
                                 Public Ticker
@@ -145,7 +145,7 @@ export default function Summary({ auth, game }) {
                             {isFinished ? (
                                 <Link
                                     href={route('games.report', currentGame.id)}
-                                    className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                    className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                                     preserveScroll
                                 >
                                     View Report
@@ -155,7 +155,7 @@ export default function Summary({ auth, game }) {
                                     href={route('games.timer', currentGame.id)}
                                     className={`inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition ${
                                         canStart
-                                            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                                            ? 'bg-green-700 text-white hover:bg-green-600'
                                             : 'bg-gray-300 text-gray-600 cursor-not-allowed'
                                     }`}
                                     preserveScroll
@@ -215,7 +215,7 @@ const TeamSquad = ({ team, fallbackLabel }) => {
                 <div>
                     <p className="text-sm font-semibold text-gray-800">{team.name || fallbackLabel}</p>
                 </div>
-                <span className="rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-semibold uppercase text-indigo-700">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-[11px] font-semibold uppercase text-green-700">
                     {players.length} players
                 </span>
             </div>
@@ -227,7 +227,7 @@ const TeamSquad = ({ team, fallbackLabel }) => {
                             className="flex items-center justify-between rounded bg-white px-2 py-1"
                         >
                             <span className="flex items-center gap-2">
-                                <span className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                                <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700">
                                     {p.shirt_number ?? '—'}
                                 </span>
                                 <span>{p.name}</span>

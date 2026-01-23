@@ -76,13 +76,13 @@ export default function Report({ auth, game }) {
                         </div>
                         <div className="flex flex-col items-start gap-2 sm:items-end print:hidden">
                             {currentGame.status !== 'finished' && (
-                                <Link href={route('games.timer', currentGame.id)} className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                <Link href={route('games.timer', currentGame.id)} className="text-sm font-medium text-green-700 hover:text-green-600">
                                     Back to Timer
                                 </Link>
                             )}
                             <Link
                                 href={route('games.official_report', currentGame.id)}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                                className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                                 target="_blank"
                                 rel="noopener noreferrer">
                                 Official Report

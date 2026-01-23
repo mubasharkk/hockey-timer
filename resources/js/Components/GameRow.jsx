@@ -18,7 +18,7 @@ export default function GameRow({ game, now }) {
                         {game.team_a_name} vs {game.team_b_name}
                     </div>
                     {game.tournament?.title && (
-                        <div className="text-[11px] font-semibold uppercase tracking-wide text-indigo-600">
+                        <div className="text-[11px] font-semibold uppercase tracking-wide text-green-700">
                             {game.tournament.title}
                         </div>
                     )}
@@ -34,7 +34,7 @@ export default function GameRow({ game, now }) {
                 <StatusBadge status={status} />
                 <Link
                     href={route(status === 'finished' ? 'games.report' : 'games.summary', game.id)}
-                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                    className="text-sm font-semibold text-green-700 hover:text-green-600"
                 >
                     {status === 'finished' ? 'Report' : 'View'}
                 </Link>

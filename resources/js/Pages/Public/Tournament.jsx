@@ -44,7 +44,7 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Tournament</p>
+                                <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Tournament</p>
                                 <h1 className="text-2xl font-semibold text-gray-900">{currentTournament.title}</h1>
                                 <p className="text-sm text-gray-600">{currentTournament.venue}</p>
                                 <p className="text-xs text-gray-500">
@@ -81,13 +81,13 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                             </div>
                             <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
                                 <button
-                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                     onClick={() => setTab('upcoming')}
                                 >
                                     Upcoming
                                 </button>
                                 <button
-                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                     onClick={() => setTab('results')}
                                 >
                                     Results

@@ -82,7 +82,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
             <div className="py-8">
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">Player</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Edit {currentPlayer.name}</h1>
                         <p className="text-sm text-gray-600">Update player details, status, and photo.</p>
                     </header>
@@ -91,7 +91,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                     {currentPlayer.id_documents && currentPlayer.id_documents.length > 0 && (
                         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                             <div className="flex items-center gap-2 mb-4">
-                                <FontAwesomeIcon icon={faIdCard} className="h-5 w-5 text-indigo-600" />
+                                <FontAwesomeIcon icon={faIdCard} className="h-5 w-5 text-green-700" />
                                 <h3 className="text-sm font-semibold text-gray-900">Uploaded ID Documents</h3>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -167,7 +167,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Gender</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.gender}
                                     onChange={(e) => setData('gender', e.target.value)}
                                 >
@@ -187,7 +187,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Blood Group</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.blood_group}
                                     onChange={(e) => setData('blood_group', e.target.value)}
                                 >
@@ -201,7 +201,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player Type</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.player_type}
                                     onChange={(e) => setData('player_type', e.target.value)}
                                 >
@@ -221,7 +221,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                                 <button
                                     type="button"
                                     onClick={addContactPerson}
-                                    className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-100"
+                                    className="inline-flex items-center gap-1 rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-100"
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="h-3 w-3" />
                                     Add Contact
@@ -277,7 +277,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
                             <textarea
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 rows={3}
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
@@ -374,7 +374,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                                     id="is_active"
                                     name="is_active"
                                     type="checkbox"
-                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-green-700 focus:ring-green-500"
                                     checked={data.is_active}
                                     onChange={(e) => setData('is_active', e.target.checked)}
                                 />
@@ -390,7 +390,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Changes'}
@@ -429,7 +429,7 @@ const Field = ({ label, error, ...props }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <input
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             {...props}
         />
         {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -440,7 +440,7 @@ const TextField = ({ label, value, onChange, error }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <input
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={value}
             onChange={(e) => onChange(e.target.value)}
         />

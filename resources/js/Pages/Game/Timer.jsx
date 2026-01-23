@@ -617,7 +617,7 @@ export default function Timer({ auth, game, config = {} }) {
                                         Public:{' '}
                                         <Link
                                             href={route('public.ticker.code', currentGame.code)}
-                                            className="text-indigo-600 hover:text-indigo-500"
+                                            className="text-green-700 hover:text-green-600"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -636,7 +636,7 @@ export default function Timer({ auth, game, config = {} }) {
                         <div className="flex flex-col items-start gap-1 sm:items-end sm:gap-0">
                             <Link
                                 href={route('games.report', currentGame.id)}
-                                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 sm:block"
+                                className="text-sm font-medium text-green-700 hover:text-green-600 sm:block"
                                 preserveScroll
                             >
                                 View Report →
@@ -664,7 +664,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 <div className="flex flex-wrap items-center gap-3">
                                     {status !== 'running' && status !== 'finished' && (
                                         <button
-                                            className="rounded-full bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
+                                            className="rounded-full bg-green-700 px-6 py-2 text-sm font-semibold text-white shadow hover:bg-green-600"
                                             onClick={handleStart}
                                             disabled={isGameOver}
                                         >
@@ -682,7 +682,7 @@ export default function Timer({ auth, game, config = {} }) {
                                     )}
                                     {status === 'paused' && (
                                         <button
-                                            className="rounded-full bg-indigo-600 px-6 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
+                                            className="rounded-full bg-green-700 px-6 py-2 text-sm font-semibold text-white shadow hover:bg-green-600"
                                             onClick={handleResume}
                                             disabled={isGameOver}
                                         >
@@ -797,7 +797,7 @@ export default function Timer({ auth, game, config = {} }) {
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">Goal Type</label>
                         <select
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                             value={goalModal?.goalType || 'FG'}
                             onChange={(e) => setGoalModal((prev) => ({ ...prev, goalType: e.target.value }))}
                         >
@@ -810,7 +810,7 @@ export default function Timer({ auth, game, config = {} }) {
                         <label className="block text-sm font-medium text-gray-700">Player Shirt Number</label>
                         <input
                             type="number"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                             value={goalModal?.shirtNumber || ''}
                             onChange={(e) => setGoalModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
                             placeholder="Optional"
@@ -844,7 +844,7 @@ export default function Timer({ auth, game, config = {} }) {
                         <label className="block text-sm font-medium text-gray-700">Player Shirt Number (optional)</label>
                         <input
                             type="number"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                             value={cardModal?.shirtNumber || ''}
                             onChange={(e) => setCardModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
                         />
@@ -853,7 +853,7 @@ export default function Timer({ auth, game, config = {} }) {
                         <label className="block text-sm font-medium text-gray-700">Minute (optional)</label>
                         <input
                             type="number"
-                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                             value={cardModal?.minutes || ''}
                             onChange={(e) => setCardModal((prev) => ({ ...prev, minutes: e.target.value }))}
                         />
@@ -876,7 +876,7 @@ const TeamScoreCard = ({ team, score, onAdd, onRemove, disabled }) => {
                 <div className="text-sm font-semibold text-gray-800">Team</div>
                 <div className="mt-2 text-4xl font-bold text-gray-900">0</div>
                 <div className="mt-2 flex justify-center gap-2 text-sm">
-                    <button className="rounded-full bg-indigo-600 px-3 py-1 text-white" disabled>
+                    <button className="rounded-full bg-green-700 px-3 py-1 text-white" disabled>
                         +
                     </button>
                     <button className="rounded-full border border-gray-300 px-3 py-1 text-gray-700" disabled>
@@ -892,7 +892,7 @@ const TeamScoreCard = ({ team, score, onAdd, onRemove, disabled }) => {
             <div className="text-sm font-semibold text-gray-800">{team.name}</div>
             <div className="mt-2 text-4xl font-bold text-gray-900 tabular-nums">{score ?? 0}</div>
             <div className="mt-2 flex justify-center gap-2 text-sm">
-                <button className="rounded-full bg-indigo-600 px-3 py-1 text-white disabled:bg-indigo-300" onClick={onAdd} disabled={disabled}>
+                <button className="rounded-full bg-green-700 px-3 py-1 text-white disabled:bg-green-300" onClick={onAdd} disabled={disabled}>
                     +
                 </button>
                 <button className="rounded-full border border-gray-300 px-3 py-1 text-gray-700 disabled:border-gray-200 disabled:text-gray-400" onClick={onRemove} disabled={disabled}>

@@ -97,7 +97,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Tournament (optional)</label>
                             <select
-                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
                                 value={data.tournament_id}
                                 onChange={(e) => setData('tournament_id', e.target.value)}
                             >
@@ -115,7 +115,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Venue</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.venue}
                                     onChange={(e) => setData('venue', e.target.value)}
                                     required
@@ -125,7 +125,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Excerpt (public)</label>
                                 <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.excerpt}
                                     onChange={(e) => setData('excerpt', e.target.value)}
                                     placeholder="Short public summary"
@@ -137,7 +137,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                     <label className="block text-sm font-medium text-gray-700">Match Date</label>
                                     <input
                                         type="date"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         value={data.game_date}
                                         min={todayStr()}
                                         onChange={(e) => {
@@ -153,7 +153,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                     <label className="block text-sm font-medium text-gray-700">Match Time</label>
                                     <input
                                         type="time"
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                         value={data.game_time}
                                         onChange={(e) => setData('game_time', e.target.value)}
                                         required
@@ -167,7 +167,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Sessions</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.sessions}
                                     onChange={(e) => setData('sessions', Number(e.target.value))}
                                 >
@@ -184,7 +184,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                 <input
                                     type="text"
                                     inputMode="numeric"
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.session_duration_minutes}
                                     onChange={(e) => setData('session_duration_minutes', e.target.value)}
                                 />
@@ -195,7 +195,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Timer Mode</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.timer_mode}
                                     onChange={(e) => setData('timer_mode', e.target.value)}
                                 >
@@ -207,7 +207,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Sport Type</label>
                                 <select
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                     value={data.sport_type}
                                     onChange={(e) => setData('sport_type', e.target.value)}
                                 >
@@ -226,7 +226,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                                 id="continue_timer_on_goal"
                                 name="continue_timer_on_goal"
                                 type="checkbox"
-                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                className="h-4 w-4 rounded border-gray-300 text-green-700 focus:ring-green-500"
                                 checked={data.continue_timer_on_goal}
                                 onChange={(e) => setData('continue_timer_on_goal', e.target.checked)}
                             />
@@ -238,7 +238,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Game Officials (optional)</label>
                             <input
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.game_officials}
                                 onChange={(e) => setData('game_officials', e.target.value)}
                                 placeholder="e.g., Ref: Alex / Umpires: Pat, Lee"
@@ -250,7 +250,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <label className="block text-sm font-medium text-gray-700">Notes (admin only, optional)</label>
                             <textarea
                                 rows={3}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
                                 value={data.notes}
                                 onChange={(e) => setData('notes', e.target.value)}
                                 placeholder="Internal notes"
@@ -270,7 +270,7 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                                className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
                             >
                                 {processing ? 'Saving...' : 'Save & Continue'}
                             </button>
@@ -286,7 +286,7 @@ const TeamSelect = ({ label, value, onChange, teams, error }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700">{label}</label>
         <select
-            className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
             value={value}
             onChange={(event) => onChange(event.target.value)}
             required
@@ -319,7 +319,7 @@ const RosterPreview = ({ title, team }) => {
                     <p className="text-sm font-semibold text-gray-800">{title}</p>
                     <p className="text-xs text-gray-600">{team.name}</p>
                 </div>
-                <span className="rounded-full bg-indigo-100 px-3 py-1 text-[11px] font-semibold uppercase text-indigo-700">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-[11px] font-semibold uppercase text-green-700">
                     {team.players?.length ?? 0} players
                 </span>
             </div>
@@ -328,7 +328,7 @@ const RosterPreview = ({ title, team }) => {
                     {team.players.map((player) => (
                         <li key={player.id} className="flex items-center justify-between rounded bg-white px-2 py-1">
                             <span className="flex items-center gap-2">
-                                <span className="rounded bg-indigo-50 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                                <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-semibold text-green-700">
                                     {player.shirt_number ?? '—'}
                                 </span>
                                 <span>{player.name}</span>

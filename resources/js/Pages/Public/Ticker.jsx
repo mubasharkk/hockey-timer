@@ -120,12 +120,12 @@ export default function Ticker({ game, gameId }) {
             <Head title="Live Ticker" />
             <div className="min-h-screen bg-slate-950 px-[calc(50vw-50%)] py-6 text-slate-50">
                 {!liveData && (
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-indigo-900/20">
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-green-900/20">
                         <form onSubmit={submit} className="flex flex-col gap-4 sm:flex-row sm:items-end">
                             <div className="flex-1">
                                 <label className="block text-sm font-semibold text-slate-200">Enter Game ID</label>
                                 <input
-                                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 shadow-inner shadow-black/30 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+                                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 shadow-inner shadow-black/30 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40"
                                     value={form.data.game}
                                     onChange={(e) => form.setData('game', e.target.value)}
                                     placeholder="e.g., 5"
@@ -134,7 +134,7 @@ export default function Ticker({ game, gameId }) {
                             </div>
                             <button
                                 type="submit"
-                                className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:bg-indigo-500"
+                                className="inline-flex items-center justify-center rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-900/40 transition hover:bg-green-600"
                             >
                                 Load
                             </button>
@@ -165,7 +165,7 @@ export default function Ticker({ game, gameId }) {
                                 )}
                             </div>
                         )}
-                        <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950 p-6 shadow-2xl shadow-indigo-900/30">
+                        <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-green-950 p-6 shadow-2xl shadow-green-900/30">
                             <div className="my-5">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="w-48 flex justify-start">

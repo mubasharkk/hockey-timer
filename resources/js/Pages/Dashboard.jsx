@@ -30,7 +30,7 @@ export default function Dashboard({ auth, upcoming = [], results = [], now }) {
                         </Link>
                         <Link
                             href={route('games.create')}
-                            className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                            className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                         >
                             New Game
                         </Link>
@@ -51,13 +51,13 @@ export default function Dashboard({ auth, upcoming = [], results = [], now }) {
                                         <div className="flex items-center justify-between">
                                             <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
                                                 <button
-                                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                                     onClick={() => setTab('upcoming')}
                                                 >
                                                     Upcoming ({upcomingGames.length})
                                                 </button>
                                                 <button
-                                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-indigo-50 text-indigo-700' : 'bg-white text-gray-700'}`}
+                                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
                                                     onClick={() => setTab('results')}
                                                 >
                                                     Results ({resultGames.length})

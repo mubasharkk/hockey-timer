@@ -15,9 +15,9 @@ export default function PublicProfile({ player, teams = [], statistics }) {
         <>
             <Head title={`${currentPlayer.name} - Player Profile`} />
 
-            <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
                 {/* Header */}
-                <div className="bg-indigo-600 px-4 py-8 text-white">
+                <div className="px-4 py-8 text-white" style={{ backgroundColor: '#01411C' }}>
                     <div className="mx-auto max-w-4xl">
                         <div className="flex items-center gap-6">
                             {currentPlayer.photo_url ? (
@@ -27,14 +27,14 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     className="h-24 w-24 rounded-full border-4 border-white/30 object-cover shadow-lg"
                                 />
                             ) : (
-                                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 bg-indigo-500 text-3xl font-bold shadow-lg">
+                                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 text-3xl font-bold shadow-lg" style={{ backgroundColor: '#026B2E' }}>
                                     {currentPlayer.name?.charAt(0) || '?'}
                                 </div>
                             )}
                             <div>
                                 <h1 className="text-3xl font-bold">{currentPlayer.name}</h1>
                                 {currentPlayer.shirt_number && (
-                                    <p className="mt-1 text-xl text-indigo-200">#{currentPlayer.shirt_number}</p>
+                                    <p className="mt-1 text-xl text-green-200">#{currentPlayer.shirt_number}</p>
                                 )}
                                 {currentPlayer.player_type_label && (
                                     <span className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
@@ -90,7 +90,7 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                             <h2 className="mb-4 text-lg font-semibold text-gray-900">Statistics</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <StatBox icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" bg="bg-green-50" />
-                                <StatBox icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-indigo-600" bg="bg-indigo-50" />
+                                <StatBox icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" bg="bg-green-50" />
                                 <StatBox icon={faFlag} label="Yellow Cards" value={statistics.yellow_cards || 0} color="text-yellow-600" bg="bg-yellow-50" />
                                 <StatBox icon={faFlag} label="Red Cards" value={statistics.red_cards || 0} color="text-red-600" bg="bg-red-50" />
                             </div>

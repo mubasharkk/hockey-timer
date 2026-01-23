@@ -96,7 +96,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
                                                 {onUpdate && (
                                                     <button
                                                         onClick={() => onUpdate(event)}
-                                                        className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                        className="p-1 text-gray-400 hover:text-green-700 transition-colors"
                                                         title="Update event"
                                                     >
                                                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -139,7 +139,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
 
                     return (
                         <div key={event.id || idx} className="relative flex w-full items-center">
-                            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-indigo-500 ring-4 ring-white shadow" />
+                            <span className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-green-500 ring-4 ring-white shadow" />
                             <div
                                 className={`relative flex w-1/2 ${
                                     side === 'teamA' ? 'mr-auto justify-end pr-12' : 'ml-auto justify-start pl-12'
@@ -179,7 +179,7 @@ const EventTimeline = ({ events = [], teams = [], sessionCount = null, sessions 
                                             {onUpdate && (
                                                 <button
                                                     onClick={() => onUpdate(event)}
-                                                    className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                    className="p-1 text-gray-400 hover:text-green-700 transition-colors"
                                                     title="Update event"
                                                 >
                                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

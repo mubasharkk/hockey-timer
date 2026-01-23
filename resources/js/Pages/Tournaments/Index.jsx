@@ -12,7 +12,7 @@ export default function Index({ auth, tournaments = [] }) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Tournaments</h2>
                     <Link
                         href={route('tournaments.create')}
-                        className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                        className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                     >
                         <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
                         New Tournament
@@ -55,7 +55,7 @@ export default function Index({ auth, tournaments = [] }) {
                                         <div className="flex items-center gap-3 text-sm font-semibold">
                                             <Link
                                                 href={route('tournaments.show', tournament.id)}
-                                                className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-500"
+                                                className="inline-flex items-center gap-1 text-green-700 hover:text-green-600"
                                             >
                                                 <FontAwesomeIcon icon={faEye} className="h-3.5 w-3.5" />
                                                 View

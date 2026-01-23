@@ -35,7 +35,7 @@ export default function GameMatchup({ game }) {
                                     ? route('public.ticker.code', game.code)
                                     : `${route('public.ticker')}?game=${game.id}`
                             }
-                            className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 font-semibold text-indigo-700 ring-1 ring-indigo-100 transition hover:bg-indigo-100"
+                            className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700 ring-1 ring-green-100 transition hover:bg-green-100"
                         >
                             <TickerIcon />
                             <span className="text-[11px] uppercase tracking-wide">Ticker</span>
@@ -68,7 +68,7 @@ const Logo = ({ src, alt }) => {
 };
 
 const TickerIcon = () => (
-    <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5 text-indigo-700" />
+    <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5 text-green-700" />
 );
 
 const ResultBadge = ({ homeScore, awayScore }) => {
