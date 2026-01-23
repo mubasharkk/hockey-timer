@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DangerButton from '@/Components/DangerButton';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
+import TeamCard from '@/Components/TeamCard';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -16,7 +17,6 @@ import {
     faPlus,
     faTrash,
     faUser,
-    faUsers,
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Show({ auth, club }) {
@@ -228,31 +228,7 @@ export default function Show({ auth, club }) {
                         {teams.length > 0 ? (
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                 {teams.map((team) => (
-                                    <Link
-                                        key={team.id}
-                                        href={route('teams.show', team.id)}
-                                        className="group rounded-lg border border-gray-100 bg-gray-50 p-4 transition hover:border-green-200 hover:bg-green-50"
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            {team.logo_url ? (
-                                                <img
-                                                    src={team.logo_url}
-                                                    alt={`${team.name} logo`}
-                                                    className="h-10 w-10 rounded-md border border-gray-100 object-cover"
-                                                />
-                                            ) : (
-                                                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-white">
-                                                    <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-gray-400" />
-                                                </div>
-                                            )}
-                                            <div>
-                                                <p className="font-medium text-gray-900 group-hover:text-green-700">{team.name}</p>
-                                                <p className="text-xs text-gray-500">
-                                                    {team.type_label || 'Team'} • {team.players_count ?? 0} players
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </Link>
+                                    <TeamCard key={team.id} team={team} showMeta />
                                 ))}
                             </div>
                         ) : (

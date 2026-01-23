@@ -184,7 +184,7 @@ class PlayerController extends Controller
         })
             ->with(['players' => function ($q) use ($relatedPlayerIds) {
                 $q->whereIn('id', $relatedPlayerIds);
-            }, 'media'])
+            }, 'media', 'club'])
             ->get();
 
         $statistics = $this->getPlayerStatistics($player, $relatedPlayerIds);

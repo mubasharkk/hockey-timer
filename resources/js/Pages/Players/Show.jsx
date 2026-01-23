@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import TeamCard from '@/Components/TeamCard';
 import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
@@ -10,7 +11,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
     const playerGames = Array.isArray(recentGames) ? recentGames : recentGames?.data || [];
     const playerEvents = Array.isArray(events) ? events : events?.data || [];
 
-    const age = currentPlayer.date_of_birth 
+    const age = currentPlayer.date_of_birth
         ? moment().diff(moment(currentPlayer.date_of_birth), 'years')
         : null;
 
@@ -70,31 +71,28 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                 <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
                     {/* Player Info Card */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                            {/* Column 1: Photo */}
-                            <div className="space-y-4">
-                                {currentPlayer.photo_url ? (
-                                    <div className="flex justify-center md:justify-start">
+                        <div className="flex flex-col gap-6 md:flex-row">
+                            {/* Column 1: Photo (1/3) */}
+                            <div className="flex-shrink-0 md:w-1/3">
+                                <div className="flex flex-col items-center">
+                                    {currentPlayer.photo_url ? (
                                         <img
                                             src={currentPlayer.photo_url}
                                             alt={currentPlayer.name}
-                                            className="h-48 w-48 rounded-lg border-2 border-gray-200 object-cover shadow-sm"
+                                            className="h-64 w-64 rounded-lg border-2 border-gray-200 object-cover shadow-sm"
                                         />
-                                    </div>
-                                ) : (
-                                    <div className="flex h-48 w-48 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
-                                        <span className="text-sm text-gray-400">No photo</span>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className="flex h-64 w-64 items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50">
+                                            <span className="text-sm text-gray-400">No photo</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
 
-                            {/* Column 2: Player Information - Compact */}
-                            <div className="space-y-4">
+                            {/* Column 2: Player Information (2/3) */}
+                            <div className="flex-1 space-y-4 md:w-2/3">
                                 <h3 className="text-lg font-semibold text-gray-900">Player Information</h3>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                    {currentPlayer.shirt_number && (
-                                        <CompactInfo icon={faShirt} label="Shirt" value={`#${currentPlayer.shirt_number}`} />
-                                    )}
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3">
                                     {currentPlayer.player_pass_number && (
                                         <CompactInfo icon={faIdCard} label="Pass #" value={currentPlayer.player_pass_number} />
                                     )}
@@ -102,10 +100,10 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                         <CompactInfo icon={faIdCard} label="NIC" value={currentPlayer.nic_number} />
                                     )}
                                     {currentPlayer.date_of_birth && (
-                                        <CompactInfo 
-                                            icon={faBirthdayCake} 
-                                            label="DOB" 
-                                            value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age}y)` : ''}`} 
+                                        <CompactInfo
+                                            icon={faBirthdayCake}
+                                            label="DOB"
+                                            value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age}y)` : ''}`}
                                         />
                                     )}
                                     {currentPlayer.gender && (
@@ -131,96 +129,82 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                         }
                                     />
                                 </div>
-                                {/* Contact Persons */}
-                                {currentPlayer.contact_persons && currentPlayer.contact_persons.length > 0 && (
-                                    <div className="mt-6 space-y-2">
-                                        <h4 className="text-sm font-semibold text-gray-700">Contact Persons</h4>
-                                        <div className="space-y-3">
-                                            {currentPlayer.contact_persons.map((contact) => (
-                                                <div key={contact.id} className="rounded-md border border-gray-100 bg-gray-50 p-3">
-                                                    <div className="flex items-center gap-2">
-                                                        <FontAwesomeIcon icon={faUserShield} className="h-4 w-4 text-gray-400" />
-                                                        <span className="text-sm font-medium text-gray-900">{contact.name}</span>
-                                                        {contact.role && (
-                                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">{contact.role}</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-600">
-                                                        {contact.phone && (
-                                                            <span className="flex items-center gap-1">
-                                                                <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
-                                                                {contact.phone}
-                                                            </span>
-                                                        )}
-                                                        {contact.email && (
-                                                            <span className="flex items-center gap-1">
-                                                                <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
-                                                                {contact.email}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                {currentPlayer.address && (
-                                    <div className="mt-6 space-y-2">
-                                        <h4 className="text-sm font-semibold text-gray-700">Address</h4>
-                                        <div className="space-y-1 text-sm text-gray-600">
-                                            {currentPlayer.address.street && (
-                                                <p>{currentPlayer.address.street}</p>
-                                            )}
-                                            {currentPlayer.address.street_extra && (
-                                                <p>{currentPlayer.address.street_extra}</p>
-                                            )}
-                                            <p>
-                                                {[
-                                                    currentPlayer.address.city,
-                                                    currentPlayer.address.state,
-                                                    currentPlayer.address.post_code,
-                                                ]
-                                                    .filter(Boolean)
-                                                    .join(', ')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
 
-                            {/* Column 3: Teams */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-semibold text-gray-900">Teams</h3>
-                                {playerTeams.length > 0 ? (
-                                    <div className="space-y-2">
-                                        {playerTeams.map((team) => (
-                                            <Link
-                                                key={team.id}
-                                                href={route('teams.show', team.id)}
-                                                className="flex items-center gap-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 transition hover:bg-gray-100"
-                                            >
-                                                {team.logo_url && (
-                                                    <img
-                                                        src={team.logo_url}
-                                                        alt={team.name}
-                                                        className="h-8 w-8 rounded object-cover"
-                                                    />
+                                {/* Contact Persons & Address in 2 columns */}
+                                <div className="grid grid-cols-1 gap-6 pt-4 sm:grid-cols-2">
+                                    {/* Contact Persons */}
+                                    {currentPlayer.contact_persons && currentPlayer.contact_persons.length > 0 && (
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-semibold text-gray-700">Contact Persons</h4>
+                                            <div className="space-y-2">
+                                                {currentPlayer.contact_persons.map((contact) => (
+                                                    <div key={contact.id} className="rounded-md border border-gray-100 bg-gray-50 p-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <FontAwesomeIcon icon={faUserShield} className="h-4 w-4 text-gray-400" />
+                                                            <span className="text-sm font-medium text-gray-900">{contact.name}</span>
+                                                            {contact.role && (
+                                                                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">{contact.role}</span>
+                                                            )}
+                                                        </div>
+                                                        <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-600">
+                                                            {contact.phone && (
+                                                                <span className="flex items-center gap-1">
+                                                                    <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
+                                                                    {contact.phone}
+                                                                </span>
+                                                            )}
+                                                            {contact.email && (
+                                                                <span className="flex items-center gap-1">
+                                                                    <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
+                                                                    {contact.email}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Address */}
+                                    {currentPlayer.address && (
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-semibold text-gray-700">Address</h4>
+                                            <div className="space-y-1 text-sm text-gray-600">
+                                                {currentPlayer.address.street && (
+                                                    <p>{currentPlayer.address.street}</p>
                                                 )}
-                                                <span className="text-sm font-medium text-gray-900">{team.name}</span>
-                                                {team.players && team.players.length > 0 && (
-                                                    <span className="ml-auto text-xs text-gray-500">
-                                                        #{team.players[0].shirt_number || '—'}
-                                                    </span>
+                                                {currentPlayer.address.street_extra && (
+                                                    <p>{currentPlayer.address.street_extra}</p>
                                                 )}
-                                            </Link>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-sm text-gray-500">No teams assigned</p>
-                                )}
+                                                <p>
+                                                    {[
+                                                        currentPlayer.address.city,
+                                                        currentPlayer.address.state,
+                                                        currentPlayer.address.post_code,
+                                                    ]
+                                                        .filter(Boolean)
+                                                        .join(', ')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* Teams Card */}
+                    {playerTeams.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 text-lg font-semibold text-gray-900">Teams</h3>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                {playerTeams.map((team) => (
+                                    <TeamCard key={team.id} team={team} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Statistics Card */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

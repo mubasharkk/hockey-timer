@@ -1,13 +1,14 @@
 import { Head } from '@inertiajs/react';
+import TeamCard from '@/Components/TeamCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faPhone, faTint, faRunning, faVenusMars } from '@fortawesome/free-solid-svg-icons';
+import { faBirthdayCake, faIdCard, faTrophy, faFutbol, faFlag, faPhone, faTint, faVenusMars } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 export default function PublicProfile({ player, teams = [], statistics }) {
     const currentPlayer = player?.data ?? player;
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
 
-    const age = currentPlayer.date_of_birth 
+    const age = currentPlayer.date_of_birth
         ? moment().diff(moment(currentPlayer.date_of_birth), 'years')
         : null;
 
@@ -20,28 +21,39 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                 <div className="px-4 py-8 text-white" style={{ backgroundColor: '#01411C' }}>
                     <div className="mx-auto max-w-4xl">
                         <div className="flex items-center gap-6">
-                            {currentPlayer.photo_url ? (
-                                <img
-                                    src={currentPlayer.photo_url}
-                                    alt={currentPlayer.name}
-                                    className="h-24 w-24 rounded-full border-4 border-white/30 object-cover shadow-lg"
-                                />
-                            ) : (
-                                <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 text-3xl font-bold shadow-lg" style={{ backgroundColor: '#026B2E' }}>
-                                    {currentPlayer.name?.charAt(0) || '?'}
-                                </div>
-                            )}
-                            <div>
-                                <h1 className="text-3xl font-bold">{currentPlayer.name}</h1>
-                                {currentPlayer.shirt_number && (
-                                    <p className="mt-1 text-xl text-green-200">#{currentPlayer.shirt_number}</p>
+                            {/* Column 1: Photo - shrink left */}
+                            <div className="flex-shrink-0">
+                                {currentPlayer.photo_url ? (
+                                    <img
+                                        src={currentPlayer.photo_url}
+                                        alt={currentPlayer.name}
+                                        className="h-24 w-24 rounded-full border-4 border-white/30 object-cover shadow-lg"
+                                    />
+                                ) : (
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 text-3xl font-bold shadow-lg" style={{ backgroundColor: '#026B2E' }}>
+                                        {currentPlayer.name?.charAt(0) || '?'}
+                                    </div>
                                 )}
+                            </div>
+
+                            {/* Column 2: Name + Type - expanded */}
+                            <div className="flex-1 min-w-0">
+                                <h1 className="text-3xl font-bold truncate">{currentPlayer.name}</h1>
                                 {currentPlayer.player_type_label && (
                                     <span className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
                                         {currentPlayer.player_type_label}
                                     </span>
                                 )}
                             </div>
+
+                            {/* Column 3: Shirt Number - shrink right */}
+                            {currentPlayer.shirt_number && (
+                                <div className="flex-shrink-0 text-right">
+                                    <span className="font-bold text-white/90" style={{ fontSize: '48px' }}>
+                                        #{currentPlayer.shirt_number}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -57,10 +69,10 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     <InfoRow icon={faIdCard} label="Pass Number" value={currentPlayer.player_pass_number} />
                                 )}
                                 {currentPlayer.date_of_birth && (
-                                    <InfoRow 
-                                        icon={faBirthdayCake} 
-                                        label="Date of Birth" 
-                                        value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age} years)` : ''}`} 
+                                    <InfoRow
+                                        icon={faBirthdayCake}
+                                        label="Date of Birth"
+                                        value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age} years)` : ''}`}
                                     />
                                 )}
                                 {currentPlayer.gender && (
@@ -72,15 +84,15 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                 {currentPlayer.phone && (
                                     <InfoRow icon={faPhone} label="Phone" value={currentPlayer.phone} />
                                 )}
-                                <InfoRow 
-                                    label="Status" 
+                                <InfoRow
+                                    label="Status"
                                     value={
                                         currentPlayer.is_active ? (
                                             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
                                         ) : (
                                             <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Inactive</span>
                                         )
-                                    } 
+                                    }
                                 />
                             </div>
                         </div>
@@ -100,26 +112,9 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                         {playerTeams.length > 0 && (
                             <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:col-span-2">
                                 <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     {playerTeams.map((team) => (
-                                        <div
-                                            key={team.id}
-                                            className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-4 py-2"
-                                        >
-                                            {team.logo_url && (
-                                                <img
-                                                    src={team.logo_url}
-                                                    alt={team.name}
-                                                    className="h-10 w-10 rounded object-cover"
-                                                />
-                                            )}
-                                            <div>
-                                                <p className="font-medium text-gray-900">{team.name}</p>
-                                                {team.players && team.players[0]?.shirt_number && (
-                                                    <p className="text-xs text-gray-500">#{team.players[0].shirt_number}</p>
-                                                )}
-                                            </div>
-                                        </div>
+                                        <TeamCard key={team.id} team={team} showClub asDiv />
                                     ))}
                                 </div>
                             </div>
