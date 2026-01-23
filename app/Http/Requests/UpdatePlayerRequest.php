@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Player;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +28,18 @@ class UpdatePlayerRequest extends FormRequest
             ],
             'nic_number' => ['nullable', 'string', 'max:50'],
             'date_of_birth' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string', Rule::in(array_keys(Player::GENDERS))],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'blood_group' => ['nullable', 'string', Rule::in(array_keys(Player::BLOOD_GROUPS))],
+            'player_type' => ['nullable', 'string', Rule::in(array_keys(Player::PLAYER_TYPES))],
+            'description' => ['nullable', 'string', 'max:5000'],
             'is_active' => ['sometimes', 'boolean'],
+            'contact_persons' => ['nullable', 'array'],
+            'contact_persons.*.id' => ['nullable', 'integer', 'exists:contact_persons,id'],
+            'contact_persons.*.name' => ['required', 'string', 'max:255'],
+            'contact_persons.*.role' => ['nullable', 'string', 'max:255'],
+            'contact_persons.*.phone' => ['nullable', 'string', 'max:50'],
+            'contact_persons.*.email' => ['nullable', 'email', 'max:255'],
             'address.street' => ['nullable', 'string', 'max:60'],
             'address.street_extra' => ['nullable', 'string', 'max:60'],
             'address.city' => ['nullable', 'string', 'max:60'],

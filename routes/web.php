@@ -84,9 +84,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Public ticker view (no auth required)
+// Public routes (no auth required)
 Route::get('/ticker', [PublicTickerController::class, 'index'])->name('public.ticker');
 Route::get('/ticker/{code}', [PublicTickerController::class, 'index'])->name('public.ticker.code');
 Route::get('/public/tournaments/{slug}', [PublicTournamentController::class, 'show'])->name('public.tournaments.show');
+Route::get('/player/{identifier}', [PlayerController::class, 'publicProfile'])->name('players.public');
 
 require __DIR__.'/auth.php';

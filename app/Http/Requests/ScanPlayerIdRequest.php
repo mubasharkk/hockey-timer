@@ -26,6 +26,11 @@ class ScanPlayerIdRequest extends FormRequest
                 'mimes:jpg,jpeg,png,gif,webp',
                 'max:10240', // 10MB max per file
             ],
+            'additional_info' => [
+                'nullable',
+                'string',
+                'max:5000',
+            ],
         ];
     }
 

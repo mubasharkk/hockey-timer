@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faIdCard, faExpand, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faIdCard, faExpand, faUser, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
 // Format date to YYYY-MM-DD for HTML date input
@@ -21,7 +21,7 @@ const formatDateForInput = (dateValue) => {
     }
 };
 
-export default function Edit({ auth, team, player }) {
+export default function Edit({ auth, team, player, genders = {}, bloodGroups = {}, playerTypes = {} }) {
     const currentTeam = team?.data ?? team;
     const currentPlayer = player?.data ?? player;
     const [lightboxImage, setLightboxImage] = useState(null);
@@ -34,6 +34,11 @@ export default function Edit({ auth, team, player }) {
         player_pass_number: currentPlayer.player_pass_number || '',
         nic_number: currentPlayer.nic_number || '',
         date_of_birth: formatDateForInput(currentPlayer.date_of_birth),
+        gender: currentPlayer.gender || '',
+        phone: currentPlayer.phone || '',
+        blood_group: currentPlayer.blood_group || '',
+        player_type: currentPlayer.player_type || '',
+        description: currentPlayer.description || '',
         is_active: currentPlayer.is_active ?? true,
         address: {
             street: currentPlayer.address?.street || '',
@@ -42,7 +47,25 @@ export default function Edit({ auth, team, player }) {
             post_code: currentPlayer.address?.post_code || '',
         },
         photo: null,
+        contact_persons: currentPlayer.contact_persons || [],
     });
+
+    const addContactPerson = () => {
+        setData('contact_persons', [
+            ...data.contact_persons,
+            { name: '', role: '', phone: '', email: '' },
+        ]);
+    };
+
+    const removeContactPerson = (index) => {
+        setData('contact_persons', data.contact_persons.filter((_, i) => i !== index));
+    };
+
+    const updateContactPerson = (index, field, value) => {
+        const updated = [...data.contact_persons];
+        updated[index] = { ...updated[index], [field]: value };
+        setData('contact_persons', updated);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -139,6 +162,131 @@ export default function Edit({ auth, team, player }) {
                             />
                         </div>
 
+                        {/* Player Details */}
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Gender</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.gender}
+                                    onChange={(e) => setData('gender', e.target.value)}
+                                >
+                                    <option value="">— Select —</option>
+                                    {Object.entries(genders).map(([value, label]) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
+                                </select>
+                                {errors.gender && <p className="mt-1 text-xs text-red-600">{errors.gender}</p>}
+                            </div>
+                            <TextField
+                                label="Phone Number"
+                                value={data.phone}
+                                onChange={(val) => setData('phone', val)}
+                                error={errors.phone}
+                            />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Blood Group</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.blood_group}
+                                    onChange={(e) => setData('blood_group', e.target.value)}
+                                >
+                                    <option value="">— Select —</option>
+                                    {Object.entries(bloodGroups).map(([value, label]) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
+                                </select>
+                                {errors.blood_group && <p className="mt-1 text-xs text-red-600">{errors.blood_group}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Player Type</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                    value={data.player_type}
+                                    onChange={(e) => setData('player_type', e.target.value)}
+                                >
+                                    <option value="">— Select —</option>
+                                    {Object.entries(playerTypes).map(([value, label]) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
+                                </select>
+                                {errors.player_type && <p className="mt-1 text-xs text-red-600">{errors.player_type}</p>}
+                            </div>
+                        </div>
+
+                        {/* Contact Persons */}
+                        <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-semibold text-gray-800">Contact Persons (optional)</p>
+                                <button
+                                    type="button"
+                                    onClick={addContactPerson}
+                                    className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-100"
+                                >
+                                    <FontAwesomeIcon icon={faPlus} className="h-3 w-3" />
+                                    Add Contact
+                                </button>
+                            </div>
+                            {data.contact_persons.length > 0 && (
+                                <div className="mt-3 space-y-3">
+                                    {data.contact_persons.map((contact, index) => (
+                                        <div key={contact.id || index} className="relative rounded-md border border-gray-200 bg-white p-3">
+                                            <button
+                                                type="button"
+                                                onClick={() => removeContactPerson(index)}
+                                                className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600"
+                                            >
+                                                <FontAwesomeIcon icon={faTimes} className="h-2.5 w-2.5" />
+                                            </button>
+                                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
+                                                <TextField
+                                                    label="Name *"
+                                                    value={contact.name}
+                                                    onChange={(val) => updateContactPerson(index, 'name', val)}
+                                                    error={errors[`contact_persons.${index}.name`]}
+                                                />
+                                                <TextField
+                                                    label="Role"
+                                                    value={contact.role || ''}
+                                                    onChange={(val) => updateContactPerson(index, 'role', val)}
+                                                    error={errors[`contact_persons.${index}.role`]}
+                                                />
+                                                <TextField
+                                                    label="Phone"
+                                                    value={contact.phone || ''}
+                                                    onChange={(val) => updateContactPerson(index, 'phone', val)}
+                                                    error={errors[`contact_persons.${index}.phone`]}
+                                                />
+                                                <TextField
+                                                    label="Email"
+                                                    value={contact.email || ''}
+                                                    onChange={(val) => updateContactPerson(index, 'email', val)}
+                                                    error={errors[`contact_persons.${index}.email`]}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            {data.contact_persons.length === 0 && (
+                                <p className="mt-2 text-xs text-gray-500">No contact persons added. Click "Add Contact" to add guardian, parent, or emergency contact.</p>
+                            )}
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Description (optional)</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                rows={3}
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Any additional notes about the player..."
+                            />
+                            {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
+                        </div>
+
+                        {/* Address */}
                         <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
                             <p className="text-sm font-semibold text-gray-800">Address (optional)</p>
                             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">

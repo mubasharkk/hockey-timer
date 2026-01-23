@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [] }) {
@@ -35,6 +35,24 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
+                        <a
+                            href={`/player/${currentPlayer.player_pass_number || currentPlayer.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-indigo-200 transition hover:bg-indigo-50"
+                        >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} className="h-3 w-3" />
+                            Public Profile
+                        </a>
+                        {playerTeams.length > 0 && (
+                            <Link
+                                href={route('teams.players.edit', [playerTeams[0].id, currentPlayer.id])}
+                                className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
+                            >
+                                <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
+                                Edit
+                            </Link>
+                        )}
                         <Link
                             href={playerTeams.length > 0 ? route('teams.show', playerTeams[0].id) : route('teams.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
@@ -70,53 +88,82 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                 )}
                             </div>
 
-                            {/* Column 2: Player Information */}
+                            {/* Column 2: Player Information - Compact */}
                             <div className="space-y-4">
                                 <h3 className="text-lg font-semibold text-gray-900">Player Information</h3>
-                                <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                                     {currentPlayer.shirt_number && (
-                                        <InfoItem
-                                            icon={faShirt}
-                                            label="Shirt Number"
-                                            value={`#${currentPlayer.shirt_number}`}
-                                        />
+                                        <CompactInfo icon={faShirt} label="Shirt" value={`#${currentPlayer.shirt_number}`} />
                                     )}
                                     {currentPlayer.player_pass_number && (
-                                        <InfoItem
-                                            icon={faIdCard}
-                                            label="Player Pass Number"
-                                            value={currentPlayer.player_pass_number}
-                                        />
+                                        <CompactInfo icon={faIdCard} label="Pass #" value={currentPlayer.player_pass_number} />
                                     )}
                                     {currentPlayer.nic_number && (
-                                        <InfoItem
-                                            icon={faIdCard}
-                                            label="NIC Number"
-                                            value={currentPlayer.nic_number}
-                                        />
+                                        <CompactInfo icon={faIdCard} label="NIC" value={currentPlayer.nic_number} />
                                     )}
                                     {currentPlayer.date_of_birth && (
-                                        <InfoItem
-                                            icon={faBirthdayCake}
-                                            label="Date of Birth"
-                                            value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age} years)` : ''}`}
+                                        <CompactInfo 
+                                            icon={faBirthdayCake} 
+                                            label="DOB" 
+                                            value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age}y)` : ''}`} 
                                         />
                                     )}
-                                    <InfoItem
+                                    {currentPlayer.gender && (
+                                        <CompactInfo icon={faVenusMars} label="Gender" value={currentPlayer.gender === 'male' ? 'Male' : 'Female'} />
+                                    )}
+                                    {currentPlayer.phone && (
+                                        <CompactInfo icon={faPhone} label="Phone" value={currentPlayer.phone} />
+                                    )}
+                                    {currentPlayer.blood_group && (
+                                        <CompactInfo icon={faTint} label="Blood" value={currentPlayer.blood_group} />
+                                    )}
+                                    {currentPlayer.player_type_label && (
+                                        <CompactInfo icon={faRunning} label="Position" value={currentPlayer.player_type_label} />
+                                    )}
+                                    <CompactInfo
                                         label="Status"
                                         value={
                                             currentPlayer.is_active ? (
-                                                <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-semibold uppercase text-green-700">
-                                                    Active
-                                                </span>
+                                                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
                                             ) : (
-                                                <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold uppercase text-amber-700">
-                                                    Inactive
-                                                </span>
+                                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Inactive</span>
                                             )
                                         }
                                     />
                                 </div>
+                                {/* Contact Persons */}
+                                {currentPlayer.contact_persons && currentPlayer.contact_persons.length > 0 && (
+                                    <div className="mt-6 space-y-2">
+                                        <h4 className="text-sm font-semibold text-gray-700">Contact Persons</h4>
+                                        <div className="space-y-3">
+                                            {currentPlayer.contact_persons.map((contact) => (
+                                                <div key={contact.id} className="rounded-md border border-gray-100 bg-gray-50 p-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <FontAwesomeIcon icon={faUserShield} className="h-4 w-4 text-gray-400" />
+                                                        <span className="text-sm font-medium text-gray-900">{contact.name}</span>
+                                                        {contact.role && (
+                                                            <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700">{contact.role}</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="mt-2 flex flex-wrap gap-4 text-xs text-gray-600">
+                                                        {contact.phone && (
+                                                            <span className="flex items-center gap-1">
+                                                                <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
+                                                                {contact.phone}
+                                                            </span>
+                                                        )}
+                                                        {contact.email && (
+                                                            <span className="flex items-center gap-1">
+                                                                <FontAwesomeIcon icon={faEnvelope} className="h-3 w-3" />
+                                                                {contact.email}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                                 {currentPlayer.address && (
                                     <div className="mt-6 space-y-2">
                                         <h4 className="text-sm font-semibold text-gray-700">Address</h4>
@@ -344,6 +391,16 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
         </AuthenticatedLayout>
     );
 }
+
+const CompactInfo = ({ icon, label, value }) => (
+    <div className="flex items-center gap-2 py-1">
+        {icon && (
+            <FontAwesomeIcon icon={icon} className="h-3.5 w-3.5 text-gray-400" />
+        )}
+        <span className="text-xs text-gray-500">{label}:</span>
+        <span className="text-sm font-medium text-gray-900">{value}</span>
+    </div>
+);
 
 const InfoItem = ({ icon, label, value }) => (
     <div className="flex items-start gap-3">

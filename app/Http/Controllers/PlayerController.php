@@ -47,21 +47,27 @@ class PlayerController extends Controller
         $this->ensureTeamAccess($team);
 
         $files = $request->file('id_documents');
+        $additionalInfo = $request->input('additional_info');
 
         // Fix image orientation before processing
         $processedFiles = $this->imageService->processMultiple($files);
 
-        // Extract data from ID documents (supports 1-2 files)
-        $extractedData = $this->idDocumentService->extractFromDocuments($processedFiles);
+        // Extract data from ID documents with additional info (supports 1-2 files)
+        $extractedData = $this->idDocumentService->extractFromDocuments($processedFiles, $additionalInfo);
 
         // Create player with extracted data
         $player = $team->players()->create([
             'registered_player_id' => null,
             'name' => $extractedData['name'] ?? 'New Player',
-            'shirt_number' => null,
+            'shirt_number' => $extractedData['shirt_number'] ?? null,
             'player_pass_number' => $this->resolvePassNumber(null),
             'nic_number' => $extractedData['nic_number'] ?? null,
             'date_of_birth' => $extractedData['date_of_birth'] ?? null,
+            'gender' => $extractedData['gender'] ?? null,
+            'phone' => $extractedData['phone'] ?? null,
+            'blood_group' => $extractedData['blood_group'] ?? null,
+            'player_type' => $extractedData['player_type'] ?? null,
+            'description' => $additionalInfo, // Store free text in description
             'is_active' => true,
         ]);
 
@@ -76,6 +82,18 @@ class PlayerController extends Controller
                 'post_code' => $address['post_code'],
                 'country_id' => 0,
             ]);
+        }
+
+        // Create contact persons if extracted
+        foreach ($extractedData['contact_persons'] ?? [] as $contactPerson) {
+            if (!empty($contactPerson['name'])) {
+                $player->contactPersons()->create([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+            }
         }
 
         // Store the ID documents as media (with fixed orientation)
@@ -106,13 +124,16 @@ class PlayerController extends Controller
 
         return Inertia::render('Players/Create', [
             'team' => TeamResource::make($team),
+            'genders' => Player::GENDERS,
+            'bloodGroups' => Player::BLOOD_GROUPS,
+            'playerTypes' => Player::PLAYER_TYPES,
         ]);
     }
 
     public function show(Player $player): Response
     {
         // Load player with relationships
-        $player->load(['addresses', 'media', 'team']);
+        $player->load(['addresses', 'media', 'team', 'contactPersons']);
 
         // Find all player records for the same person (by registered_player_id or player_pass_number)
         $relatedPlayerIds = $this->getRelatedPlayerIds($player);
@@ -144,16 +165,50 @@ class PlayerController extends Controller
         ]);
     }
 
+    /**
+     * Display public player profile (no auth required).
+     */
+    public function publicProfile(string $identifier): Response
+    {
+        // Find player by pass number or ID
+        $player = Player::where('player_pass_number', $identifier)
+            ->orWhere('id', $identifier)
+            ->firstOrFail();
+
+        $player->load(['addresses', 'media', 'team', 'contactPersons']);
+
+        $relatedPlayerIds = $this->getRelatedPlayerIds($player);
+
+        $teams = Team::whereHas('players', function ($query) use ($relatedPlayerIds) {
+            $query->whereIn('id', $relatedPlayerIds);
+        })
+            ->with(['players' => function ($q) use ($relatedPlayerIds) {
+                $q->whereIn('id', $relatedPlayerIds);
+            }, 'media'])
+            ->get();
+
+        $statistics = $this->getPlayerStatistics($player, $relatedPlayerIds);
+
+        return Inertia::render('Players/PublicProfile', [
+            'player' => PlayerResource::make($player),
+            'teams' => TeamResource::collection($teams),
+            'statistics' => $statistics,
+        ]);
+    }
+
     public function edit(Team $team, Player $player): Response
     {
         $this->ensureTeamAccess($team);
         abort_unless($player->team_id === $team->id, 404);
 
-        $player->load(['addresses', 'media']);
+        $player->load(['addresses', 'media', 'contactPersons']);
 
         return Inertia::render('Players/Edit', [
             'team' => TeamResource::make($team),
             'player' => PlayerResource::make($player),
+            'genders' => Player::GENDERS,
+            'bloodGroups' => Player::BLOOD_GROUPS,
+            'playerTypes' => Player::PLAYER_TYPES,
         ]);
     }
 
@@ -168,6 +223,11 @@ class PlayerController extends Controller
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number')),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
+            'gender' => $request->string('gender') ?: null,
+            'phone' => $request->string('phone') ?: null,
+            'blood_group' => $request->string('blood_group') ?: null,
+            'player_type' => $request->string('player_type') ?: null,
+            'description' => $request->string('description') ?: null,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -191,6 +251,18 @@ class PlayerController extends Controller
                 ->toMediaCollection('photo');
         }
 
+        // Create contact persons
+        if ($request->has('contact_persons')) {
+            foreach ($request->input('contact_persons', []) as $contactPerson) {
+                $player->contactPersons()->create([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+            }
+        }
+
         return redirect()->route('teams.show', $team)->with('success', 'Player added.');
     }
 
@@ -205,8 +277,37 @@ class PlayerController extends Controller
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number'), $player),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
+            'gender' => $request->string('gender') ?: null,
+            'phone' => $request->string('phone') ?: null,
+            'blood_group' => $request->string('blood_group') ?: null,
+            'player_type' => $request->string('player_type') ?: null,
+            'description' => $request->string('description') ?: null,
             'is_active' => $request->boolean('is_active', true),
         ]);
+
+        // Sync contact persons
+        $submittedIds = [];
+        foreach ($request->input('contact_persons', []) as $contactPerson) {
+            if (!empty($contactPerson['id'])) {
+                $player->contactPersons()->where('id', $contactPerson['id'])->update([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+                $submittedIds[] = $contactPerson['id'];
+            } else {
+                $newContact = $player->contactPersons()->create([
+                    'name' => $contactPerson['name'],
+                    'role' => $contactPerson['role'] ?? null,
+                    'phone' => $contactPerson['phone'] ?? null,
+                    'email' => $contactPerson['email'] ?? null,
+                ]);
+                $submittedIds[] = $newContact->id;
+            }
+        }
+        // Delete removed contact persons
+        $player->contactPersons()->whereNotIn('id', $submittedIds)->delete();
 
         $address = $request->input('address', []);
         $existingAddress = $player->addresses()->first();

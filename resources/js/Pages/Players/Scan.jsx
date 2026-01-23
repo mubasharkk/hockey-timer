@@ -14,6 +14,7 @@ export default function Scan({ auth, team }) {
 
     const { data, setData, post, processing, errors } = useForm({
         id_documents: [],
+        additional_info: '',
     });
 
     const handleFiles = (newFiles) => {
@@ -211,6 +212,37 @@ export default function Scan({ auth, team }) {
                                     {errors.id_documents || errors['id_documents.0'] || errors['id_documents.1']}
                                 </p>
                             )}
+
+                            {/* Additional Information */}
+                            <div className="space-y-2">
+                                <label htmlFor="additional_info" className="block text-sm font-medium text-gray-700">
+                                    Additional Information (Optional)
+                                </label>
+                                <textarea
+                                    id="additional_info"
+                                    rows={5}
+                                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                                    placeholder="Enter any player information you know. This takes precedence over scanned data.
+
+Example:
+Name: Muhammad Ali
+Shirt Number: 10
+Date of Birth: 15/03/2005
+Phone: 0300-1234567
+Blood Group: B+
+Father Name: Ahmad Ali
+Father Phone: 0321-9876543"
+                                    value={data.additional_info}
+                                    onChange={(e) => setData('additional_info', e.target.value)}
+                                />
+                                <p className="text-xs text-gray-500">
+                                    You can enter player name, shirt number, date of birth, phone, blood group, player type, 
+                                    and contact person details. These values will override any data extracted from the ID document.
+                                </p>
+                                {errors.additional_info && (
+                                    <p className="text-sm text-red-600">{errors.additional_info}</p>
+                                )}
+                            </div>
 
                             {/* Actions */}
                             <div className="flex items-center justify-between border-t border-gray-100 pt-6">
