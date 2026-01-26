@@ -57,7 +57,6 @@ class PlayerController extends Controller
 
         // Create player with extracted data
         $player = $team->players()->create([
-            'registered_player_id' => null,
             'name' => $extractedData['name'] ?? 'New Player',
             'shirt_number' => $extractedData['shirt_number'] ?? null,
             'player_pass_number' => $this->resolvePassNumber(null),
@@ -135,7 +134,7 @@ class PlayerController extends Controller
         // Load player with relationships
         $player->load(['addresses', 'media', 'team', 'contactPersons']);
 
-        // Find all player records for the same person (by registered_player_id or player_pass_number)
+        // Find all player records for the same person (by player_pass_number)
         $relatedPlayerIds = $this->getRelatedPlayerIds($player);
 
         // Get all teams this player belongs to
@@ -217,7 +216,6 @@ class PlayerController extends Controller
         $this->ensureTeamAccess($team);
 
         $player = $team->players()->create([
-            'registered_player_id' => null,
             'name' => $request->string('name'),
             'shirt_number' => $request->integer('shirt_number'),
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number')),
@@ -393,15 +391,7 @@ class PlayerController extends Controller
     {
         $ids = [$player->id];
 
-        // Find players with the same registered_player_id
-        if ($player->registered_player_id) {
-            $related = Player::where('registered_player_id', $player->registered_player_id)
-                ->pluck('id')
-                ->toArray();
-            $ids = array_merge($ids, $related);
-        }
-
-        // Also find players with the same player_pass_number (if it exists and is unique)
+        // Find players with the same player_pass_number
         if ($player->player_pass_number) {
             $related = Player::where('player_pass_number', $player->player_pass_number)
                 ->pluck('id')

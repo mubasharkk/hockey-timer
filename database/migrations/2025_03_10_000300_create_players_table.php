@@ -10,7 +10,6 @@ return new class extends Migration {
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->foreignId('team_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('registered_player_id')->nullable()->constrained('players')->nullOnDelete();
             $table->string('name');
             $table->unsignedSmallInteger('shirt_number')->nullable();
             $table->string('player_pass_number', 32)->nullable()->unique();

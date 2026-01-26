@@ -39,7 +39,6 @@ class TeamSeeder extends Seeder
 
             for ($p = 0; $p < $playerCount; $p++) {
                 $players[] = [
-                    'registered_player_id' => null,
                     'name' => $faker->name(),
                     'shirt_number' => $shirtNumbers[$p],
                     'player_pass_number' => $this->uniquePass($existingPasses),

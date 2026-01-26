@@ -26,7 +26,6 @@ class Player extends Model implements HasMedia
 
     protected $fillable = [
         'team_id',
-        'registered_player_id',
         'name',
         'shirt_number',
         'player_pass_number',
@@ -48,11 +47,6 @@ class Player extends Model implements HasMedia
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
-    }
-
-    public function registeredPlayer(): BelongsTo
-    {
-        return $this->belongsTo(self::class, 'registered_player_id');
     }
 
     public function contactPersons(): MorphMany
