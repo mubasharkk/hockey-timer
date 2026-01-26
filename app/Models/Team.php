@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Models\Game;
 use Spatie\MediaLibrary\HasMedia;
@@ -65,9 +64,11 @@ class Team extends Model implements HasMedia
         return $this->belongsTo(Game::class, 'game_id');
     }
 
-    public function players(): HasMany
+    public function players(): BelongsToMany
     {
-        return $this->hasMany(Player::class);
+        return $this->belongsToMany(Player::class)
+            ->withPivot(['shirt_number', 'is_active'])
+            ->withTimestamps();
     }
 
     public function pools(): BelongsToMany

@@ -19,14 +19,18 @@ class UpdatePlayerRequest extends FormRequest
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'shirt_number' => ['nullable', 'integer', 'min:0', 'max:999'],
             'player_pass_number' => [
                 'nullable',
                 'string',
-                'max:50',
+                'max:32',
                 Rule::unique('players', 'player_pass_number')->ignore($playerId),
             ],
-            'nic_number' => ['nullable', 'string', 'max:50'],
+            'nic_number' => [
+                'nullable',
+                'string',
+                'max:32',
+                Rule::unique('players', 'nic_number')->ignore($playerId),
+            ],
             'date_of_birth' => ['nullable', 'date'],
             'gender' => ['nullable', 'string', Rule::in(array_keys(Player::GENDERS))],
             'phone' => ['nullable', 'string', 'max:50'],

@@ -23,6 +23,7 @@ class TeamSeeder extends Seeder
 
         $faker = Faker::create();
         $existingPasses = Player::pluck('player_pass_number')->filter()->all();
+        $existingNics = Player::pluck('nic_number')->filter()->all();
 
         for ($i = 1; $i <= 8; $i++) {
             $team = Team::create([
@@ -35,23 +36,24 @@ class TeamSeeder extends Seeder
 
             $playerCount = rand(12, 15);
             $shirtNumbers = Arr::shuffle(range(1, 30));
-            $players = [];
 
             for ($p = 0; $p < $playerCount; $p++) {
-                $players[] = [
+                // Create player
+                $player = Player::create([
+                    'user_id' => $user->id,
                     'name' => $faker->name(),
-                    'shirt_number' => $shirtNumbers[$p],
                     'player_pass_number' => $this->uniquePass($existingPasses),
-                    'nic_number' => $faker->numerify('#############'),
+                    'nic_number' => $this->uniqueNic($existingNics, $faker),
                     'date_of_birth' => $faker->dateTimeBetween('-30 years', '-16 years')->format('Y-m-d'),
-                    'is_active' => (bool) rand(0, 1),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                    'team_id' => $team->id,
-                ];
-            }
+                    'is_active' => true,
+                ]);
 
-            $team->players()->insert($players);
+                // Attach to team with shirt number
+                $team->players()->attach($player->id, [
+                    'shirt_number' => $shirtNumbers[$p],
+                    'is_active' => (bool) rand(0, 1),
+                ]);
+            }
         }
     }
 
@@ -64,5 +66,16 @@ class TeamSeeder extends Seeder
         $existing[] = $code;
 
         return $code;
+    }
+
+    private function uniqueNic(array &$existing, $faker): string
+    {
+        do {
+            $nic = $faker->numerify('#############');
+        } while (in_array($nic, $existing, true) || Player::where('nic_number', $nic)->exists());
+
+        $existing[] = $nic;
+
+        return $nic;
     }
 }

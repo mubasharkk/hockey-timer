@@ -6,8 +6,7 @@ import { useState, useRef } from 'react';
 
 const MAX_FILES = 2;
 
-export default function Scan({ auth, team }) {
-    const currentTeam = team?.data ?? team;
+export default function Scan({ auth }) {
     const [previews, setPreviews] = useState([]);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
@@ -69,7 +68,7 @@ export default function Scan({ auth, team }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.players.scan.process', currentTeam.id), {
+        post(route('players.scan.process'), {
             forceFormData: true,
         });
     };
@@ -247,7 +246,7 @@ Father Phone: 0321-9876543"
                             {/* Actions */}
                             <div className="flex items-center justify-between border-t border-gray-100 pt-6">
                                 <Link
-                                    href={route('teams.players.create', currentTeam.id)}
+                                    href={route('players.create')}
                                     className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
                                 >
                                     <FontAwesomeIcon icon={faKeyboard} className="h-4 w-4" />

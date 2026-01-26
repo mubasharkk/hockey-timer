@@ -23,11 +23,12 @@ class PlayerResource extends JsonResource
             'name' => $media->file_name,
         ])->toArray();
 
+        // Get shirt number from pivot if loaded via team relationship
+        $shirtNumber = $this->pivot?->shirt_number ?? null;
+
         return [
             'id' => $this->id,
-            'team_id' => $this->team_id,
             'name' => $this->name,
-            'shirt_number' => $this->shirt_number,
             'player_pass_number' => $this->player_pass_number,
             'nic_number' => $this->nic_number,
             'date_of_birth' => $this->date_of_birth?->format('Y-m-d'),
@@ -38,6 +39,11 @@ class PlayerResource extends JsonResource
             'player_type_label' => $this->player_type_label,
             'description' => $this->description,
             'is_active' => (bool) $this->is_active,
+            'shirt_number' => $shirtNumber,
+            'pivot' => $this->whenPivotLoaded('player_team', fn () => [
+                'shirt_number' => $this->pivot->shirt_number,
+                'is_active' => (bool) $this->pivot->is_active,
+            ]),
             'address' => $address ? [
                 'street' => $address->street,
                 'street_extra' => $address->street_extra,
@@ -46,9 +52,11 @@ class PlayerResource extends JsonResource
                 'post_code' => $address->post_code,
                 'country_id' => $address->country_id,
             ] : null,
+            'addresses' => $this->whenLoaded('addresses', fn () => $this->addresses),
             'photo_url' => $this->getFirstMediaUrl('photo') ?: null,
             'id_documents' => $idDocuments,
             'contact_persons' => ContactPersonResource::collection($this->whenLoaded('contactPersons')),
+            'teams' => TeamResource::collection($this->whenLoaded('teams')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

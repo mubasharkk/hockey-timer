@@ -4,13 +4,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUser, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 
-export default function Create({ auth, team, genders = {}, bloodGroups = {}, playerTypes = {} }) {
-    const currentTeam = team?.data ?? team;
+export default function Create({ auth, genders = {}, bloodGroups = {}, playerTypes = {} }) {
     const [photoPreview, setPhotoPreview] = useState(null);
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
-        shirt_number: '',
         player_pass_number: '',
         nic_number: '',
         date_of_birth: '',
@@ -49,45 +47,33 @@ export default function Create({ auth, team, genders = {}, bloodGroups = {}, pla
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('teams.players.store', currentTeam.id), {
+        post(route('players.store'), {
             forceFormData: true,
         });
     };
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Register Player" />
+            <Head title="Create Player" />
 
             <div className="py-8">
                 <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
-                        <h1 className="text-2xl font-semibold text-gray-900">Add to {currentTeam.name}</h1>
-                        <p className="text-sm text-gray-600">Capture player identity, pass number, and optional address/photo.</p>
+                        <h1 className="text-2xl font-semibold text-gray-900">Create New Player</h1>
+                        <p className="text-sm text-gray-600">Enter player details. You can add them to teams later.</p>
                     </header>
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Name</label>
-                                <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                    value={data.name}
-                                    onChange={(e) => setData('name', e.target.value)}
-                                    required
-                                />
-                                {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Shirt Number</label>
-                                <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                    value={data.shirt_number}
-                                    onChange={(e) => setData('shirt_number', e.target.value)}
-                                    placeholder="Optional"
-                                />
-                                {errors.shirt_number && <p className="mt-1 text-xs text-red-600">{errors.shirt_number}</p>}
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Name</label>
+                            <input
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                required
+                            />
+                            {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

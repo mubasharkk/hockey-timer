@@ -5,6 +5,7 @@ use App\Http\Controllers\ClubController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TeamPlayerController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\TournamentPoolTeamController;
 use App\Http\Controllers\DashboardController;
@@ -44,18 +45,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/teams/{team}/edit', [TeamController::class, 'edit'])->name('teams.edit');
     Route::put('/teams/{team}', [TeamController::class, 'update'])->name('teams.update');
     Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.destroy');
+
+    // Team Players (roster management)
+    Route::get('/teams/{team}/players', [TeamPlayerController::class, 'index'])->name('teams.players.index');
+    Route::get('/teams/{team}/players/add', [TeamPlayerController::class, 'create'])->name('teams.players.create');
+    Route::get('/teams/{team}/players/search', [TeamPlayerController::class, 'search'])->name('teams.players.search');
+    Route::post('/teams/{team}/players', [TeamPlayerController::class, 'store'])->name('teams.players.store');
+    Route::put('/teams/{team}/players/{player}', [TeamPlayerController::class, 'update'])->name('teams.players.update');
+    Route::delete('/teams/{team}/players/{player}', [TeamPlayerController::class, 'destroy'])->name('teams.players.destroy');
+
+    // Players (standalone)
+    Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+    Route::get('/players/scan', [PlayerController::class, 'scan'])->name('players.scan');
+    Route::post('/players/scan', [PlayerController::class, 'processScan'])->name('players.scan.process');
+    Route::get('/players/create', [PlayerController::class, 'create'])->name('players.create');
+    Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
+    Route::get('/players/search', [PlayerController::class, 'search'])->name('players.search');
     Route::get('/players/{player}', [PlayerController::class, 'show'])->name('players.show');
-
-    // Player creation flow - Step 1: Scan ID
-    Route::get('/teams/{team}/players/scan', [PlayerController::class, 'scan'])->name('teams.players.scan');
-    Route::post('/teams/{team}/players/scan', [PlayerController::class, 'processScan'])->name('teams.players.scan.process');
-
-    // Player creation flow - Step 2: Manual entry (or skip scan)
-    Route::get('/teams/{team}/players/create', [PlayerController::class, 'create'])->name('teams.players.create');
-    Route::post('/teams/{team}/players', [PlayerController::class, 'store'])->name('teams.players.store');
-    Route::get('/teams/{team}/players/{player}/edit', [PlayerController::class, 'edit'])->name('teams.players.edit');
-    Route::put('/teams/{team}/players/{player}', [PlayerController::class, 'update'])->name('teams.players.update');
-    Route::delete('/teams/{team}/players/{player}', [PlayerController::class, 'destroy'])->name('teams.players.destroy');
+    Route::get('/players/{player}/edit', [PlayerController::class, 'edit'])->name('players.edit');
+    Route::put('/players/{player}', [PlayerController::class, 'update'])->name('players.update');
+    Route::delete('/players/{player}', [PlayerController::class, 'destroy'])->name('players.destroy');
 
     Route::get('/tournaments', [TournamentController::class, 'index'])->name('tournaments.index');
     Route::get('/tournaments/create', [TournamentController::class, 'create'])->name('tournaments.create');

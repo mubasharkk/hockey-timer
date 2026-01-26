@@ -9,6 +9,7 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Lecturize\Addresses\Traits\HasAddresses;
 use Spatie\MediaLibrary\HasMedia;
@@ -25,9 +26,8 @@ class Player extends Model implements HasMedia
     use HasPlayerType;
 
     protected $fillable = [
-        'team_id',
+        'user_id',
         'name',
-        'shirt_number',
         'player_pass_number',
         'nic_number',
         'date_of_birth',
@@ -44,13 +44,30 @@ class Player extends Model implements HasMedia
         'is_active' => 'boolean',
     ];
 
-    public function team(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Team::class);
+        return $this->belongsTo(User::class);
+    }
+
+    public function teams(): BelongsToMany
+    {
+        return $this->belongsToMany(Team::class)
+            ->withPivot(['shirt_number', 'is_active'])
+            ->withTimestamps();
     }
 
     public function contactPersons(): MorphMany
     {
         return $this->morphMany(ContactPerson::class, 'contactable');
+    }
+
+    /**
+     * Search players by NIC or pass number.
+     */
+    public static function search(string $query)
+    {
+        return static::where('nic_number', 'like', "%{$query}%")
+            ->orWhere('player_pass_number', 'like', "%{$query}%")
+            ->orWhere('name', 'like', "%{$query}%");
     }
 }

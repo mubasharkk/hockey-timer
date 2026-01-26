@@ -9,11 +9,10 @@ return new class extends Migration {
     {
         Schema::create('players', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('team_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
-            $table->unsignedSmallInteger('shirt_number')->nullable();
             $table->string('player_pass_number', 32)->nullable()->unique();
-            $table->string('nic_number', 32)->nullable();
+            $table->string('nic_number', 32)->nullable()->unique();
             $table->date('date_of_birth')->nullable();
             $table->string('gender', 10)->nullable();
             $table->string('phone', 50)->nullable();

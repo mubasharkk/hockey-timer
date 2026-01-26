@@ -51,6 +51,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Teams
                                 </NavLink>
                                 <NavLink
+                                    href={route('players.index')}
+                                    active={route().current('players.*')}
+                                >
+                                    Players
+                                </NavLink>
+                                <NavLink
                                     href={route('tournaments.index')}
                                     active={route().current('tournaments.*')}
                                 >
@@ -174,6 +180,12 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('teams.*')}
                         >
                             Teams
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('players.index')}
+                            active={route().current('players.*')}
+                        >
+                            Players
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('tournaments.index')}

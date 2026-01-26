@@ -30,7 +30,9 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                             <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentPlayer.name}</h2>
-                            <p className="text-sm text-gray-600"># {currentPlayer.shirt_number}</p>
+                            {currentPlayer.player_pass_number && (
+                                <p className="text-sm text-gray-600">Pass: {currentPlayer.player_pass_number}</p>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -43,17 +45,15 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             <FontAwesomeIcon icon={faExternalLinkAlt} className="h-3 w-3" />
                             Public Profile
                         </a>
-                        {playerTeams.length > 0 && (
-                            <Link
-                                href={route('teams.players.edit', [playerTeams[0].id, currentPlayer.id])}
-                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
-                            >
-                                <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
-                                Edit
-                            </Link>
-                        )}
                         <Link
-                            href={playerTeams.length > 0 ? route('teams.show', playerTeams[0].id) : route('teams.index')}
+                            href={route('players.edit', currentPlayer.id)}
+                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                        >
+                            <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
+                            Edit
+                        </Link>
+                        <Link
+                            href={route('players.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />

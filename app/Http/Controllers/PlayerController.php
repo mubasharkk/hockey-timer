@@ -16,7 +16,6 @@ use App\Services\ImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,24 +27,32 @@ class PlayerController extends Controller
     ) {}
 
     /**
+     * Display a listing of players.
+     */
+    public function index(): Response
+    {
+        $players = Player::with(['teams', 'media'])
+            ->latest()
+            ->paginate(20);
+
+        return Inertia::render('Players/Index', [
+            'players' => PlayerResource::collection($players),
+        ]);
+    }
+
+    /**
      * Step 1: Show the ID document scan page.
      */
-    public function scan(Team $team): Response
+    public function scan(): Response
     {
-        $this->ensureTeamAccess($team);
-
-        return Inertia::render('Players/Scan', [
-            'team' => TeamResource::make($team),
-        ]);
+        return Inertia::render('Players/Scan');
     }
 
     /**
      * Step 1b: Process the scanned ID documents and create player.
      */
-    public function processScan(ScanPlayerIdRequest $request, Team $team): RedirectResponse
+    public function processScan(ScanPlayerIdRequest $request): RedirectResponse
     {
-        $this->ensureTeamAccess($team);
-
         $files = $request->file('id_documents');
         $additionalInfo = $request->input('additional_info');
 
@@ -56,9 +63,9 @@ class PlayerController extends Controller
         $extractedData = $this->idDocumentService->extractFromDocuments($processedFiles, $additionalInfo);
 
         // Create player with extracted data
-        $player = $team->players()->create([
+        $player = Player::create([
+            'user_id' => Auth::id(),
             'name' => $extractedData['name'] ?? 'New Player',
-            'shirt_number' => $extractedData['shirt_number'] ?? null,
             'player_pass_number' => $this->resolvePassNumber(null),
             'nic_number' => $extractedData['nic_number'] ?? null,
             'date_of_birth' => $extractedData['date_of_birth'] ?? null,
@@ -66,7 +73,7 @@ class PlayerController extends Controller
             'phone' => $extractedData['phone'] ?? null,
             'blood_group' => $extractedData['blood_group'] ?? null,
             'player_type' => $extractedData['player_type'] ?? null,
-            'description' => $additionalInfo, // Store free text in description
+            'description' => $additionalInfo,
             'is_active' => true,
         ]);
 
@@ -109,55 +116,37 @@ class PlayerController extends Controller
             : 'Player created. ID scan could not extract data - please fill in manually.';
 
         return redirect()
-            ->route('teams.players.edit', [$team, $player])
+            ->route('players.edit', $player)
             ->with('success', $message)
             ->with('extracted_confidence', $extractedData['confidence'] ?? null);
     }
 
     /**
-     * Step 2: Show the create form (manual entry or continue without ID).
+     * Show the create form (manual entry).
      */
-    public function create(Team $team): Response
+    public function create(): Response
     {
-        $this->ensureTeamAccess($team);
-
         return Inertia::render('Players/Create', [
-            'team' => TeamResource::make($team),
             'genders' => Player::GENDERS,
             'bloodGroups' => Player::BLOOD_GROUPS,
             'playerTypes' => Player::PLAYER_TYPES,
         ]);
     }
 
+    /**
+     * Display the specified player.
+     */
     public function show(Player $player): Response
     {
-        // Load player with relationships
-        $player->load(['addresses', 'media', 'team', 'contactPersons']);
+        $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
-        // Find all player records for the same person (by player_pass_number)
-        $relatedPlayerIds = $this->getRelatedPlayerIds($player);
-
-        // Get all teams this player belongs to
-        $teams = Team::whereHas('players', function ($query) use ($relatedPlayerIds) {
-            $query->whereIn('id', $relatedPlayerIds);
-        })
-            ->with(['players' => function ($q) use ($relatedPlayerIds) {
-                $q->whereIn('id', $relatedPlayerIds);
-            }, 'media', 'club'])
-            ->get();
-
-        // Get player statistics across all teams
-        $statistics = $this->getPlayerStatistics($player, $relatedPlayerIds);
-
-        // Get recent games where player participated
-        $recentGames = $this->getRecentGames($player, $relatedPlayerIds);
-
-        // Get player events
-        $events = $this->getPlayerEvents($player, $relatedPlayerIds);
+        $statistics = $this->getPlayerStatistics($player);
+        $recentGames = $this->getRecentGames($player);
+        $events = $this->getPlayerEvents($player);
 
         return Inertia::render('Players/Show', [
             'player' => PlayerResource::make($player),
-            'teams' => TeamResource::collection($teams),
+            'teams' => TeamResource::collection($player->teams),
             'statistics' => $statistics,
             'recentGames' => GameResource::collection($recentGames),
             'events' => $events,
@@ -169,41 +158,30 @@ class PlayerController extends Controller
      */
     public function publicProfile(string $identifier): Response
     {
-        // Find player by pass number or ID
         $player = Player::where('player_pass_number', $identifier)
+            ->orWhere('nic_number', $identifier)
             ->orWhere('id', $identifier)
             ->firstOrFail();
 
-        $player->load(['addresses', 'media', 'team', 'contactPersons']);
+        $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
-        $relatedPlayerIds = $this->getRelatedPlayerIds($player);
-
-        $teams = Team::whereHas('players', function ($query) use ($relatedPlayerIds) {
-            $query->whereIn('id', $relatedPlayerIds);
-        })
-            ->with(['players' => function ($q) use ($relatedPlayerIds) {
-                $q->whereIn('id', $relatedPlayerIds);
-            }, 'media', 'club'])
-            ->get();
-
-        $statistics = $this->getPlayerStatistics($player, $relatedPlayerIds);
+        $statistics = $this->getPlayerStatistics($player);
 
         return Inertia::render('Players/PublicProfile', [
             'player' => PlayerResource::make($player),
-            'teams' => TeamResource::collection($teams),
+            'teams' => TeamResource::collection($player->teams),
             'statistics' => $statistics,
         ]);
     }
 
-    public function edit(Team $team, Player $player): Response
+    /**
+     * Show the form for editing the specified player.
+     */
+    public function edit(Player $player): Response
     {
-        $this->ensureTeamAccess($team);
-        abort_unless($player->team_id === $team->id, 404);
-
-        $player->load(['addresses', 'media', 'contactPersons']);
+        $player->load(['addresses', 'media', 'contactPersons', 'teams']);
 
         return Inertia::render('Players/Edit', [
-            'team' => TeamResource::make($team),
             'player' => PlayerResource::make($player),
             'genders' => Player::GENDERS,
             'bloodGroups' => Player::BLOOD_GROUPS,
@@ -211,13 +189,14 @@ class PlayerController extends Controller
         ]);
     }
 
-    public function store(StorePlayerRequest $request, Team $team): RedirectResponse
+    /**
+     * Store a newly created player.
+     */
+    public function store(StorePlayerRequest $request): RedirectResponse
     {
-        $this->ensureTeamAccess($team);
-
-        $player = $team->players()->create([
+        $player = Player::create([
+            'user_id' => Auth::id(),
             'name' => $request->string('name'),
-            'shirt_number' => $request->integer('shirt_number'),
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number')),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
@@ -237,7 +216,6 @@ class PlayerController extends Controller
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                // Fallback when no country lookup table is seeded yet.
                 'country_id' => $address['country_id'] ?? 0,
             ]);
         }
@@ -249,7 +227,6 @@ class PlayerController extends Controller
                 ->toMediaCollection('photo');
         }
 
-        // Create contact persons
         if ($request->has('contact_persons')) {
             foreach ($request->input('contact_persons', []) as $contactPerson) {
                 $player->contactPersons()->create([
@@ -261,17 +238,16 @@ class PlayerController extends Controller
             }
         }
 
-        return redirect()->route('teams.show', $team)->with('success', 'Player added.');
+        return redirect()->route('players.show', $player)->with('success', 'Player created.');
     }
 
-    public function update(UpdatePlayerRequest $request, Team $team, Player $player): RedirectResponse
+    /**
+     * Update the specified player.
+     */
+    public function update(UpdatePlayerRequest $request, Player $player): RedirectResponse
     {
-        $this->ensureTeamAccess($team);
-        abort_unless($player->team_id === $team->id, 404);
-
         $player->update([
             'name' => $request->string('name'),
-            'shirt_number' => $request->integer('shirt_number'),
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number'), $player),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
@@ -304,7 +280,6 @@ class PlayerController extends Controller
                 $submittedIds[] = $newContact->id;
             }
         }
-        // Delete removed contact persons
         $player->contactPersons()->whereNotIn('id', $submittedIds)->delete();
 
         $address = $request->input('address', []);
@@ -337,22 +312,36 @@ class PlayerController extends Controller
                 ->toMediaCollection('photo');
         }
 
-        return redirect()->route('teams.show', $team)->with('success', 'Player updated.');
+        return redirect()->route('players.show', $player)->with('success', 'Player updated.');
     }
 
-    public function destroy(Team $team, Player $player): RedirectResponse
+    /**
+     * Remove the specified player.
+     */
+    public function destroy(Player $player): RedirectResponse
     {
-        $this->ensureTeamAccess($team);
-        abort_unless($player->team_id === $team->id, 404);
-
         $player->delete();
 
-        return redirect()->route('teams.show', $team)->with('success', 'Player removed.');
+        return redirect()->route('players.index')->with('success', 'Player deleted.');
     }
 
-    private function ensureTeamAccess(Team $team): void
+    /**
+     * Search players by NIC or pass number.
+     */
+    public function search(): \Illuminate\Http\JsonResponse
     {
-        abort_unless($team->user_id === Auth::id(), 403);
+        $query = request('q', '');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $players = Player::search($query)
+            ->with(['teams:id,name', 'media'])
+            ->limit(10)
+            ->get();
+
+        return response()->json(PlayerResource::collection($players));
     }
 
     private function resolvePassNumber(?string $value, ?Player $current = null): string
@@ -387,33 +376,14 @@ class PlayerController extends Controller
         return $street && $city && $post && strlen($post) >= 4;
     }
 
-    private function getRelatedPlayerIds(Player $player): array
+    private function getPlayerStatistics(Player $player): array
     {
-        $ids = [$player->id];
-
-        // Find players with the same player_pass_number
-        if ($player->player_pass_number) {
-            $related = Player::where('player_pass_number', $player->player_pass_number)
-                ->pluck('id')
-                ->toArray();
-            $ids = array_merge($ids, $related);
-        }
-
-        return array_unique($ids);
-    }
-
-    private function getPlayerStatistics(Player $player, array $relatedPlayerIds): array
-    {
-        // Get all teams for related players
-        $teamIds = Player::whereIn('id', $relatedPlayerIds)
-            ->pluck('team_id')
-            ->unique()
-            ->toArray();
+        $teamIds = $player->teams()->pluck('teams.id')->toArray();
 
         // Get shirt numbers for this player across all teams
-        $shirtNumbers = Player::whereIn('id', $relatedPlayerIds)
-            ->whereNotNull('shirt_number')
-            ->pluck('shirt_number')
+        $shirtNumbers = $player->teams()
+            ->whereNotNull('player_team.shirt_number')
+            ->pluck('player_team.shirt_number')
             ->unique()
             ->toArray();
 
@@ -429,7 +399,6 @@ class PlayerController extends Controller
             ];
         }
 
-        // Get events for this player across all teams and shirt numbers
         $events = Event::whereIn('team_id', $teamIds)
             ->whereIn('player_shirt_number', $shirtNumbers)
             ->get();
@@ -445,18 +414,13 @@ class PlayerController extends Controller
         ];
     }
 
-    private function getRecentGames(Player $player, array $relatedPlayerIds): \Illuminate\Database\Eloquent\Collection
+    private function getRecentGames(Player $player): \Illuminate\Database\Eloquent\Collection
     {
-        // Get all teams for related players
-        $teamIds = Player::whereIn('id', $relatedPlayerIds)
-            ->pluck('team_id')
-            ->unique()
-            ->toArray();
+        $teamIds = $player->teams()->pluck('teams.id')->toArray();
 
-        // Get shirt numbers for this player across all teams
-        $shirtNumbers = Player::whereIn('id', $relatedPlayerIds)
-            ->whereNotNull('shirt_number')
-            ->pluck('shirt_number')
+        $shirtNumbers = $player->teams()
+            ->whereNotNull('player_team.shirt_number')
+            ->pluck('player_team.shirt_number')
             ->unique()
             ->toArray();
 
@@ -489,18 +453,13 @@ class PlayerController extends Controller
             ]);
     }
 
-    private function getPlayerEvents(Player $player, array $relatedPlayerIds): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    private function getPlayerEvents(Player $player): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        // Get all teams for related players
-        $teamIds = Player::whereIn('id', $relatedPlayerIds)
-            ->pluck('team_id')
-            ->unique()
-            ->toArray();
+        $teamIds = $player->teams()->pluck('teams.id')->toArray();
 
-        // Get shirt numbers for this player across all teams
-        $shirtNumbers = Player::whereIn('id', $relatedPlayerIds)
-            ->whereNotNull('shirt_number')
-            ->pluck('shirt_number')
+        $shirtNumbers = $player->teams()
+            ->whereNotNull('player_team.shirt_number')
+            ->pluck('player_team.shirt_number')
             ->unique()
             ->toArray();
 
