@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 
-export default function TeamCard({ team, showMeta = false, showClub = false, asDiv = false }) {
+export default function TeamCard({ team, showMeta = false, asDiv = false }) {
     const content = (
         <>
             {team.logo_url ? (
@@ -18,7 +18,7 @@ export default function TeamCard({ team, showMeta = false, showClub = false, asD
                 <span className="text-sm font-medium text-gray-900 block truncate group-hover:text-green-700">
                     {team.name}
                 </span>
-                {showClub && team.club?.name && (
+                {team.club?.name && (
                     <span className="text-xs text-gray-500 block truncate">{team.club.name}</span>
                 )}
                 {showMeta && (

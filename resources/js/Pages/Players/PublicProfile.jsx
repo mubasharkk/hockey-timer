@@ -112,7 +112,7 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                 <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     {playerTeams.map((team) => (
-                                        <TeamCard key={team.id} team={team} showClub asDiv />
+                                        <TeamCard key={team.id} team={team} asDiv />
                                     ))}
                                 </div>
                             </div>
