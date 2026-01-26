@@ -1,16 +1,14 @@
 import { Head } from '@inertiajs/react';
 import TeamCard from '@/Components/TeamCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBirthdayCake, faIdCard, faTrophy, faFutbol, faFlag, faPhone, faTint, faVenusMars } from '@fortawesome/free-solid-svg-icons';
-import moment from 'moment';
+import { faTrophy, faFutbol, faFlag, faUser, faUserShield, faLocationDot, faIdCard } from '@fortawesome/free-solid-svg-icons';
 
 export default function PublicProfile({ player, teams = [], statistics }) {
     const currentPlayer = player?.data ?? player;
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
-
-    const age = currentPlayer.date_of_birth
-        ? moment().diff(moment(currentPlayer.date_of_birth), 'years')
-        : null;
+    const contactPersons = currentPlayer.contact_persons || [];
+    const address = currentPlayer.addresses?.[0] || currentPlayer.address;
+    const guardian = contactPersons.find(c => c.role?.toLowerCase().includes('guardian')) || contactPersons[0];
 
     return (
         <>
@@ -57,70 +55,71 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                 </div>
 
                 {/* Content */}
-                <div className="mx-auto max-w-4xl px-4 py-8">
-                    <div className="grid gap-6 md:grid-cols-2">
-                        {/* Player Info Card */}
-                        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Player Information</h2>
-                            <div className="space-y-3">
-                                {currentPlayer.player_pass_number && (
-                                    <InfoRow icon={faIdCard} label="Pass Number" value={currentPlayer.player_pass_number} />
-                                )}
-                                {currentPlayer.date_of_birth && (
-                                    <InfoRow
-                                        icon={faBirthdayCake}
-                                        label="Date of Birth"
-                                        value={`${moment(currentPlayer.date_of_birth).format('DD MMM YYYY')}${age ? ` (${age} years)` : ''}`}
-                                    />
-                                )}
-                                {currentPlayer.gender && (
-                                    <InfoRow icon={faVenusMars} label="Gender" value={currentPlayer.gender === 'male' ? 'Male' : 'Female'} />
-                                )}
-                                {currentPlayer.blood_group && (
-                                    <InfoRow icon={faTint} label="Blood Group" value={currentPlayer.blood_group} />
-                                )}
-                                {currentPlayer.phone && (
-                                    <InfoRow icon={faPhone} label="Phone" value={currentPlayer.phone} />
-                                )}
-                                <InfoRow
-                                    label="Status"
-                                    value={
-                                        currentPlayer.is_active ? (
-                                            <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
-                                        ) : (
-                                            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">Inactive</span>
-                                        )
-                                    }
-                                />
+                <div className="mx-auto max-w-4xl px-4 py-6">
+                    {/* Basic Info */}
+                    <div className="mb-6 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+                        <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+                            <div>
+                                <span className="flex items-center gap-1.5 text-gray-500">
+                                    <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
+                                    Name
+                                </span>
+                                <p className="font-medium text-gray-900">{currentPlayer.name}</p>
                             </div>
-                        </div>
-
-                        {/* Statistics Card */}
-                        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Statistics</h2>
-                            <div className="grid grid-cols-2 gap-4">
-                                <StatBox icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" bg="bg-green-50" />
-                                <StatBox icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" bg="bg-green-50" />
-                                <StatBox icon={faFlag} label="Yellow Cards" value={statistics.yellow_cards || 0} color="text-yellow-600" bg="bg-yellow-50" />
-                                <StatBox icon={faFlag} label="Red Cards" value={statistics.red_cards || 0} color="text-red-600" bg="bg-red-50" />
-                            </div>
-                        </div>
-
-                        {/* Teams Card */}
-                        {playerTeams.length > 0 && (
-                            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:col-span-2">
-                                <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {playerTeams.map((team) => (
-                                        <TeamCard key={team.id} team={team} asDiv />
-                                    ))}
+                            {guardian && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faUserShield} className="h-3 w-3" />
+                                        Guardian
+                                    </span>
+                                    <p className="font-medium text-gray-900">{guardian.name}</p>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                            {(address?.city || address?.country) && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faLocationDot} className="h-3 w-3" />
+                                        Location
+                                    </span>
+                                    <p className="font-medium text-gray-900">
+                                        {[address?.city, address?.country].filter(Boolean).join(', ')}
+                                    </p>
+                                </div>
+                            )}
+                            {currentPlayer.player_pass_number && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faIdCard} className="h-3 w-3" />
+                                        Pass Number
+                                    </span>
+                                    <p className="font-medium text-gray-900">{currentPlayer.player_pass_number}</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
+                    {/* Statistics - Compact inline */}
+                    <div className="mb-6 flex flex-wrap items-center justify-center gap-6 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+                        <StatItem icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" />
+                        <StatItem icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" />
+                        <StatItem icon={faFlag} label="Yellow" value={statistics.yellow_cards || 0} color="text-yellow-600" />
+                        <StatItem icon={faFlag} label="Red" value={statistics.red_cards || 0} color="text-red-600" />
+                    </div>
+
+                    {/* Teams Card */}
+                    {playerTeams.length > 0 && (
+                        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                            <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                {playerTeams.map((team) => (
+                                    <TeamCard key={team.id} team={team} asDiv />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Footer */}
-                    <div className="mt-8 text-center text-sm text-gray-400">
+                    <div className="mt-6 text-center text-xs text-gray-400">
                         Player Profile
                     </div>
                 </div>
@@ -129,20 +128,10 @@ export default function PublicProfile({ player, teams = [], statistics }) {
     );
 }
 
-const InfoRow = ({ icon, label, value }) => (
-    <div className="flex items-center justify-between border-b border-gray-100 py-2 last:border-0">
-        <div className="flex items-center gap-2 text-gray-600">
-            {icon && <FontAwesomeIcon icon={icon} className="h-4 w-4 text-gray-400" />}
-            <span className="text-sm">{label}</span>
-        </div>
-        <div className="text-sm font-medium text-gray-900">{value}</div>
-    </div>
-);
-
-const StatBox = ({ icon, label, value, color, bg }) => (
-    <div className={`rounded-lg ${bg} p-4 text-center`}>
-        {icon && <FontAwesomeIcon icon={icon} className={`mx-auto mb-2 h-5 w-5 ${color}`} />}
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+const StatItem = ({ icon, label, value, color }) => (
+    <div className="flex items-center gap-2">
+        {icon && <FontAwesomeIcon icon={icon} className={`h-4 w-4 ${color}`} />}
+        <span className="text-xl font-bold text-gray-900">{value}</span>
+        <span className="text-xs text-gray-500">{label}</span>
     </div>
 );
