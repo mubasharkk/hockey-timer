@@ -16,6 +16,11 @@ return new class extends Migration {
             $table->string('player_pass_number', 32)->nullable()->unique();
             $table->string('nic_number', 32)->nullable();
             $table->date('date_of_birth')->nullable();
+            $table->string('gender', 10)->nullable();
+            $table->string('phone', 50)->nullable();
+            $table->string('blood_group', 10)->nullable();
+            $table->string('player_type', 20)->nullable();
+            $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
