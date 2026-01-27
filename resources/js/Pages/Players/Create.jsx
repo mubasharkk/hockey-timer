@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faUser, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
+import AddressForm from '@/Components/AddressForm';
 
 export default function Create({ auth, genders = {}, bloodGroups = {}, playerTypes = {} }) {
     const [photoPreview, setPhotoPreview] = useState(null);
@@ -22,6 +23,7 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
             street: '',
             city: '',
             state: '',
+            country: '',
             post_code: '',
         },
         photo: null,
@@ -233,35 +235,17 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
                         </div>
 
                         {/* Address */}
-                        <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
-                            <p className="text-sm font-semibold text-gray-800">Address (optional)</p>
-                            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                <TextField
-                                    label="Street"
-                                    value={data.address.street}
-                                    onChange={(val) => setData('address', { ...data.address, street: val })}
-                                    error={errors['address.street']}
-                                />
-                                <TextField
-                                    label="City"
-                                    value={data.address.city}
-                                    onChange={(val) => setData('address', { ...data.address, city: val })}
-                                    error={errors['address.city']}
-                                />
-                                <TextField
-                                    label="State"
-                                    value={data.address.state}
-                                    onChange={(val) => setData('address', { ...data.address, state: val })}
-                                    error={errors['address.state']}
-                                />
-                                <TextField
-                                    label="Postal Code"
-                                    value={data.address.post_code}
-                                    onChange={(val) => setData('address', { ...data.address, post_code: val })}
-                                    error={errors['address.post_code']}
-                                />
-                            </div>
-                        </div>
+                        <AddressForm
+                            address={data.address}
+                            onChange={(newAddress) => setData('address', newAddress)}
+                            errors={{
+                                street: errors['address.street'],
+                                city: errors['address.city'],
+                                state: errors['address.state'],
+                                country: errors['address.country'],
+                                post_code: errors['address.post_code']
+                            }}
+                        />
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>

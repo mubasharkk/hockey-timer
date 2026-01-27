@@ -414,7 +414,7 @@ class PlayerController extends Controller
         ];
     }
 
-    private function getRecentGames(Player $player): \Illuminate\Database\Eloquent\Collection
+    private function getRecentGames(Player $player): \Illuminate\Support\Collection
     {
         $teamIds = $player->teams()->pluck('teams.id')->toArray();
 

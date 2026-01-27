@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faFloppyDisk, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import AddressForm from '@/Components/AddressForm';
 
 export default function Edit({ auth, club }) {
     const currentClub = club?.data ?? club;
@@ -18,6 +19,7 @@ export default function Edit({ auth, club }) {
             street: currentClub?.address?.street ?? '',
             city: currentClub?.address?.city ?? '',
             state: currentClub?.address?.state ?? '',
+            country: currentClub?.address?.country ?? '',
             post_code: currentClub?.address?.post_code ?? '',
         },
         contact_persons: currentClub?.contact_persons ?? [],
@@ -163,43 +165,17 @@ export default function Edit({ auth, club }) {
                         </div>
 
                         {/* Address */}
-                        <div className="rounded-md border border-gray-100 bg-gray-50 p-4">
-                            <p className="text-sm font-semibold text-gray-800">Address (optional)</p>
-                            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                <div className="sm:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700">Street</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                        value={data.address.street}
-                                        onChange={(e) => setData('address', { ...data.address, street: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">City</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                        value={data.address.city}
-                                        onChange={(e) => setData('address', { ...data.address, city: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">State</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                        value={data.address.state}
-                                        onChange={(e) => setData('address', { ...data.address, state: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-                                    <input
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                        value={data.address.post_code}
-                                        onChange={(e) => setData('address', { ...data.address, post_code: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <AddressForm
+                            address={data.address}
+                            onChange={(newAddress) => setData('address', newAddress)}
+                            errors={{
+                                street: errors['address.street'],
+                                city: errors['address.city'],
+                                state: errors['address.state'],
+                                country: errors['address.country'],
+                                post_code: errors['address.post_code']
+                            }}
+                        />
 
                         {/* Contact Persons */}
                         <div className="space-y-3">
