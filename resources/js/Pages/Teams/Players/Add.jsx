@@ -3,7 +3,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faSearch, faUser, faPlus, faSpinner, faIdCard } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect, useCallback } from 'react';
-import debounce from 'lodash/debounce';
+import debounce from 'lodash.debounce';
 
 export default function Add({ auth, team }) {
     const currentTeam = team?.data ?? team;

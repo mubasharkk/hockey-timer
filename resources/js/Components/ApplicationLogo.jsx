@@ -3,7 +3,7 @@ export default function ApplicationLogo({ className = '', ...props }) {
         <img
             src="/icons/logo.png"
             alt="HockeyApp logo"
-            className={`h-10 w-10 object-contain ${className}`.trim()}
+            className={`object-contain ${className}`.trim()}
             {...props}
         />
     );

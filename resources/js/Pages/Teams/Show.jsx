@@ -63,7 +63,7 @@ export default function Show({ auth, team }) {
                     <div className="flex items-center gap-3">
                         {canManage && (
                             <Link
-                                href={route('teams.players.scan', currentTeam.id)}
+                                href={route('teams.players.create', currentTeam.id)}
                                 className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                             >
                                 <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
@@ -231,7 +231,7 @@ export default function Show({ auth, team }) {
                             <h3 className="text-lg font-semibold text-gray-900">Players</h3>
                                     {canManage && (
                                         <Link
-                                            href={route('teams.players.scan', currentTeam.id)}
+                                            href={route('teams.players.create', currentTeam.id)}
                                             className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 hover:text-green-600"
                                         >
                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
@@ -277,13 +277,13 @@ export default function Show({ auth, team }) {
                                             {canManage && (
                                                 <td className="px-3 py-2 text-right text-sm font-semibold">
                                                     <div className="flex justify-end gap-2">
-                                                        <Link
-                                                            href={route('teams.players.edit', [currentTeam.id, player.id])}
-                                                            className="inline-flex items-center gap-1 text-green-700 hover:text-green-600"
-                                                        >
-                                                            <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
-                                                            Edit
-                                                        </Link>
+                                                        {/*<Link*/}
+                                                        {/*    href={route('teams.players.edit', [currentTeam.id, player.id])}*/}
+                                                        {/*    className="inline-flex items-center gap-1 text-green-700 hover:text-green-600"*/}
+                                                        {/*>*/}
+                                                        {/*    <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />*/}
+                                                        {/*    Edit*/}
+                                                        {/*</Link>*/}
                                                         <button
                                                             type="button"
                                                             className="inline-flex items-center gap-1 text-red-600 hover:text-red-500"
