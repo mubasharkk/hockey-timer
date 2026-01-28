@@ -64,7 +64,7 @@ class PlayerController extends Controller
 
         // Create player with extracted data
         $player = Player::create([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user()->id,
             'name' => $extractedData['name'] ?? 'New Player',
             'player_pass_number' => $this->resolvePassNumber(null),
             'nic_number' => $extractedData['nic_number'] ?? null,
