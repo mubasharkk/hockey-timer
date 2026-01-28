@@ -28,7 +28,7 @@ export default function Imprint() {
 
                             <h2 className="mb-3 mt-6 text-xl font-semibold text-gray-800">Contact</h2>
                             <p className="mb-4">
-                                Email: info@karachihockey.com
+                                Email: info@karachi-hockey.com
                             </p>
 
                             <h2 className="mb-3 mt-6 text-xl font-semibold text-gray-800">Development</h2>
