@@ -1,8 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import DangerButton from '@/Components/DangerButton';
+import Modal from '@/Components/Modal';
+import SecondaryButton from '@/Components/SecondaryButton';
 import TeamCard from '@/Components/TeamCard';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [] }) {
@@ -11,9 +15,18 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
     const playerGames = Array.isArray(recentGames) ? recentGames : recentGames?.data || [];
     const playerEvents = Array.isArray(events) ? events : events?.data || [];
 
+    const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const { delete: deletePlayer, processing: deleting } = useForm();
+
     const age = currentPlayer.date_of_birth
         ? moment().diff(moment(currentPlayer.date_of_birth), 'years')
         : null;
+
+    const handleDelete = () => {
+        deletePlayer(route('players.destroy', currentPlayer.id), {
+            onFinish: () => setConfirmingDelete(false),
+        });
+    };
 
     return (
         <AuthenticatedLayout
@@ -52,6 +65,14 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
                             Edit
                         </Link>
+                        <button
+                            type="button"
+                            onClick={() => setConfirmingDelete(true)}
+                            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500"
+                        >
+                            <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
+                            Delete
+                        </button>
                         <Link
                             href={route('players.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
@@ -370,6 +391,22 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                     )}
                 </div>
             </div>
+
+            <Modal show={confirmingDelete} onClose={() => setConfirmingDelete(false)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">Delete this player?</h2>
+                    <p className="mt-2 text-sm text-gray-600">
+                        Are you sure you want to delete <strong>{currentPlayer.name}</strong>? This action cannot be undone.
+                        All associated data including statistics and game events will be permanently removed.
+                    </p>
+                    <div className="mt-4 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setConfirmingDelete(false)}>Cancel</SecondaryButton>
+                        <DangerButton onClick={handleDelete} disabled={deleting}>
+                            {deleting ? 'Deleting...' : 'Delete Player'}
+                        </DangerButton>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }

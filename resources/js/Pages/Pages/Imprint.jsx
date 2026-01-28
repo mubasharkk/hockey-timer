@@ -22,7 +22,7 @@ export default function Imprint() {
                         <div className="prose prose-green max-w-none text-gray-600">
                             <h2 className="mb-3 mt-6 text-xl font-semibold text-gray-800">Organization</h2>
                             <p className="mb-4">
-                                Karachi Hockey Association<br />
+                                Karachi Hockey Company<br />
                                 Karachi, Pakistan
                             </p>
 

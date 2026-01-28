@@ -1,7 +1,26 @@
-import { Head } from '@inertiajs/react';
+import {Head, Link} from '@inertiajs/react';
 import TeamCard from '@/Components/TeamCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrophy, faFutbol, faFlag, faUser, faUserShield, faLocationDot, faIdCard } from '@fortawesome/free-solid-svg-icons';
+import { faTrophy, faFutbol, faFlag, faUser, faUserShield, faLocationDot, faIdCard, faDroplet, faTshirt, faCakeCandles, faPhone } from '@fortawesome/free-solid-svg-icons';
+import ApplicationLogo from "@/Components/ApplicationLogo.jsx";
+
+const calculateAge = (dob) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+};
+
+const formatDate = (dateString) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
 
 export default function PublicProfile({ player, teams = [], statistics }) {
     const currentPlayer = player?.data ?? player;
@@ -9,6 +28,8 @@ export default function PublicProfile({ player, teams = [], statistics }) {
     const contactPersons = currentPlayer.contact_persons || [];
     const address = currentPlayer.addresses?.[0] || currentPlayer.address;
     const guardian = contactPersons.find(c => c.role?.toLowerCase().includes('guardian')) || contactPersons[0];
+    const father = contactPersons.find(c => c.role?.toLowerCase().includes('father'));
+    const age = calculateAge(currentPlayer.date_of_birth);
 
     return (
         <>
@@ -46,9 +67,9 @@ export default function PublicProfile({ player, teams = [], statistics }) {
 
                             {/* Column 3: Shirt Number - shrink right */}
                             <div className="flex-shrink-0 text-right">
-                                <span className="font-bold text-white/90" style={{ fontSize: '48px' }}>
-                                    # {currentPlayer.shirt_number}
-                                </span>
+                                <Link href="/">
+                                    <ApplicationLogo className="block h-32 w-auto fill-current text-white" />
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -95,6 +116,45 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     <p className="font-medium text-gray-900">{currentPlayer.player_pass_number}</p>
                                 </div>
                             )}
+                            {currentPlayer.blood_group && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faDroplet} className="h-3 w-3" />
+                                        Blood Group
+                                    </span>
+                                    <p className="font-medium text-gray-900">{currentPlayer.blood_group}</p>
+                                </div>
+                            )}
+                            {currentPlayer.date_of_birth && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faCakeCandles} className="h-3 w-3" />
+                                        Date of Birth
+                                    </span>
+                                    <p className="font-medium text-gray-900">
+                                        {formatDate(currentPlayer.date_of_birth)}
+                                        {age !== null && <span className="ml-1 text-gray-500">({age} yrs)</span>}
+                                    </p>
+                                </div>
+                            )}
+                            {currentPlayer.phone_number && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
+                                        Phone
+                                    </span>
+                                    <p className="font-medium text-gray-900">{currentPlayer.phone_number}</p>
+                                </div>
+                            )}
+                            {father?.phone && (
+                                <div>
+                                    <span className="flex items-center gap-1.5 text-gray-500">
+                                        <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
+                                        Father's Phone
+                                    </span>
+                                    <p className="font-medium text-gray-900">{father.phone}</p>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -112,7 +172,15 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                             <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {playerTeams.map((team) => (
-                                    <TeamCard key={team.id} team={team} asDiv />
+                                    <div key={team.id} className="flex items-center gap-3 rounded-lg p-3">
+                                        <TeamCard team={team} asDiv className="flex-1" />
+                                        {team.pivot?.shirt_number && (
+                                            <div className="flex items-center gap-1.5 rounded-md bg-green-100 px-2 py-1 text-sm font-semibold text-green-800">
+                                                <FontAwesomeIcon icon={faTshirt} className="h-3 w-3" />
+                                                #{team.pivot.shirt_number}
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         </div>

@@ -10,7 +10,7 @@ export default function Footer() {
                 <div className="flex flex-col items-center justify-between gap-4 text-center lg:flex-row lg:text-left">
                     <p className="text-sm text-green-200">
                         &copy; {currentYear} Karachi Hockey. All rights reserved.
-                        Developed by <a href="https://social-gizmo.com" target={'_blank'}>Mubashar Khokhar IT Consulting</a>
+                        Developed by <a href="https://social-gizmo.com" target={'_blank'}>MK IT Consulting</a>
                     </p>
                     <div className="flex items-center gap-6">
                         {user ? (
