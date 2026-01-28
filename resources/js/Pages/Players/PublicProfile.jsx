@@ -81,13 +81,6 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                     {/* Basic Info */}
                     <div className="mb-6 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
                         <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-                            <div>
-                                <span className="flex items-center gap-1.5 text-gray-500">
-                                    <FontAwesomeIcon icon={faUser} className="h-3 w-3" />
-                                    Name
-                                </span>
-                                <p className="font-medium text-gray-900">{currentPlayer.name}</p>
-                            </div>
                             {(guardian || father) && (
                                 <div>
                                     <span className="flex items-center gap-1.5 text-gray-500">
@@ -96,9 +89,9 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     </span>
                                     <p className="font-medium text-gray-900">
                                         {(father || guardian).name}
+                                        <br/>
                                         {(father?.phone || guardian?.phone) && (
-                                            <span className="ml-2 text-gray-500">
-                                                <FontAwesomeIcon icon={faPhone} className="mr-1 h-3 w-3" />
+                                            <span className="text-gray-500">
                                                 {father?.phone || guardian?.phone}
                                             </span>
                                         )}

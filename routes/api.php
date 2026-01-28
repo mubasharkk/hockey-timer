@@ -25,3 +25,11 @@ Route::post('/sync/game', [SyncGameController::class, 'store']);
 Route::post('/sync/game/{game}/sessions', [SyncSessionController::class, 'store']);
 Route::post('/sync/game/{game}/events', [SyncEventController::class, 'store']);
 Route::get('/public/ticker/{game}', [PublicTickerApiController::class, 'show']);
+
+Route::get('/countries', function () {
+    return \Illuminate\Support\Facades\DB::table(config('countries.table_name', 'countries'))
+        ->select('iso_3166_2 as code', 'name')
+        ->orderByRaw("CASE WHEN iso_3166_2 = 'PK' THEN 0 ELSE 1 END")
+        ->orderBy('name')
+        ->get();
+});

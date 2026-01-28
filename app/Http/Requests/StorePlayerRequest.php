@@ -46,6 +46,7 @@ class StorePlayerRequest extends FormRequest
             'address.city' => ['nullable', 'string', 'max:60'],
             'address.state' => ['nullable', 'string', 'max:60'],
             'address.post_code' => ['nullable', 'string', 'max:10'],
+            'address.country' => ['nullable', 'string', 'max:2'],
             'photo' => ['nullable', 'image', 'max:5120'],
         ];
     }

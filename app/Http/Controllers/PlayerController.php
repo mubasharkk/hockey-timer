@@ -97,7 +97,7 @@ class PlayerController extends Controller
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                'country_id' => 0,
+                'country' => $address['country'] ?? 'PK',
             ]);
         }
 
@@ -227,7 +227,7 @@ class PlayerController extends Controller
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                'country_id' => $address['country_id'] ?? 0,
+                'country' => $address['country'] ?? 'PK',
             ]);
         }
 
@@ -299,11 +299,11 @@ class PlayerController extends Controller
         if ($this->shouldStoreAddress($address)) {
             $payload = [
                 'street' => $address['street'],
-                'street_extra' => $address['street_extra'] ?? null,
+                //'street_extra' => $address['street_extra'] ?? null,
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                'country_id' => $address['country_id'] ?? 0,
+                //'country' => $address['country'] ?? 'PK',
             ];
 
             if ($existingAddress) {
