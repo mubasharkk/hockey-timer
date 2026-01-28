@@ -62,6 +62,17 @@ class PlayerController extends Controller
         // Extract data from ID documents with additional info (supports 1-2 files)
         $extractedData = $this->idDocumentService->extractFromDocuments($processedFiles, $additionalInfo);
 
+        // Check if player with this NIC already exists
+        $nicNumber = $extractedData['nic_number'] ?? null;
+        if ($nicNumber) {
+            $existingPlayer = Player::where('nic_number', $nicNumber)->first();
+            if ($existingPlayer) {
+                return redirect()
+                    ->route('players.show', $existingPlayer)
+                    ->with('error', "A player with NIC number {$nicNumber} already exists.");
+            }
+        }
+
         // Create player with extracted data
         $player = Player::create([
             'user_id' => $request->user()->id,
