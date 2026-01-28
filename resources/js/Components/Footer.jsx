@@ -20,14 +20,7 @@ export default function Footer() {
                             >
                                 Dashboard
                             </Link>
-                        ) : (
-                            <Link
-                                href={route('register')}
-                                className="text-sm text-green-200 transition hover:text-white"
-                            >
-                                Register
-                            </Link>
-                        )}
+                        ) : null}
                         <Link
                             href={route('pages.show', 'privacy')}
                             className="text-sm text-green-200 transition hover:text-white"

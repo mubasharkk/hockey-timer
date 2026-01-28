@@ -1,4 +1,5 @@
 import {Head, Link} from '@inertiajs/react';
+import Footer from '@/Components/Footer';
 import TeamCard from '@/Components/TeamCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faFutbol, faFlag, faUser, faUserShield, faLocationDot, faIdCard, faDroplet, faTshirt, faCakeCandles, faPhone } from '@fortawesome/free-solid-svg-icons';
@@ -32,10 +33,10 @@ export default function PublicProfile({ player, teams = [], statistics }) {
     const age = calculateAge(currentPlayer.date_of_birth);
 
     return (
-        <>
+        <div className="flex min-h-screen flex-col bg-gradient-to-br from-green-50 via-white to-emerald-50">
             <Head title={`${currentPlayer.name} - Player Profile`} />
 
-            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
+            <div className="flex-1">
                 {/* Header */}
                 <div className="px-4 py-8 text-white" style={{ backgroundColor: '#01411C' }}>
                     <div className="mx-auto max-w-4xl">
@@ -87,13 +88,21 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                 </span>
                                 <p className="font-medium text-gray-900">{currentPlayer.name}</p>
                             </div>
-                            {guardian && (
+                            {(guardian || father) && (
                                 <div>
                                     <span className="flex items-center gap-1.5 text-gray-500">
                                         <FontAwesomeIcon icon={faUserShield} className="h-3 w-3" />
-                                        Guardian
+                                        {father ? 'Father' : 'Guardian'}
                                     </span>
-                                    <p className="font-medium text-gray-900">{guardian.name}</p>
+                                    <p className="font-medium text-gray-900">
+                                        {(father || guardian).name}
+                                        {(father?.phone || guardian?.phone) && (
+                                            <span className="ml-2 text-gray-500">
+                                                <FontAwesomeIcon icon={faPhone} className="mr-1 h-3 w-3" />
+                                                {father?.phone || guardian?.phone}
+                                            </span>
+                                        )}
+                                    </p>
                                 </div>
                             )}
                             {(address?.city || address?.country) && (
@@ -146,15 +155,6 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     <p className="font-medium text-gray-900">{currentPlayer.phone_number}</p>
                                 </div>
                             )}
-                            {father?.phone && (
-                                <div>
-                                    <span className="flex items-center gap-1.5 text-gray-500">
-                                        <FontAwesomeIcon icon={faPhone} className="h-3 w-3" />
-                                        Father's Phone
-                                    </span>
-                                    <p className="font-medium text-gray-900">{father.phone}</p>
-                                </div>
-                            )}
                         </div>
                     </div>
 
@@ -186,13 +186,11 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                         </div>
                     )}
 
-                    {/* Footer */}
-                    <div className="mt-6 text-center text-xs text-gray-400">
-                        Player Profile
-                    </div>
                 </div>
             </div>
-        </>
+
+            <Footer />
+        </div>
     );
 }
 
