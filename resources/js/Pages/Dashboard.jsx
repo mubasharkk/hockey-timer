@@ -3,6 +3,9 @@ import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import moment from 'moment';
 import GameRow from '@/Components/GameRow';
+import DashboardStats from '@/Components/DashboardStats';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrophy, faUsers, faFutbol } from '@fortawesome/free-solid-svg-icons';
 
 export default function Dashboard({ auth, upcoming = [], results = [], now }) {
     const [tab, setTab] = useState('upcoming');
@@ -13,26 +16,32 @@ export default function Dashboard({ auth, upcoming = [], results = [], now }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600 sm:gap-3">
                         <Link
                             href={route('tournaments.create')}
-                            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                            title="New Tournament"
                         >
-                            New Tournament
+                            <FontAwesomeIcon icon={faTrophy} className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">New Tournament</span>
                         </Link>
                         <Link
                             href={route('teams.create')}
-                            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                            title="Register Team"
                         >
-                            Register Team
+                            <FontAwesomeIcon icon={faUsers} className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">Register Team</span>
                         </Link>
                         <Link
                             href={route('games.create')}
-                            className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                            title="New Game"
                         >
-                            New Game
+                            <FontAwesomeIcon icon={faFutbol} className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">New Game</span>
                         </Link>
                     </div>
                 </div>
@@ -41,10 +50,14 @@ export default function Dashboard({ auth, upcoming = [], results = [], now }) {
             <Head title="Dashboard" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                            <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                                <div className="p-6 text-gray-900">
-                                    <h3 className="text-lg font-semibold text-gray-900">Games</h3>
+                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
+                    {/* Statistics Block */}
+                    <DashboardStats />
+
+                    {/* Games Block */}
+                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
+                        <div className="p-6 text-gray-900">
+                            <h3 className="text-lg font-semibold text-gray-900">Games</h3>
                                     <p className="mt-1 text-sm text-gray-600">Recent games with status and scheduled start.</p>
 
                                     <div className="mt-4 space-y-4">

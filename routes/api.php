@@ -6,6 +6,7 @@ use App\Http\Controllers\SyncEventController;
 use App\Http\Controllers\SyncGameController;
 use App\Http\Controllers\SyncSessionController;
 use App\Http\Controllers\PublicTickerApiController;
+use App\Http\Controllers\Api\DashboardStatsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,3 +34,5 @@ Route::get('/countries', function () {
         ->orderBy('name')
         ->get();
 });
+
+Route::get('/dashboard/stats', DashboardStatsController::class);
