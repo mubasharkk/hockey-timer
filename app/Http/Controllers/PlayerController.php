@@ -170,6 +170,10 @@ class PlayerController extends Controller
             'statistics' => $statistics,
             'recentGames' => GameResource::collection($recentGames),
             'events' => $events,
+            'can' => [
+                'edit' => $this->hasAccess($player),
+                'delete' => $this->hasAccess($player),
+            ],
         ]);
     }
 

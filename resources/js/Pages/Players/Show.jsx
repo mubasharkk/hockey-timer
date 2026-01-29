@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt, faTrash, faExpand } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [] }) {
+export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [], can = {} }) {
     const currentPlayer = player?.data ?? player;
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
     const playerGames = Array.isArray(recentGames) ? recentGames : recentGames?.data || [];
@@ -60,23 +60,27 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             <FontAwesomeIcon icon={faExternalLinkAlt} className="h-3 w-3" />
                             <span className="hidden sm:inline">Public Profile</span>
                         </a>
-                        <Link
-                            href={route('players.edit', currentPlayer.id)}
-                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
-                            title="Edit"
-                        >
-                            <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
-                            <span className="hidden sm:inline">Edit</span>
-                        </Link>
-                        <button
-                            type="button"
-                            onClick={() => setConfirmingDelete(true)}
-                            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 sm:px-3"
-                            title="Delete"
-                        >
-                            <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
-                            <span className="hidden sm:inline">Delete</span>
-                        </button>
+                        {can.edit && (
+                            <Link
+                                href={route('players.edit', currentPlayer.id)}
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                                title="Edit"
+                            >
+                                <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
+                                <span className="hidden sm:inline">Edit</span>
+                            </Link>
+                        )}
+                        {can.delete && (
+                            <button
+                                type="button"
+                                onClick={() => setConfirmingDelete(true)}
+                                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 sm:px-3"
+                                title="Delete"
+                            >
+                                <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
+                                <span className="hidden sm:inline">Delete</span>
+                            </button>
+                        )}
                         <Link
                             href={route('players.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
