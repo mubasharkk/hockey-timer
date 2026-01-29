@@ -309,7 +309,7 @@ class PlayerController extends Controller
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                //'country' => $address['country'] ?? 'PK',
+                'country' => $address['country'] ?? 'PK',
             ];
 
             if ($existingAddress) {
