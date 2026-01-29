@@ -36,20 +36,20 @@ export default function Show({ auth, team }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         {currentTeam?.logo_url && (
                             <img
                                 src={currentTeam.logo_url}
                                 alt={`${currentTeam.name} logo`}
-                                className="h-12 w-12 rounded-md border border-gray-200 object-cover"
+                                className="h-10 w-10 rounded-md border border-gray-200 object-cover sm:h-12 sm:w-12"
                             />
                         )}
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
                                 {currentTeam.type_label || 'Team'}
                             </p>
-                            <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTeam.name}</h2>
+                            <h2 className="text-lg font-semibold leading-tight text-gray-800 sm:text-xl">{currentTeam.name}</h2>
                             {currentTeam.club && (
                                 <Link
                                     href={route('clubs.show', currentTeam.club.id)}
@@ -60,41 +60,45 @@ export default function Show({ auth, team }) {
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                         {canManage && (
                             <Link
                                 href={route('teams.players.create', currentTeam.id)}
-                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                                title="Add Player"
                             >
                                 <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                                Add Player
+                                <span className="hidden sm:inline">Add Player</span>
                             </Link>
                         )}
                         {canManage && (
                             <Link
                                 href={route('teams.edit', currentTeam.id)}
-                                className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                                className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                                title="Edit Team"
                             >
                                 <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
-                                Edit Team
+                                <span className="hidden sm:inline">Edit Team</span>
                             </Link>
                         )}
                         {canManage && (
                             <button
                                 type="button"
                                 onClick={() => setConfirmingTeamDelete(true)}
-                                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500"
+                                className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 sm:px-3"
+                                title="Delete"
                             >
                                 <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
-                                Delete
+                                <span className="hidden sm:inline">Delete</span>
                             </button>
                         )}
                         <Link
                             href={route('teams.index')}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                            title="Back"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-                            Back
+                            <span className="hidden sm:inline">Back</span>
                         </Link>
                     </div>
                 </div>

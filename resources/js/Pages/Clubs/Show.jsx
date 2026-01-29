@@ -43,7 +43,7 @@ export default function Show({ auth, club }) {
             <div className="py-8">
                 <div className="mx-auto max-w-6xl space-y-6">
                     {/* Header */}
-                    <header className="flex items-center justify-between gap-4">
+                    <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="flex items-center gap-4">
                             {currentClub.logo_url ? (
                                 <button
@@ -54,55 +54,59 @@ export default function Show({ auth, club }) {
                                     <img
                                         src={currentClub.logo_url}
                                         alt={`${currentClub.name} logo`}
-                                        className="h-16 w-16 rounded-lg border border-gray-200 object-cover transition group-hover:border-green-500"
+                                        className="h-14 w-14 rounded-lg border border-gray-200 object-cover transition group-hover:border-green-500 sm:h-16 sm:w-16"
                                     />
                                     <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/0 transition group-hover:bg-black/20">
                                         <FontAwesomeIcon icon={faExpand} className="h-4 w-4 text-white opacity-0 transition group-hover:opacity-100" />
                                     </div>
                                 </button>
                             ) : (
-                                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-green-50">
-                                    <FontAwesomeIcon icon={faBuilding} className="h-8 w-8 text-green-700" />
+                                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-green-50 sm:h-16 sm:w-16">
+                                    <FontAwesomeIcon icon={faBuilding} className="h-7 w-7 text-green-700 sm:h-8 sm:w-8" />
                                 </div>
                             )}
                             <div>
                                 <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Club</p>
-                                <h1 className="text-2xl font-semibold text-gray-900">{currentClub.name}</h1>
+                                <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">{currentClub.name}</h1>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             {canManage && (
                                 <>
                                     <Link
                                         href={route('clubs.teams.create', currentClub.id)}
-                                        className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                        className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                                        title="Add Team"
                                     >
                                         <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                                        Add Team
+                                        <span className="hidden sm:inline">Add Team</span>
                                     </Link>
                                     <Link
                                         href={route('clubs.edit', currentClub.id)}
-                                        className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                                        className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                                        title="Edit"
                                     >
                                         <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
-                                        Edit
+                                        <span className="hidden sm:inline">Edit</span>
                                     </Link>
                                     <button
                                         type="button"
                                         onClick={() => setConfirmingDelete(true)}
-                                        className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500"
+                                        className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 sm:px-3"
+                                        title="Delete"
                                     >
                                         <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
-                                        Delete
+                                        <span className="hidden sm:inline">Delete</span>
                                     </button>
                                 </>
                             )}
                             <Link
                                 href={route('clubs.index')}
-                                className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                                className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                                title="Back"
                             >
                                 <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-                                Back
+                                <span className="hidden sm:inline">Back</span>
                             </Link>
                         </div>
                     </header>
