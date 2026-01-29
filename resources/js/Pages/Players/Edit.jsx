@@ -45,7 +45,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
             street: currentPlayer.address?.street || '',
             city: currentPlayer.address?.city || '',
             state: currentPlayer.address?.state || '',
-            country: currentPlayer.address?.country || '',
+            country: currentPlayer.address?.country?.iso_3166_2 || '',
             post_code: currentPlayer.address?.post_code || '',
         },
         photo: null,

@@ -19,7 +19,7 @@ export default function Edit({ auth, club }) {
             street: currentClub?.address?.street ?? '',
             city: currentClub?.address?.city ?? '',
             state: currentClub?.address?.state ?? '',
-            country: currentClub?.address?.country ?? '',
+            country: currentClub?.address?.country?.iso_3166_2 ?? '',
             post_code: currentClub?.address?.post_code ?? '',
         },
         contact_persons: currentClub?.contact_persons ?? [],

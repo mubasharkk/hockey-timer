@@ -49,7 +49,7 @@ class UpdatePlayerRequest extends FormRequest
             'address.city' => ['nullable', 'string', 'max:60'],
             'address.state' => ['nullable', 'string', 'max:60'],
             'address.post_code' => ['required_with:address.city', 'nullable', 'string', 'max:10'],
-            'address.country' => ['nullable', 'string', 'max:2'],
+            'address.country' => ['nullable', 'string', 'max:2',  'exists:countries,iso_3166_2'],
             'photo' => ['nullable', 'image', 'max:5120'],
         ];
     }

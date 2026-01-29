@@ -98,14 +98,14 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                     </p>
                                 </div>
                             )}
-                            {(address?.city || address?.country) && (
+                            {(address?.city || address?.country?.name) && (
                                 <div>
                                     <span className="flex items-center gap-1.5 text-gray-500">
                                         <FontAwesomeIcon icon={faLocationDot} className="h-3 w-3" />
                                         Location
                                     </span>
                                     <p className="font-medium text-gray-900">
-                                        {[address?.city, address?.country].filter(Boolean).join(', ')}
+                                        {[address?.city, address?.country?.name].filter(Boolean).join(', ')}
                                     </p>
                                 </div>
                             )}

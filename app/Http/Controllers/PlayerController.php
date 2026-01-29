@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Webpatser\Countries\Countries;
 
 class PlayerController extends Controller
 {
@@ -234,6 +235,7 @@ class PlayerController extends Controller
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
                 'country' => $address['country'] ?? 'PK',
+                'is_primary' => true,
             ]);
         }
 
@@ -309,11 +311,12 @@ class PlayerController extends Controller
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
-                'country' => $address['country'] ?? 'PK',
+                'country_id' => Countries::where('iso_3166_2', $address['country'])->first()->id,
+                'is_primary' => true,
             ];
 
             if ($existingAddress) {
-                $player->updateAddress($existingAddress, $payload);
+                $existingAddress->update($payload);
             } else {
                 $player->addAddress($payload);
             }
