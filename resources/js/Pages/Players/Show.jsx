@@ -32,54 +32,58 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                         {currentPlayer.photo_url && (
                             <img
                                 src={currentPlayer.photo_url}
                                 alt={currentPlayer.name}
-                                className="h-16 w-16 rounded-full border-2 border-gray-200 object-cover"
+                                className="h-12 w-12 rounded-full border-2 border-gray-200 object-cover sm:h-16 sm:w-16"
                             />
                         )}
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
-                            <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentPlayer.name}</h2>
+                            <h2 className="text-lg font-semibold leading-tight text-gray-800 sm:text-xl">{currentPlayer.name}</h2>
                             {currentPlayer.player_pass_number && (
                                 <p className="text-sm text-gray-600">Pass: {currentPlayer.player_pass_number}</p>
                             )}
                         </div>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <a
                             href={`/player/${currentPlayer.player_pass_number || currentPlayer.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50 sm:px-3"
+                            title="Public Profile"
                         >
                             <FontAwesomeIcon icon={faExternalLinkAlt} className="h-3 w-3" />
-                            Public Profile
+                            <span className="hidden sm:inline">Public Profile</span>
                         </a>
                         <Link
                             href={route('players.edit', currentPlayer.id)}
-                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                            title="Edit"
                         >
                             <FontAwesomeIcon icon={faPen} className="h-3 w-3" />
-                            Edit
+                            <span className="hidden sm:inline">Edit</span>
                         </Link>
                         <button
                             type="button"
                             onClick={() => setConfirmingDelete(true)}
-                            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500"
+                            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 sm:px-3"
+                            title="Delete"
                         >
                             <FontAwesomeIcon icon={faTrash} className="h-3 w-3" />
-                            Delete
+                            <span className="hidden sm:inline">Delete</span>
                         </button>
                         <Link
                             href={route('players.index')}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                            title="Back"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-                            Back
+                            <span className="hidden sm:inline">Back</span>
                         </Link>
                     </div>
                 </div>

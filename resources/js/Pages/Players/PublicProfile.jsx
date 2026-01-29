@@ -38,27 +38,35 @@ export default function PublicProfile({ player, teams = [], statistics }) {
 
             <div className="flex-1">
                 {/* Header */}
-                <div className="px-4 py-8 text-white" style={{ backgroundColor: '#01411C' }}>
+                <div className="px-4 py-6 text-white sm:py-8" style={{ backgroundColor: '#01411C' }}>
                     <div className="mx-auto max-w-4xl">
-                        <div className="flex items-center gap-6">
-                            {/* Column 1: Photo - shrink left */}
+                        {/* Logo on top (mobile only) */}
+                        <div className="mb-4 flex justify-center md:hidden">
+                            <Link href="/">
+                                <ApplicationLogo className="block h-20 w-auto fill-current text-white" />
+                            </Link>
+                        </div>
+
+                        {/* Photo, Name, and Logo (md: logo on right) */}
+                        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:gap-6 sm:text-left">
+                            {/* Photo */}
                             <div className="flex-shrink-0">
                                 {currentPlayer.photo_url ? (
                                     <img
                                         src={currentPlayer.photo_url}
                                         alt={currentPlayer.name}
-                                        className="h-24 w-24 rounded-full border-4 border-white/30 object-cover shadow-lg"
+                                        className="h-24 w-24 rounded-full border-4 border-white/30 object-cover shadow-lg sm:h-28 sm:w-28"
                                     />
                                 ) : (
-                                    <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 text-3xl font-bold shadow-lg" style={{ backgroundColor: '#026B2E' }}>
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white/30 text-3xl font-bold shadow-lg sm:h-28 sm:w-28" style={{ backgroundColor: '#026B2E' }}>
                                         {currentPlayer.name?.charAt(0) || '?'}
                                     </div>
                                 )}
                             </div>
 
-                            {/* Column 2: Name + Type - expanded */}
-                            <div className="flex-1 min-w-0">
-                                <h1 className="text-3xl font-bold truncate">{currentPlayer.name}</h1>
+                            {/* Name + Type */}
+                            <div className="flex-1">
+                                <h1 className="text-2xl font-bold leading-tight sm:text-3xl">{currentPlayer.name}</h1>
                                 {currentPlayer.player_type_label && (
                                     <span className="mt-2 inline-block rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
                                         {currentPlayer.player_type_label}
@@ -66,10 +74,10 @@ export default function PublicProfile({ player, teams = [], statistics }) {
                                 )}
                             </div>
 
-                            {/* Column 3: Shirt Number - shrink right */}
-                            <div className="flex-shrink-0 text-right">
+                            {/* Logo on right (md and up) */}
+                            <div className="hidden flex-shrink-0 md:block">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-32 w-auto fill-current text-white" />
+                                    <ApplicationLogo className="block h-28 w-auto fill-current text-white" />
                                 </Link>
                             </div>
                         </div>
