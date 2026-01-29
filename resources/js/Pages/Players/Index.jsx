@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faIdCard, faUser, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
+import PlayerCard from '@/Components/PlayerCard';
 
 export default function Index({ auth, players }) {
     const playerList = players?.data ?? [];
@@ -65,47 +66,7 @@ export default function Index({ auth, players }) {
                     {filteredPlayers.length > 0 ? (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {filteredPlayers.map((player) => (
-                                <Link
-                                    key={player.id}
-                                    href={route('players.show', player.id)}
-                                    className="group rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-green-300 hover:shadow-md"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        {player.photo_url ? (
-                                            <img
-                                                src={player.photo_url}
-                                                alt={player.name}
-                                                className="h-14 w-14 rounded-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700 text-lg font-semibold">
-                                                {player.name?.charAt(0) || '?'}
-                                            </div>
-                                        )}
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 truncate group-hover:text-green-700">
-                                                {player.name}
-                                            </p>
-                                            {player.player_pass_number && (
-                                                <p className="text-xs text-gray-500">
-                                                    Pass: {player.player_pass_number}
-                                                </p>
-                                            )}
-                                            {player.nic_number && (
-                                                <p className="text-xs text-gray-500">
-                                                    NIC: {player.nic_number}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                            player.is_active
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-gray-100 text-gray-600'
-                                        }`}>
-                                            {player.is_active ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </div>
-                                </Link>
+                                <PlayerCard key={player.id} player={player} />
                             ))}
                         </div>
                     ) : (
