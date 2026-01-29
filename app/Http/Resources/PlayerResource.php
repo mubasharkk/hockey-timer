@@ -50,7 +50,7 @@ class PlayerResource extends JsonResource
                 'city' => $address->city,
                 'state' => $address->state,
                 'post_code' => $address->post_code,
-                'country' => $address->country->only('name', 'iso_3166_2'),
+                'country' => $address->country?->only('name', 'iso_3166_2'),
             ] : null,
             'addresses' => $this->whenLoaded('addresses', fn () => $this->addresses),
             'photo_url' => $this->getFirstMediaUrl('photo') ?: null,
