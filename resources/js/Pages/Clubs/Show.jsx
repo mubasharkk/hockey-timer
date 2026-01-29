@@ -10,6 +10,7 @@ import {
     faArrowLeft,
     faBuilding,
     faEnvelope,
+    faExpand,
     faGlobe,
     faLocationDot,
     faPen,
@@ -22,6 +23,7 @@ import {
 export default function Show({ auth, club }) {
     const currentClub = club?.data ?? club;
     const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const [lightboxImage, setLightboxImage] = useState(null);
     const { delete: deleteClub, processing } = useForm();
 
     const teams = currentClub?.teams ?? [];
@@ -44,11 +46,20 @@ export default function Show({ auth, club }) {
                     <header className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             {currentClub.logo_url ? (
-                                <img
-                                    src={currentClub.logo_url}
-                                    alt={`${currentClub.name} logo`}
-                                    className="h-16 w-16 rounded-lg border border-gray-200 object-cover"
-                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setLightboxImage(currentClub.logo_url)}
+                                    className="group relative cursor-pointer"
+                                >
+                                    <img
+                                        src={currentClub.logo_url}
+                                        alt={`${currentClub.name} logo`}
+                                        className="h-16 w-16 rounded-lg border border-gray-200 object-cover transition group-hover:border-green-500"
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/0 transition group-hover:bg-black/20">
+                                        <FontAwesomeIcon icon={faExpand} className="h-4 w-4 text-white opacity-0 transition group-hover:opacity-100" />
+                                    </div>
+                                </button>
                             ) : (
                                 <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-green-50">
                                     <FontAwesomeIcon icon={faBuilding} className="h-8 w-8 text-green-700" />
@@ -253,6 +264,28 @@ export default function Show({ auth, club }) {
                     </div>
                 </div>
             </Modal>
+
+            {/* Lightbox Modal */}
+            {lightboxImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                    onClick={() => setLightboxImage(null)}
+                >
+                    <div className="relative max-h-[90vh] max-w-[90vw]">
+                        <img
+                            src={lightboxImage}
+                            alt="Club Logo Full View"
+                            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+                        />
+                        <button
+                            onClick={() => setLightboxImage(null)}
+                            className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-800 shadow-lg transition hover:bg-gray-100"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
