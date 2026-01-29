@@ -147,6 +147,7 @@ ADDRESS:
 - City
 - State/Province
 - Postal/ZIP code
+- Country (in ISO-3166 / 2 Chars)
 
 CONTACT PERSONS (guardians, parents, emergency contacts):
 - Name
@@ -170,7 +171,8 @@ Return the data as a JSON object with this structure:
         "street": "Street address",
         "city": "City name",
         "state": "State or province",
-        "post_code": "Postal/ZIP code"
+        "post_code": "Postal/ZIP code",
+        "country": "Country in ISO-3166 (2 Chars)",
     },
     "contact_persons": [
         {
@@ -242,6 +244,7 @@ PROMPT;
                 'city' => $data['address']['city'] ?? null,
                 'state' => $data['address']['state'] ?? null,
                 'post_code' => $data['address']['post_code'] ?? null,
+                'country' => $data['address']['country'] ?? null,
             ],
             'contact_persons' => $contactPersons,
             'additional_info' => $additionalInfo,

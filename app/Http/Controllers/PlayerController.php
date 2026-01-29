@@ -91,14 +91,20 @@ class PlayerController extends Controller
         // Store address if extracted
         $address = $extractedData['address'] ?? [];
         if ($this->shouldStoreAddress($address)) {
-            $player->addAddress([
-                'street' => $address['street'],
-                'street_extra' => null,
-                'city' => $address['city'],
-                'state' => $address['state'] ?? null,
-                'post_code' => $address['post_code'],
-                'country' => $address['country'] ?? 'PK',
-            ]);
+            try {
+                $country = $address['country'] && strlen($address['country']) === 2 ? $address['country'] : 'PK';
+
+                $player->addAddress([
+                    'street' => $address['street'],
+                    'street_extra' => null,
+                    'city' => $address['city'],
+                    'state' => $address['state'] ?? null,
+                    'post_code' => $address['post_code'] ?? '----',
+                    'country' => $country,
+                ]);
+            } catch (\Lecturize\Addresses\Exceptions\FailedValidationException $e) {
+                // Silently skip address storage if validation fails
+            }
         }
 
         // Create contact persons if extracted
