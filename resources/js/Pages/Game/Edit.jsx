@@ -65,7 +65,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
             <Head title="Edit Game" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl space-y-6">
                     <header className="space-y-2">
                         <h1 className="text-2xl font-semibold text-gray-900">Edit Game</h1>
                         <p className="text-sm text-gray-600">Update timings, venue, and officials. Team rosters come from registered teams.</p>

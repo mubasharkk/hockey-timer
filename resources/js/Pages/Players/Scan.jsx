@@ -95,7 +95,7 @@ export default function Scan({ auth }) {
             <Head title="Scan Player ID" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-2xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-2xl space-y-6">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Step 1 of 2</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Scan ID Document</h1>

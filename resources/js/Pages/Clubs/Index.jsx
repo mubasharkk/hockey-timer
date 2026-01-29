@@ -11,7 +11,7 @@ export default function Index({ auth, clubs }) {
             <Head title="Clubs" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     <header className="flex items-center justify-between">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900">Clubs</h1>

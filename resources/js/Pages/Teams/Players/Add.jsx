@@ -68,7 +68,7 @@ export default function Add({ auth, team }) {
             <Head title={`Add Player to ${currentTeam.name}`} />
 
             <div className="py-8">
-                <div className="mx-auto max-w-2xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-2xl space-y-6">
                     <header className="flex items-center justify-between gap-4">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">

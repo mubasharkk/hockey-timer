@@ -57,7 +57,7 @@ export default function Create({ auth, club, clubs, teamTypes }) {
             <Head title="Register Team" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-3xl space-y-6">
                     <header className="space-y-2">
                         {currentClub && <p className="text-xs font-semibold uppercase tracking-wide text-green-700">{currentClub.name}</p>}
                         <h1 className="text-2xl font-semibold text-gray-900">{currentClub ? 'Add a Team' : 'Register a Team'}</h1>

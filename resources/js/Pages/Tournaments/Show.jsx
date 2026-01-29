@@ -105,7 +105,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
             <Head title={currentTournament.title} />
 
             <div className="py-10">
-                <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-5xl space-y-6">
                     {currentTournament.logo_url && (
                         <div className="flex justify-center">
                             <img

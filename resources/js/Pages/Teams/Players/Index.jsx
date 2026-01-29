@@ -14,7 +14,7 @@ export default function Index({ auth, team, players }) {
             <Head title={`${currentTeam.name} - Roster`} />
 
             <div className="py-8">
-                <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     <header className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             {currentTeam.logo_url ? (

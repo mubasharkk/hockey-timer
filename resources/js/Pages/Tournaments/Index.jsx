@@ -23,7 +23,7 @@ export default function Index({ auth, tournaments = [] }) {
             <Head title="Tournaments" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-5xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-5xl">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <p className="text-sm text-gray-600">Organize games under tournaments and pools.</p>

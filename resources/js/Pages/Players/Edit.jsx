@@ -82,7 +82,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
             <Head title="Edit Player" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl space-y-6">
                     <header className="space-y-1">
                         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                         <h1 className="text-2xl font-semibold text-gray-900">Edit {currentPlayer.name}</h1>

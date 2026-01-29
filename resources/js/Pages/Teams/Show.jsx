@@ -103,7 +103,7 @@ export default function Show({ auth, team }) {
             <Head title={currentTeam.name} />
 
             <div className="py-10">
-                <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     {/* Club Info */}
                     {currentTeam.club && (
                         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">

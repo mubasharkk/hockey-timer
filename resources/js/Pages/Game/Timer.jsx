@@ -15,7 +15,7 @@ export default function Timer({ auth, game, config = {} }) {
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Live Timer" />
                 <div className="py-6">
-                    <div className="mx-auto max-w-5xl sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl">
                         <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">Game not found.</div>
                     </div>
                 </div>
@@ -600,7 +600,7 @@ export default function Timer({ auth, game, config = {} }) {
             <Head title="Live Timer" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-5xl space-y-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-5xl space-y-4">
                     <header className="flex flex-col gap-2 px-2 sm:flex-row sm:items-center sm:justify-between sm:px-0">
                         <div className="space-y-1 sm:space-y-2 px-1 sm:px-0">
                             <p className="text-xs uppercase tracking-wide text-gray-500">{scheduledDisplay || 'Live Match'}</p>

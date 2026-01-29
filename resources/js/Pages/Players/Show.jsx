@@ -96,7 +96,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
             <Head title={currentPlayer.name} />
 
             <div className="py-10">
-                <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     {/* Player Info Card */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="flex flex-col gap-6 md:flex-row">

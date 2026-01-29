@@ -27,7 +27,7 @@ export default function Create({ auth }) {
         <AuthenticatedLayout user={auth.user}>
             <Head title="New Tournament" />
             <div className="py-8">
-                <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-3xl space-y-6">
                     <header className="space-y-2">
                         <h1 className="text-2xl font-semibold text-gray-900">Create Tournament</h1>
                         <p className="text-sm text-gray-600">Give your tournament a title and optional slug.</p>

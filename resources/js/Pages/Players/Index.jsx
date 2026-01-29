@@ -23,7 +23,7 @@ export default function Index({ auth, players }) {
             <Head title="Players" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-6xl space-y-6 px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900">Players</h1>

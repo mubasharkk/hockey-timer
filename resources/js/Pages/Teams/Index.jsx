@@ -35,7 +35,7 @@ export default function Index({ auth, teams = [] }) {
             <Head title="Teams" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
                             <p className="text-sm text-gray-600">Registered teams ready to be used when creating games.</p>

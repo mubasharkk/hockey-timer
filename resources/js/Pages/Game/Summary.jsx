@@ -15,7 +15,7 @@ export default function Summary({ auth, game }) {
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Match Summary" />
                 <div className="py-8">
-                    <div className="mx-auto max-w-4xl sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-4xl">
                         <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">Game not found.</div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@ export default function Summary({ auth, game }) {
             <Head title="Match Summary" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-4xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl space-y-6">
                     <header className="space-y-1">
                         <p className="text-xs uppercase tracking-wide text-gray-500">Summary</p>
                         <h1 className="text-2xl font-semibold text-gray-900">

@@ -41,7 +41,7 @@ export default function Show({ auth, club }) {
             <Head title={currentClub.name} />
 
             <div className="py-8">
-                <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-6xl space-y-6">
                     {/* Header */}
                     <header className="flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">

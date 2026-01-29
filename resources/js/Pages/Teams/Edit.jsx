@@ -54,7 +54,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
             <Head title={`Edit ${currentTeam.name}`} />
 
             <div className="py-8">
-                <div className="mx-auto max-w-3xl space-y-6 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-3xl space-y-6">
                     <header className="flex items-center justify-between gap-3">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Team</p>

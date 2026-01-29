@@ -108,7 +108,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                         .print-table th { background: #f9fafb; font-weight: 600; color: #374151; }
                     `}
                 </style>
-                <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-6 lg:px-8 print:max-w-full print:px-4">
+                <div className="mx-auto max-w-6xl space-y-4 print:max-w-full print:px-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between no-print">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Official Report</p>

@@ -11,7 +11,7 @@ export default function Report({ auth, game }) {
             <AuthenticatedLayout user={auth.user}>
                 <Head title="Match Report" />
                 <div className="py-8">
-                    <div className="mx-auto max-w-5xl sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-5xl">
                         <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">Game not found.</div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ export default function Report({ auth, game }) {
                         }
                     `}
                 </style>
-                <div className="mx-auto max-w-5xl space-y-6 sm:px-6 lg:px-8 print:mx-auto print:max-w-[210mm] print:px-0 print:py-0">
+                <div className="mx-auto max-w-5xl space-y-6 print:mx-auto print:max-w-[210mm] print:px-0 print:py-0">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between print:flex-row print:items-center print:justify-between">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-gray-500">Match Report</p>
