@@ -6,7 +6,7 @@ import TeamCard from '@/Components/TeamCard';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt, faTrash, faExpand } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
 export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [] }) {
@@ -16,6 +16,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
     const playerEvents = Array.isArray(events) ? events : events?.data || [];
 
     const [confirmingDelete, setConfirmingDelete] = useState(false);
+    const [lightboxImage, setLightboxImage] = useState(null);
     const { delete: deletePlayer, processing: deleting } = useForm();
 
     const age = currentPlayer.date_of_birth
@@ -209,6 +210,7 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                                         </div>
                                     )}
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -389,6 +391,41 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             </div>
                         </div>
                     )}
+
+                    {/* ID Documents Card */}
+                    {currentPlayer.id_documents && currentPlayer.id_documents.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <div className="flex items-center gap-2 mb-4">
+                                <FontAwesomeIcon icon={faIdCard} className="h-5 w-5 text-green-700" />
+                                <h3 className="text-sm font-semibold text-gray-900">Uploaded ID Documents</h3>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                {currentPlayer.id_documents.map((doc, index) => (
+                                    <div
+                                        key={doc.id}
+                                        className="group relative cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                                        onClick={() => setLightboxImage(doc.url)}
+                                    >
+                                        <img
+                                            src={doc.url}
+                                            alt={`ID Document ${index + 1}`}
+                                            className="h-48 w-full object-cover transition group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition group-hover:bg-black/30">
+                                            <FontAwesomeIcon
+                                                icon={faExpand}
+                                                className="h-6 w-6 text-white opacity-0 transition group-hover:opacity-100"
+                                            />
+                                        </div>
+                                        <p className="p-2 text-xs text-gray-600 truncate">{doc.name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <p className="mt-3 text-xs text-gray-500">
+                                Click on an image to view full size.
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -407,6 +444,28 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                     </div>
                 </div>
             </Modal>
+
+            {/* Lightbox Modal */}
+            {lightboxImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+                    onClick={() => setLightboxImage(null)}
+                >
+                    <div className="relative max-h-[90vh] max-w-[90vw]">
+                        <img
+                            src={lightboxImage}
+                            alt="ID Document Full View"
+                            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+                        />
+                        <button
+                            onClick={() => setLightboxImage(null)}
+                            className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-800 shadow-lg transition hover:bg-gray-100"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
