@@ -16,7 +16,7 @@ class ClubController extends Controller
     public function index(): Response
     {
         $clubs = Club::query()
-            ->where('user_id', Auth::id())
+            //->where('user_id', Auth::id())
             ->with(['media', 'teams', 'contactPersons'])
             ->withCount('teams')
             ->orderBy('name')
