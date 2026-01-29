@@ -24,25 +24,27 @@ export default function Index({ auth, players }) {
 
             <div className="py-8">
                 <div className="mx-auto max-w-6xl space-y-6 sm:px-6 lg:px-8">
-                    <header className="flex items-center justify-between gap-4">
+                    <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900">Players</h1>
                             <p className="text-sm text-gray-600">Manage all players in the system</p>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             <Link
                                 href={route('players.scan')}
-                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-4 sm:py-2"
+                                title="Scan ID"
                             >
                                 <FontAwesomeIcon icon={faIdCard} className="h-4 w-4" />
-                                Scan ID
+                                <span className="hidden sm:inline">Scan ID</span>
                             </Link>
                             <Link
                                 href={route('players.create')}
-                                className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                                className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-4 sm:py-2"
+                                title="Add Player"
                             >
                                 <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                                Add Player
+                                <span className="hidden sm:inline">Add Player</span>
                             </Link>
                         </div>
                     </header>

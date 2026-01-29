@@ -111,7 +111,7 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
                         </div>
 
                         {/* Player Details */}
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-5">
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Gender</label>
                                 <select
@@ -313,12 +313,12 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <p className="text-xs text-gray-500">Pass numbers auto-generate when left blank.</p>
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300"
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-green-300 sm:w-auto"
                             >
                                 <FontAwesomeIcon icon={faSave} className="h-4 w-4" />
                                 {processing ? 'Saving...' : 'Save Player'}
