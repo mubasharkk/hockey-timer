@@ -19,9 +19,11 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Webpatser\Countries\Countries;
+use App\Http\Controllers\Concerns\EnsuresOwnership;
 
 class PlayerController extends Controller
 {
+    use EnsuresOwnership;
     public function __construct(
         private readonly IdDocumentService $idDocumentService,
         private readonly ImageService $imageService
@@ -197,6 +199,8 @@ class PlayerController extends Controller
      */
     public function edit(Player $player): Response
     {
+        $this->ensureAccess($player);
+
         $player->load(['addresses', 'media', 'contactPersons', 'teams']);
 
         return Inertia::render('Players/Edit', [
@@ -265,6 +269,8 @@ class PlayerController extends Controller
      */
     public function update(UpdatePlayerRequest $request, Player $player): RedirectResponse
     {
+        $this->ensureAccess($player);
+
         $player->update([
             'name' => $request->string('name'),
             'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number'), $player),
@@ -340,6 +346,8 @@ class PlayerController extends Controller
      */
     public function destroy(Player $player): RedirectResponse
     {
+        $this->ensureAccess($player);
+
         $player->delete();
 
         return redirect()->route('players.index')->with('success', 'Player deleted.');

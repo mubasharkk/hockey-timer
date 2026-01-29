@@ -10,9 +10,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Http\Controllers\Concerns\EnsuresOwnership;
 
 class ClubController extends Controller
 {
+    use EnsuresOwnership;
     public function index(): Response
     {
         $clubs = Club::query()
@@ -79,7 +81,7 @@ class ClubController extends Controller
 
     public function show(Club $club): Response
     {
-        $this->ensureAccess($club);
+        //$this->ensureAccess($club);
 
         $club->load([
             'media',
@@ -187,11 +189,6 @@ class ClubController extends Controller
         $club->delete();
 
         return redirect()->route('clubs.index')->with('success', 'Club deleted successfully.');
-    }
-
-    private function ensureAccess(Club $club): void
-    {
-        abort_unless($club->user_id === Auth::id(), 403);
     }
 
     private function shouldStoreAddress(array $address): bool
