@@ -17,15 +17,17 @@ class ClubController extends Controller
     use EnsuresOwnership;
     public function index(): Response
     {
-        $clubs = Club::query()
-            //->where('user_id', Auth::id())
+        $query = Club::query()
             ->with(['media', 'teams', 'contactPersons'])
             ->withCount('teams')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if (!backpack_user()->is_admin) {
+            $query = $query->where('user_id', Auth::id());
+        }
 
         return Inertia::render('Clubs/Index', [
-            'clubs' => ClubResource::collection($clubs),
+            'clubs' => ClubResource::collection($query->get()),
         ]);
     }
 
