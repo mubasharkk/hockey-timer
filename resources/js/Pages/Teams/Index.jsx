@@ -89,7 +89,7 @@ export default function Index({ auth, teams = [] }) {
                                         <div className="flex items-center gap-3">
                                             {ownsTeam(team) && (
                                                 <Link
-                                                    href={route('players.scan', team.id)}
+                                                    href={route('teams.players.create', currentTeam.id)}
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
                                                 >
                                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
