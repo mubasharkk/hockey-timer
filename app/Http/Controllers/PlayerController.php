@@ -34,12 +34,15 @@ class PlayerController extends Controller
      */
     public function index(): Response
     {
-        $players = Player::with(['teams', 'media'])
-            ->latest()
-            ->paginate(20);
+        $query = Player::with(['teams', 'media'])
+            ->latest();
+
+        if (!backpack_user()?->is_admin) {
+            $query->where('user_id', Auth::id());
+        }
 
         return Inertia::render('Players/Index', [
-            'players' => PlayerResource::collection($players),
+            'players' => PlayerResource::collection($query->paginate(20)),
         ]);
     }
 
