@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\EnsuresOwnership;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Club;
@@ -15,21 +16,24 @@ use Inertia\Response;
 
 class TeamController extends Controller
 {
+    use EnsuresOwnership;
     public function index(): Response
     {
-        $teams = Team::query()
-            ->where('user_id', Auth::id())
+        $query = Team::query()
             ->with([
                 'media',
                 'club',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
                 'contactPersons',
             ])
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        if (!backpack_user()->is_admin) {
+            $query = $query->where('user_id', Auth::id());
+        }
 
         return Inertia::render('Teams/Index', [
-            'teams' => TeamResource::collection($teams),
+            'teams' => TeamResource::collection($query->get()),
         ]);
     }
 
@@ -48,7 +52,7 @@ class TeamController extends Controller
 
     public function createForClub(Club $club): Response
     {
-        $this->ensureClubAccess($club);
+        $this->ensureAccess($club);
 
         return Inertia::render('Teams/Create', [
             'club' => ClubResource::make($club),
@@ -95,7 +99,7 @@ class TeamController extends Controller
 
     public function storeForClub(StoreTeamRequest $request, Club $club): RedirectResponse
     {
-        $this->ensureClubAccess($club);
+        $this->ensureAccess($club);
 
         $team = Team::create([
             'user_id' => Auth::id(),
@@ -147,7 +151,7 @@ class TeamController extends Controller
 
     public function edit(Team $team): Response
     {
-        $this->ensureManageable($team);
+        $this->ensureAccess($team);
 
         $team->load(['contactPersons', 'club']);
 
@@ -165,7 +169,7 @@ class TeamController extends Controller
 
     public function update(UpdateTeamRequest $request, Team $team): RedirectResponse
     {
-        $this->ensureManageable($team);
+        $this->ensureAccess($team);
 
         $team->update([
             'club_id' => $request->input('club_id') ?: null,
@@ -225,20 +229,11 @@ class TeamController extends Controller
 
     public function destroy(Team $team): RedirectResponse
     {
-        $this->ensureManageable($team);
+        $this->ensureAccess($team);
 
         $team->delete();
 
         return redirect()->route('teams.index')->with('success', 'Team deleted.');
     }
 
-    private function ensureManageable(Team $team): void
-    {
-        abort_unless($team->user_id === Auth::id(), 403);
-    }
-
-    private function ensureClubAccess(Club $club): void
-    {
-        abort_unless($club->user_id === Auth::id(), 403);
-    }
 }
