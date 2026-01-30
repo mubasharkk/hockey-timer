@@ -116,6 +116,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
+                                        {user.is_admin && (
+                                            <Dropdown.Link href="/admin">
+                                                Admin
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href={route('profile.edit')}
                                         >
@@ -226,6 +231,11 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
+                            {user.is_admin && (
+                                <ResponsiveNavLink href="/admin">
+                                    Admin
+                                </ResponsiveNavLink>
+                            )}
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>
