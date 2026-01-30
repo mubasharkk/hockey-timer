@@ -1,12 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faBuilding, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 export default function Index({ auth, teams = [] }) {
-    const userId = auth?.user?.id;
     const teamList = Array.isArray(teams) ? teams : teams?.data || [];
-    const ownsTeam = (team) => userId && team.user_id === userId;
 
     return (
         <AuthenticatedLayout
@@ -88,36 +86,13 @@ export default function Index({ auth, teams = [] }) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-2 sm:gap-3">
-                                            {ownsTeam(team) && (
-                                                <Link
-                                                    href={route('teams.players.create', team.id)}
-                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
-                                                    title="Add Player"
-                                                >
-                                                    <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
-                                                    <span className="hidden sm:inline">Add Player</span>
-                                                </Link>
-                                            )}
-                                            {ownsTeam(team) && (
-                                                <Link
-                                                    href={route('teams.edit', team.id)}
-                                                    className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
-                                                    title="Edit"
-                                                >
-                                                    <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
-                                                    <span className="hidden sm:inline">Edit</span>
-                                                </Link>
-                                            )}
-                                            <Link
-                                                href={route('teams.show', team.id)}
-                                                className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 hover:text-green-600"
-                                                title="View"
-                                            >
-                                                <FontAwesomeIcon icon={faEye} className="h-3.5 w-3.5" />
-                                                <span className="hidden sm:inline">View</span>
-                                            </Link>
-                                        </div>
+                                        <Link
+                                            href={route('teams.show', team.id)}
+                                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                        >
+                                            View Team
+                                            <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
+                                        </Link>
                                     </div>
                                 ))}
                             </div>
