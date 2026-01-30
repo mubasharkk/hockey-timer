@@ -11,22 +11,24 @@ export default function Index({ auth, teams = [] }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">Teams</h2>
                     <div className="flex items-center gap-2">
                         <Link
                             href={route('teams.create')}
-                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                            className="inline-flex items-center gap-2 rounded-md bg-green-700 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 sm:px-3"
+                            title="Register Team"
                         >
                             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                            Register Team
+                            <span className="hidden sm:inline">Register Team</span>
                         </Link>
                         <Link
                             href={route('clubs.index')}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"
+                            title="Clubs"
                         >
                             <FontAwesomeIcon icon={faBuilding} className="h-4 w-4" />
-                            Clubs
+                            <span className="hidden sm:inline">Clubs</span>
                         </Link>
                     </div>
                 </div>
@@ -57,7 +59,7 @@ export default function Index({ auth, teams = [] }) {
                                 {teamList.map((team) => (
                                     <div
                                         key={team.id}
-                                        className="flex flex-wrap items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-4 py-3"
+                                        className="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
                                     >
                                         <div className="flex items-center gap-3">
                                             {team.logo_url ? (
@@ -86,31 +88,34 @@ export default function Index({ auth, teams = [] }) {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-2 sm:gap-3">
                                             {ownsTeam(team) && (
                                                 <Link
                                                     href={route('teams.players.create', team.id)}
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                                                    title="Add Player"
                                                 >
                                                     <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" />
-                                                    Add Player
+                                                    <span className="hidden sm:inline">Add Player</span>
                                                 </Link>
                                             )}
                                             {ownsTeam(team) && (
                                                 <Link
                                                     href={route('teams.edit', team.id)}
                                                     className="inline-flex items-center gap-1 text-sm font-semibold text-gray-700 hover:text-gray-900"
+                                                    title="Edit"
                                                 >
                                                     <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />
-                                                    Edit
+                                                    <span className="hidden sm:inline">Edit</span>
                                                 </Link>
                                             )}
                                             <Link
                                                 href={route('teams.show', team.id)}
                                                 className="inline-flex items-center gap-1 text-sm font-semibold text-green-700 hover:text-green-600"
+                                                title="View"
                                             >
                                                 <FontAwesomeIcon icon={faEye} className="h-3.5 w-3.5" />
-                                                View
+                                                <span className="hidden sm:inline">View</span>
                                             </Link>
                                         </div>
                                     </div>
