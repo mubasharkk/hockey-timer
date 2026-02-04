@@ -11,8 +11,8 @@ class EventResource extends JsonResource
      */
     public function toArray($request): array
     {
-        $game = $this->whenLoaded('game');
-        $team = $this->whenLoaded('team');
+        $game = $this->relationLoaded('game') ? $this->game : null;
+        $team = $this->relationLoaded('team') ? $this->team : null;
 
         // Determine opponent team name
         $opponentTeam = null;

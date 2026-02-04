@@ -31,7 +31,6 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: 'put',
         name: currentPlayer.name || '',
-        shirt_number: currentPlayer.shirt_number || '',
         nic_number: currentPlayer.nic_number || '',
         date_of_birth: formatDateForInput(currentPlayer.date_of_birth),
         gender: currentPlayer.gender || '',
@@ -124,21 +123,12 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                     )}
 
                     <form onSubmit={submit} className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <Field
-                                label="Name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                error={errors.name}
-                            />
-                            <Field
-                                label="Shirt Number"
-                                value={data.shirt_number}
-                                onChange={(e) => setData('shirt_number', e.target.value)}
-                                error={errors.shirt_number}
-                                placeholder="Optional"
-                            />
-                        </div>
+                        <Field
+                            label="Name"
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            error={errors.name}
+                        />
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
