@@ -32,7 +32,6 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
         _method: 'put',
         name: currentPlayer.name || '',
         shirt_number: currentPlayer.shirt_number || '',
-        player_pass_number: currentPlayer.player_pass_number || '',
         nic_number: currentPlayer.nic_number || '',
         date_of_birth: formatDateForInput(currentPlayer.date_of_birth),
         gender: currentPlayer.gender || '',
@@ -142,13 +141,12 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <Field
-                                label="Player Pass Number"
-                                value={data.player_pass_number}
-                                onChange={(e) => setData('player_pass_number', e.target.value)}
-                                error={errors.player_pass_number}
-                                placeholder="Leave empty to keep or auto-generate"
-                            />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Player Pass Number</label>
+                                <p className="mt-1 block w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                                    {currentPlayer.player_pass_number || <span className="text-gray-400">Not assigned</span>}
+                                </p>
+                            </div>
                             <Field
                                 label="Player NIC (optional)"
                                 value={data.nic_number}
@@ -370,7 +368,7 @@ export default function Edit({ auth, team, player, genders = {}, bloodGroups = {
                         </div>
 
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-gray-500">Pass numbers keep the current value unless replaced.</p>
+                            <p className="text-xs text-gray-500">Pass number cannot be changed.</p>
                             <button
                                 type="submit"
                                 disabled={processing}

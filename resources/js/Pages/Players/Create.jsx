@@ -10,7 +10,6 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
 
     const { data, setData, post, processing, errors } = useForm({
         name: '',
-        player_pass_number: '',
         nic_number: '',
         date_of_birth: '',
         gender: '',
@@ -81,13 +80,9 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player Pass Number</label>
-                                <input
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                                    value={data.player_pass_number}
-                                    onChange={(e) => setData('player_pass_number', e.target.value)}
-                                    placeholder="Leave empty to auto-generate"
-                                />
-                                {errors.player_pass_number && <p className="mt-1 text-xs text-red-600">{errors.player_pass_number}</p>}
+                                <p className="mt-1 block w-full rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500">
+                                    Auto-generated on save
+                                </p>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Player NIC (optional)</label>
@@ -314,7 +309,7 @@ export default function Create({ auth, genders = {}, bloodGroups = {}, playerTyp
                         </div>
 
                         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-xs text-gray-500">Pass numbers auto-generate when left blank.</p>
+                            <p className="text-xs text-gray-500">Pass number will be auto-generated.</p>
                             <button
                                 type="submit"
                                 disabled={processing}

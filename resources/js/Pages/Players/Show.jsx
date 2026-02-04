@@ -44,9 +44,27 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Player</p>
                             <h2 className="text-lg font-semibold leading-tight text-gray-800 sm:text-xl">{currentPlayer.name}</h2>
-                            {currentPlayer.player_pass_number && (
-                                <p className="text-sm text-gray-600">Pass: {currentPlayer.player_pass_number}</p>
-                            )}
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                {currentPlayer.player_pass_number && (
+                                    <p className="text-sm text-gray-600">Pass: {currentPlayer.player_pass_number}</p>
+                                )}
+                                {playerTeams.length > 0 && (
+                                    <div className="flex flex-wrap items-center gap-1">
+                                        {playerTeams.map((team) => (
+                                            <Link
+                                                key={team.id}
+                                                href={route('teams.show', team.id)}
+                                                className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-200"
+                                            >
+                                                {team.logo_url && (
+                                                    <img src={team.logo_url} alt="" className="h-3 w-3 rounded-full object-cover" />
+                                                )}
+                                                {team.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -238,60 +256,21 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                     {/* Statistics Card */}
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <h3 className="mb-4 text-lg font-semibold text-gray-900">Statistics</h3>
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                            <StatCard
-                                icon={faFutbol}
-                                label="Goals"
-                                value={statistics.goals || 0}
-                                color="text-green-600"
-                            />
-                            <StatCard
-                                icon={faFlag}
-                                label="Yellow Cards"
-                                value={statistics.yellow_cards || 0}
-                                color="text-yellow-600"
-                            />
-                            <StatCard
-                                icon={faFlag}
-                                label="Red Cards"
-                                value={statistics.red_cards || 0}
-                                color="text-red-600"
-                            />
-                            <StatCard
-                                icon={faTrophy}
-                                label="Games Played"
-                                value={statistics.total_games || 0}
-                                color="text-green-700"
-                            />
+                        <div className="flex flex-wrap items-center justify-start gap-6">
+                            <StatItem icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" />
+                            <StatItem icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" />
+                            <StatItem icon={faFlag} label="Yellow" value={statistics.yellow_cards || 0} color="text-yellow-600" />
+                            <StatItem icon={faFlag} label="Red" value={statistics.red_cards || 0} color="text-red-600" />
+                            {statistics.green_cards > 0 && (
+                                <StatItem icon={faFlag} label="Green" value={statistics.green_cards} color="text-emerald-600" />
+                            )}
+                            {statistics.penalty_corners > 0 && (
+                                <StatItem icon={faStopwatch} label="PC" value={statistics.penalty_corners} color="text-blue-600" />
+                            )}
+                            {statistics.penalty_strokes > 0 && (
+                                <StatItem icon={faStopwatch} label="PS" value={statistics.penalty_strokes} color="text-purple-600" />
+                            )}
                         </div>
-                        {(statistics.green_cards > 0 || statistics.penalty_corners > 0 || statistics.penalty_strokes > 0) && (
-                            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                                {statistics.green_cards > 0 && (
-                                    <StatCard
-                                        icon={faFlag}
-                                        label="Green Cards"
-                                        value={statistics.green_cards}
-                                        color="text-emerald-600"
-                                    />
-                                )}
-                                {statistics.penalty_corners > 0 && (
-                                    <StatCard
-                                        icon={faStopwatch}
-                                        label="Penalty Corners"
-                                        value={statistics.penalty_corners}
-                                        color="text-blue-600"
-                                    />
-                                )}
-                                {statistics.penalty_strokes > 0 && (
-                                    <StatCard
-                                        icon={faStopwatch}
-                                        label="Penalty Strokes"
-                                        value={statistics.penalty_strokes}
-                                        color="text-purple-600"
-                                    />
-                                )}
-                            </div>
-                        )}
                     </div>
 
                     {/* Recent Games Card */}
@@ -500,13 +479,11 @@ const InfoItem = ({ icon, label, value }) => (
     </div>
 );
 
-const StatCard = ({ icon, label, value, color }) => (
-    <div className="rounded-md border border-gray-100 bg-gray-50 p-4 text-center">
-        {icon && (
-            <FontAwesomeIcon icon={icon} className={`mx-auto mb-2 h-6 w-6 ${color}`} />
-        )}
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</p>
+const StatItem = ({ icon, label, value, color }) => (
+    <div className="flex items-center gap-2">
+        {icon && <FontAwesomeIcon icon={icon} className={`h-4 w-4 ${color}`} />}
+        <span className="text-xl font-bold text-gray-900">{value}</span>
+        <span className="text-xs text-gray-500">{label}</span>
     </div>
 );
 
