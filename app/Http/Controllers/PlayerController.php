@@ -418,8 +418,6 @@ class PlayerController extends Controller
             'yellow_cards' => $player->total_yellow_cards,
             'red_cards' => $player->total_red_cards,
             'green_cards' => $player->total_green_cards,
-            'penalty_corners' => $player->total_penalty_corners,
-            'penalty_strokes' => $player->total_penalty_strokes,
             'total_games' => $player->total_games,
         ];
     }

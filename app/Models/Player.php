@@ -43,8 +43,6 @@ class Player extends Model implements HasMedia
         'total_green_cards',
         'total_yellow_cards',
         'total_red_cards',
-        'total_penalty_corners',
-        'total_penalty_strokes',
     ];
 
     protected $casts = [
