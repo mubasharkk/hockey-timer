@@ -294,7 +294,7 @@ const TeamSelect = ({ label, value, onChange, teams, error }) => (
             <option value="">Select team</option>
             {teams.map((team) => (
                 <option key={team.id} value={team.id}>
-                    {team.name}
+                    {team.name} / {team.club.name}
                 </option>
             ))}
         </select>

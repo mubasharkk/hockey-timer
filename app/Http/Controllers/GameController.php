@@ -30,10 +30,11 @@ class GameController extends Controller
             ->where('user_id', Auth::id())
             ->with([
                 'media',
+                'club',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             ])
             ->orderBy('name')
-            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
+            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
 
         $tournaments = Tournament::with(['pools.teams:id,name'])
             ->orderBy('title')
@@ -145,8 +146,8 @@ class GameController extends Controller
 
         $teams = Team::where('user_id', Auth::id())
             ->orderBy('name')
-            ->with('media')
-            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id']);
+            ->with(['media', 'club'])
+            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
 
         $tournaments = Tournament::with(['pools.teams:id,name'])
             ->orderBy('title')
