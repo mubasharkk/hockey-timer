@@ -401,6 +401,12 @@ export default function Timer({ auth, game, config = {} }) {
         return player?.name || null;
     };
 
+    const findPlayerId = (team, shirtNumber) => {
+        if (!team || !shirtNumber) return null;
+        const player = (team.players || []).find((p) => `${p.shirt_number}` === `${shirtNumber}`);
+        return player?.id || null;
+    };
+
     const openGoalDialog = (team) => {
         if (!team?.id || isGameOver) return;
         const shouldPause = !currentGame.continue_timer_on_goal;
@@ -437,6 +443,7 @@ export default function Timer({ auth, game, config = {} }) {
         if (!team?.id || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: (prev[team.id] ?? 0) + 1 }));
         const playerName = findPlayerName(team, shirtNumber);
+        const playerId = findPlayerId(team, shirtNumber);
         const newEvent = {
             id: `temp-${Date.now()}`,
             team_id: team.id,
@@ -444,6 +451,7 @@ export default function Timer({ auth, game, config = {} }) {
             event_type: 'goal',
             goal_type: goalType || null,
             player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
+            player_id: playerId,
             timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
             note: playerName || null,
@@ -494,6 +502,7 @@ export default function Timer({ auth, game, config = {} }) {
         if (!team?.id || isGameOver) return;
         const timerValue = currentEventSeconds;
         const playerName = findPlayerName(team, shirtNumber);
+        const playerId = findPlayerId(team, shirtNumber);
         const minuteText = minutes
             ? `${Math.max(parseInt(minutes, 10) || 0, 0)}m`
             : `${Math.floor(timerValue / 60)}m`;
@@ -506,6 +515,7 @@ export default function Timer({ auth, game, config = {} }) {
             event_type: 'card',
             card_type: cardType,
             player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
+            player_id: playerId,
             timer_value_seconds: timerValue,
             occurred_at: new Date().toISOString(),
             note,

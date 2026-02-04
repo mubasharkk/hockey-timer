@@ -9,8 +9,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPen, faBirthdayCake, faIdCard, faShirt, faTrophy, faFutbol, faFlag, faStopwatch, faPhone, faTint, faRunning, faUserShield, faEnvelope, faVenusMars, faExternalLinkAlt, faTrash, faExpand } from '@fortawesome/free-solid-svg-icons';
 import moment from 'moment';
 
-export default function Show({ auth, player, teams = [], statistics, recentGames = [], events = [], can = {} }) {
+export default function Show({ auth, player, teams = [], recentGames = [], events = [], can = {} }) {
     const currentPlayer = player?.data ?? player;
+    const statistics = currentPlayer?.statistics ?? [];
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
     const playerGames = Array.isArray(recentGames) ? recentGames : recentGames?.data || [];
     const playerEvents = Array.isArray(events) ? events : events?.data || [];
@@ -47,22 +48,6 @@ export default function Show({ auth, player, teams = [], statistics, recentGames
                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                                 {currentPlayer.player_pass_number && (
                                     <p className="text-sm text-gray-600">Pass: {currentPlayer.player_pass_number}</p>
-                                )}
-                                {playerTeams.length > 0 && (
-                                    <div className="flex flex-wrap items-center gap-1">
-                                        {playerTeams.map((team) => (
-                                            <Link
-                                                key={team.id}
-                                                href={route('teams.show', team.id)}
-                                                className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-200"
-                                            >
-                                                {team.logo_url && (
-                                                    <img src={team.logo_url} alt="" className="h-3 w-3 rounded-full object-cover" />
-                                                )}
-                                                {team.name}
-                                            </Link>
-                                        ))}
-                                    </div>
                                 )}
                             </div>
                         </div>

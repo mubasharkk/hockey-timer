@@ -163,14 +163,12 @@ class PlayerController extends Controller
     {
         $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
-        $statistics = $this->getPlayerStatistics($player);
         $recentGames = $this->getRecentGames($player);
         $events = $this->getPlayerEvents($player);
 
         return Inertia::render('Players/Show', [
             'player' => PlayerResource::make($player),
             'teams' => TeamResource::collection($player->teams),
-            'statistics' => $statistics,
             'recentGames' => GameResource::collection($recentGames),
             'events' => $events,
             'can' => [
@@ -192,12 +190,9 @@ class PlayerController extends Controller
 
         $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
-        $statistics = $this->getPlayerStatistics($player);
-
         return Inertia::render('Players/PublicProfile', [
             'player' => PlayerResource::make($player),
-            'teams' => TeamResource::collection($player->teams),
-            'statistics' => $statistics,
+            'teams' => TeamResource::collection($player->teams)
         ]);
     }
 
@@ -409,17 +404,6 @@ class PlayerController extends Controller
         $post = $address['post_code'] ?? null;
 
         return $street && $city && $post && strlen($post) >= 4;
-    }
-
-    private function getPlayerStatistics(Player $player): array
-    {
-        return [
-            'goals' => $player->total_goals,
-            'yellow_cards' => $player->total_yellow_cards,
-            'red_cards' => $player->total_red_cards,
-            'green_cards' => $player->total_green_cards,
-            'total_games' => $player->total_games,
-        ];
     }
 
     private function getRecentGames(Player $player): \Illuminate\Support\Collection

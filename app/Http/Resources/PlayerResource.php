@@ -57,6 +57,13 @@ class PlayerResource extends JsonResource
             'id_documents' => $idDocuments,
             'contact_persons' => ContactPersonResource::collection($this->whenLoaded('contactPersons')),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),
+            'statistics' => [
+                'total_games' => $this->total_games ?? 0,
+                'total_goals' => $this->total_goals ?? 0,
+                'total_green_cards' => $this->total_green_cards ?? 0,
+                'total_yellow_cards' => $this->total_yellow_cards ?? 0,
+                'total_red_cards' => $this->total_red_cards ?? 0,
+            ],
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

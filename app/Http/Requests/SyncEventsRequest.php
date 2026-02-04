@@ -28,6 +28,7 @@ class SyncEventsRequest extends FormRequest
             'events.*.goal_type' => ['nullable', Rule::in(['FG', 'PG'])],
             'events.*.card_type' => ['nullable', Rule::in(['green', 'yellow', 'red'])],
             'events.*.player_shirt_number' => ['nullable', 'integer'],
+            'events.*.player_id' => ['nullable', 'integer'],
             'events.*.timer_value_seconds' => ['nullable', 'integer', 'min:0'],
             'events.*.occurred_at' => ['nullable', 'date'],
             'events.*.note' => ['nullable', 'string'],

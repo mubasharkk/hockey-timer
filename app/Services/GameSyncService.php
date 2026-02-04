@@ -174,6 +174,7 @@ class GameSyncService
                 'goal_type' => $event['goal_type'] ?? null,
                 'card_type' => $event['card_type'] ?? null,
                 'player_shirt_number' => $event['player_shirt_number'] ?? null,
+                'player_id' => $event['player_id'] ?? null,
                 'timer_value_seconds' => $timerSeconds,
                 'occurred_at' => $occurredAt,
                 'note' => $note,
