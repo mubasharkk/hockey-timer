@@ -56,8 +56,6 @@ class EventObserver
             'total_green_cards' => $events->where('event_type', 'card')->where('card_type', 'green')->count(),
             'total_yellow_cards' => $events->where('event_type', 'card')->where('card_type', 'yellow')->count(),
             'total_red_cards' => $events->where('event_type', 'card')->where('card_type', 'red')->count(),
-            'total_penalty_corners' => $events->where('event_type', 'penalty_corner')->count(),
-            'total_penalty_strokes' => $events->where('event_type', 'penalty_stroke')->count(),
         ]);
     }
 }
