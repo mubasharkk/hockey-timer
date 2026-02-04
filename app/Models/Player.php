@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Lecturize\Addresses\Traits\HasAddresses;
 use Spatie\MediaLibrary\HasMedia;
@@ -37,6 +38,13 @@ class Player extends Model implements HasMedia
         'player_type',
         'description',
         'is_active',
+        'total_games',
+        'total_goals',
+        'total_green_cards',
+        'total_yellow_cards',
+        'total_red_cards',
+        'total_penalty_corners',
+        'total_penalty_strokes',
     ];
 
     protected $casts = [
@@ -59,6 +67,11 @@ class Player extends Model implements HasMedia
     public function contactPersons(): MorphMany
     {
         return $this->morphMany(ContactPerson::class, 'contactable');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
     }
 
     /**

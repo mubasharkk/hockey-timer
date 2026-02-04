@@ -16,6 +16,7 @@ class Event extends Model
     protected $fillable = [
         'game_id',
         'team_id',
+        'player_id',
         'session_number',
         'event_type',
         'goal_type',
@@ -38,5 +39,10 @@ class Event extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function player(): BelongsTo
+    {
+        return $this->belongsTo(Player::class);
     }
 }

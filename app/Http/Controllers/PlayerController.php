@@ -413,60 +413,26 @@ class PlayerController extends Controller
 
     private function getPlayerStatistics(Player $player): array
     {
-        $teamIds = $player->teams()->pluck('teams.id')->toArray();
-
-        // Get shirt numbers for this player across all teams
-        $shirtNumbers = $player->teams()
-            ->whereNotNull('player_team.shirt_number')
-            ->pluck('player_team.shirt_number')
-            ->unique()
-            ->toArray();
-
-        if (empty($shirtNumbers) || empty($teamIds)) {
-            return [
-                'goals' => 0,
-                'yellow_cards' => 0,
-                'red_cards' => 0,
-                'green_cards' => 0,
-                'penalty_corners' => 0,
-                'penalty_strokes' => 0,
-                'total_games' => 0,
-            ];
-        }
-
-        $events = Event::whereIn('team_id', $teamIds)
-            ->whereIn('player_shirt_number', $shirtNumbers)
-            ->get();
-
         return [
-            'goals' => $events->where('event_type', 'goal')->count(),
-            'yellow_cards' => $events->where('event_type', 'card')->where('card_type', 'yellow')->count(),
-            'red_cards' => $events->where('event_type', 'card')->where('card_type', 'red')->count(),
-            'green_cards' => $events->where('event_type', 'card')->where('card_type', 'green')->count(),
-            'penalty_corners' => $events->where('event_type', 'penalty_corner')->count(),
-            'penalty_strokes' => $events->where('event_type', 'penalty_stroke')->count(),
-            'total_games' => $events->pluck('game_id')->unique()->count(),
+            'goals' => $player->total_goals,
+            'yellow_cards' => $player->total_yellow_cards,
+            'red_cards' => $player->total_red_cards,
+            'green_cards' => $player->total_green_cards,
+            'penalty_corners' => $player->total_penalty_corners,
+            'penalty_strokes' => $player->total_penalty_strokes,
+            'total_games' => $player->total_games,
         ];
     }
 
     private function getRecentGames(Player $player): \Illuminate\Support\Collection
     {
-        $teamIds = $player->teams()->pluck('teams.id')->toArray();
-
-        $shirtNumbers = $player->teams()
-            ->whereNotNull('player_team.shirt_number')
-            ->pluck('player_team.shirt_number')
-            ->unique()
-            ->toArray();
-
-        if (empty($shirtNumbers) || empty($teamIds)) {
-            return collect();
-        }
-
-        $gameIds = Event::whereIn('team_id', $teamIds)
-            ->whereIn('player_shirt_number', $shirtNumbers)
+        $gameIds = Event::where('player_id', $player->id)
             ->pluck('game_id')
             ->unique();
+
+        if ($gameIds->isEmpty()) {
+            return collect();
+        }
 
         return \App\Models\Game::whereIn('id', $gameIds)
             ->with('tournament:id,title')
@@ -490,20 +456,7 @@ class PlayerController extends Controller
 
     private function getPlayerEvents(Player $player): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $teamIds = $player->teams()->pluck('teams.id')->toArray();
-
-        $shirtNumbers = $player->teams()
-            ->whereNotNull('player_team.shirt_number')
-            ->pluck('player_team.shirt_number')
-            ->unique()
-            ->toArray();
-
-        if (empty($shirtNumbers) || empty($teamIds)) {
-            return \App\Http\Resources\EventResource::collection(collect());
-        }
-
-        $events = Event::whereIn('team_id', $teamIds)
-            ->whereIn('player_shirt_number', $shirtNumbers)
+        $events = Event::where('player_id', $player->id)
             ->with(['game:id,team_a_name,team_b_name,home_team_id,away_team_id,game_date,game_time,code', 'team:id,name'])
             ->orderBy('occurred_at', 'desc')
             ->limit(50)
