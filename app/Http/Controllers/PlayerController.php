@@ -14,6 +14,8 @@ use App\Http\Resources\TeamResource;
 use App\Http\Resources\GameResource;
 use App\Services\IdDocumentService;
 use App\Services\ImageService;
+use App\Services\Player\PassNumberService;
+use App\Services\Player\PlayerEventQueryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -27,7 +29,9 @@ class PlayerController extends Controller
     use EnsuresOwnership;
     public function __construct(
         private readonly IdDocumentService $idDocumentService,
-        private readonly ImageService $imageService
+        private readonly ImageService $imageService,
+        private readonly PassNumberService $passNumberService,
+        private readonly PlayerEventQueryService $playerEventQueryService,
     ) {}
 
     /**
@@ -79,7 +83,7 @@ class PlayerController extends Controller
         $player = Player::create([
             'user_id' => $request->user()->id,
             'name' => $extractedData['name'] ?? 'New Player',
-            'player_pass_number' => $this->resolvePassNumber(null),
+            'player_pass_number' => $this->passNumberService->resolve(null),
             'nic_number' => $extractedData['nic_number'] ?? null,
             'date_of_birth' => $extractedData['date_of_birth'] ?? null,
             'gender' => $extractedData['gender'] ?? null,
@@ -145,8 +149,8 @@ class PlayerController extends Controller
     {
         $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
-        $recentGames = $this->getRecentGames($player);
-        $events = $this->getPlayerEvents($player);
+        $recentGames = $this->playerEventQueryService->getRecentGames($player);
+        $events = $this->playerEventQueryService->getPlayerEvents($player);
 
         return Inertia::render('Players/Show', [
             'player' => PlayerResource::make($player),
@@ -203,7 +207,7 @@ class PlayerController extends Controller
         $player = Player::create([
             'user_id' => Auth::id(),
             'name' => $request->string('name'),
-            'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number')),
+            'player_pass_number' => $this->passNumberService->resolve($request->input('player_pass_number')),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
             'gender' => $request->string('gender') ?: null,
@@ -245,7 +249,7 @@ class PlayerController extends Controller
 
         $player->update([
             'name' => $request->string('name'),
-            'player_pass_number' => $this->resolvePassNumber($request->input('player_pass_number'), $player),
+            'player_pass_number' => $this->passNumberService->resolve($request->input('player_pass_number'), $player),
             'nic_number' => $request->string('nic_number') ?: null,
             'date_of_birth' => $request->date('date_of_birth') ?: null,
             'gender' => $request->string('gender') ?: null,
@@ -319,25 +323,6 @@ class PlayerController extends Controller
         return response()->json(PlayerResource::collection($players));
     }
 
-    private function resolvePassNumber(?string $value, ?Player $current = null): string
-    {
-        $candidate = $value ?: $this->generatePassNumber();
-        while (
-            Player::where('player_pass_number', $candidate)
-                ->when($current?->id, fn ($q) => $q->where('id', '!=', $current->id))
-                ->exists()
-        ) {
-            $candidate = $this->generatePassNumber();
-        }
-
-        return $candidate;
-    }
-
-    private function generatePassNumber(): string
-    {
-        return Str::upper(Str::random(6));
-    }
-
     private function shouldStoreAddress(array $address): bool
     {
         if (empty($address)) {
@@ -349,46 +334,5 @@ class PlayerController extends Controller
         $post = $address['post_code'] ?? null;
 
         return $street && $city && $post && strlen($post) >= 4;
-    }
-
-    private function getRecentGames(Player $player): \Illuminate\Support\Collection
-    {
-        $gameIds = Event::where('player_id', $player->id)
-            ->pluck('game_id')
-            ->unique();
-
-        if ($gameIds->isEmpty()) {
-            return collect();
-        }
-
-        return \App\Models\Game::whereIn('id', $gameIds)
-            ->with('tournament:id,title')
-            ->orderBy('game_date', 'desc')
-            ->orderBy('game_time', 'desc')
-            ->limit(10)
-            ->get([
-                'id',
-                'team_a_name',
-                'team_b_name',
-                'tournament_id',
-                'venue',
-                'sport_type',
-                'code',
-                'game_date',
-                'game_time',
-                'status',
-                'ended_at',
-            ]);
-    }
-
-    private function getPlayerEvents(Player $player): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
-    {
-        $events = Event::where('player_id', $player->id)
-            ->with(['game:id,team_a_name,team_b_name,home_team_id,away_team_id,game_date,game_time,code', 'team:id,name'])
-            ->orderBy('occurred_at', 'desc')
-            ->limit(50)
-            ->get();
-
-        return \App\Http\Resources\EventResource::collection($events);
     }
 }
