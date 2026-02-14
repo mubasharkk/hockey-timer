@@ -5,75 +5,40 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GameResource;
 use App\Http\Resources\MatchSessionResource;
 use App\Models\Game;
+use App\Services\Game\GameScoreCalculatorService;
+use App\Services\Game\GameStateService;
+use App\Services\Game\GameTimerService;
 use Illuminate\Http\JsonResponse;
 
 class PublicTickerApiController extends Controller
 {
+    public function __construct(
+        private readonly GameScoreCalculatorService $scoreCalculator,
+        private readonly GameStateService $gameStateService,
+        private readonly GameTimerService $timerService,
+    ) {}
+
     public function show(Game $game): JsonResponse
     {
         $game->load([
             'teams' => fn ($q) => $q->with('media')->orderBy('side'),
             'tournament' => fn ($q) => $q->with('media'),
         ]);
+
         $sessionModels = $game->sessions()->orderBy('number')->get();
         $eventModels = $game->events()->orderByDesc('occurred_at')->limit(50)->get();
-        $goalCounts = $game->events()
-            ->selectRaw('team_id, COUNT(*) as total')
-            ->where('event_type', 'goal')
-            ->groupBy('team_id')
-            ->pluck('total', 'team_id');
 
-        $home = $game->teams->firstWhere('side', 'home');
-        $away = $game->teams->firstWhere('side', 'away');
-        $homeScore = $home ? ($goalCounts[$home->id] ?? $home->score ?? 0) : 0;
-        $awayScore = $away ? ($goalCounts[$away->id] ?? $away->score ?? 0) : 0;
+        $scores = $this->scoreCalculator->calculateScores($game);
+        $currentSessionNumber = $this->gameStateService->determineCurrentSession($game);
+        $isRunning = $this->gameStateService->isRunning($game);
+        $isBreak = $this->gameStateService->isOnBreak($game);
 
-        // Determine current session
-        $sessionCount = max($sessionModels->count(), (int) ($game->getAttribute('sessions') ?? 0));
-        $endedSessions = $eventModels->where('event_type', 'session_end')->count();
-        $currentSessionNumber = max(1, min($sessionCount ?: 1, $endedSessions + 1));
         $currentSession = $sessionModels->firstWhere('number', $currentSessionNumber)
             ?: $sessionModels->sortBy('number')->first();
 
         $elapsed = $currentSession?->actual_duration_seconds ?? 0;
         $planned = $currentSession?->planned_duration_seconds ?? ($game->session_duration_minutes * 60);
-
-        $lastStartEvent = $game->events()
-            ->where(function ($q) {
-                $q->where('event_type', 'session_start')
-                    ->orWhere(function ($q2) {
-                        $q2->where('event_type', 'highlight')
-                            ->where('note', 'like', '%session%start%');
-                    });
-            })
-            ->latest('occurred_at')
-            ->first();
-
-        $lastEndEvent = $game->events()
-            ->whereIn('event_type', ['session_end', 'game_end'])
-            ->latest('occurred_at')
-            ->first();
-
-        $lastStartAt = $lastStartEvent?->occurred_at;
-        $lastEndAt = $lastEndEvent?->occurred_at;
-
-        $isRunning = $game->status !== 'finished'
-            && $lastStartAt
-            && (! $lastEndAt || $lastStartAt > $lastEndAt);
-
-        $isBreak = ! $isRunning
-            && $endedSessions >= ($currentSessionNumber - 1)
-            && (! $currentSession?->started_at || ($lastEndAt && (! $lastStartAt || $lastEndAt >= $lastStartAt)));
-
-        $timerSeconds = 0;
-        if ($isRunning) {
-            $timerSeconds = $game->timer_mode === 'DESC'
-                ? max($planned - $elapsed, 0)
-                : max($elapsed, 0);
-        } else {
-            // Keep timer at zero during breaks or when stopped.
-            $timerSeconds = 0;
-        }
+        $timerSeconds = $this->timerService->calculateTimerValue($game, $elapsed, $planned, $isRunning);
 
         $recentEvents = $eventModels->take(5)->values()->map(function ($event) {
             return [
@@ -91,11 +56,12 @@ class PublicTickerApiController extends Controller
         });
 
         $gameData = GameResource::make($game)->resolve();
+        $sessionCount = max($sessionModels->count(), (int) ($game->getAttribute('sessions') ?? 0));
 
         return response()->json(array_merge($gameData, [
             'game_id' => $game->id,
-            'team_a_score' => $homeScore ?? 0,
-            'team_b_score' => $awayScore ?? 0,
+            'team_a_score' => $scores['home'] ?? 0,
+            'team_b_score' => $scores['away'] ?? 0,
             'timer_seconds' => $timerSeconds,
             'current_period' => $currentSessionNumber,
             'current_session' => $currentSession ? MatchSessionResource::make($currentSession) : null,
