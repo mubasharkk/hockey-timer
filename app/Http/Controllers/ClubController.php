@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ContactPerson\SyncContactPersons;
 use App\Http\Requests\StoreClubRequest;
 use App\Http\Requests\UpdateClubRequest;
 use App\Models\Club;
@@ -36,7 +37,7 @@ class ClubController extends Controller
         return Inertia::render('Clubs/Create');
     }
 
-    public function store(StoreClubRequest $request): RedirectResponse
+    public function store(StoreClubRequest $request, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $club = Club::create([
             'user_id' => Auth::id(),
@@ -47,7 +48,6 @@ class ClubController extends Controller
             'description' => $request->string('description') ?: null,
         ]);
 
-        // Handle address
         $address = $request->input('address', []);
         if ($this->shouldStoreAddress($address)) {
             $club->addAddress([
@@ -59,24 +59,11 @@ class ClubController extends Controller
             ]);
         }
 
-        // Handle logo
         if ($request->hasFile('logo')) {
-            $club
-                ->addMediaFromRequest('logo')
-                ->toMediaCollection('logo');
+            $club->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        // Handle contact persons
-        if ($request->has('contact_persons')) {
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                $club->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-            }
-        }
+        $syncContactPersons($club, $request->input('contact_persons', []));
 
         return redirect()->route('clubs.show', $club)->with('success', 'Club created successfully.');
     }
@@ -108,7 +95,7 @@ class ClubController extends Controller
         ]);
     }
 
-    public function update(UpdateClubRequest $request, Club $club): RedirectResponse
+    public function update(UpdateClubRequest $request, Club $club, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $this->ensureAccess($club);
 
@@ -120,7 +107,6 @@ class ClubController extends Controller
             'description' => $request->string('description') ?: null,
         ]);
 
-        // Handle address
         $address = $request->input('address', []);
         $existingAddress = $club->addresses()->first();
 
@@ -142,44 +128,16 @@ class ClubController extends Controller
             $club->flushAddresses();
         }
 
-        // Handle logo
         if ($request->boolean('remove_logo')) {
             $club->clearMediaCollection('logo');
         }
 
         if ($request->hasFile('logo')) {
             $club->clearMediaCollection('logo');
-            $club
-                ->addMediaFromRequest('logo')
-                ->toMediaCollection('logo');
+            $club->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        // Sync contact persons
-        if ($request->has('contact_persons')) {
-            $existingIds = [];
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                if (isset($contactPerson['id'])) {
-                    $club->contactPersons()->where('id', $contactPerson['id'])->update([
-                        'name' => $contactPerson['name'],
-                        'role' => $contactPerson['role'] ?? null,
-                        'phone' => $contactPerson['phone'] ?? null,
-                        'email' => $contactPerson['email'] ?? null,
-                    ]);
-                    $existingIds[] = $contactPerson['id'];
-                } else {
-                    $newContact = $club->contactPersons()->create([
-                        'name' => $contactPerson['name'],
-                        'role' => $contactPerson['role'] ?? null,
-                        'phone' => $contactPerson['phone'] ?? null,
-                        'email' => $contactPerson['email'] ?? null,
-                    ]);
-                    $existingIds[] = $newContact->id;
-                }
-            }
-            $club->contactPersons()->whereNotIn('id', $existingIds)->delete();
-        } else {
-            $club->contactPersons()->delete();
-        }
+        $syncContactPersons($club, $request->input('contact_persons', []));
 
         return redirect()->route('clubs.show', $club)->with('success', 'Club updated successfully.');
     }

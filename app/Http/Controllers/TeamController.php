@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ContactPerson\SyncContactPersons;
 use App\Http\Controllers\Concerns\EnsuresOwnership;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
@@ -61,7 +62,7 @@ class TeamController extends Controller
         ]);
     }
 
-    public function store(StoreTeamRequest $request): RedirectResponse
+    public function store(StoreTeamRequest $request, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $team = Team::create([
             'user_id' => Auth::id(),
@@ -77,27 +78,15 @@ class TeamController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $team
-                ->addMediaFromRequest('logo')
-                ->toMediaCollection('logo');
+            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        // Create contact persons
-        if ($request->has('contact_persons')) {
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                $team->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-            }
-        }
+        $syncContactPersons($team, $request->input('contact_persons', []));
 
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
     }
 
-    public function storeForClub(StoreTeamRequest $request, Club $club): RedirectResponse
+    public function storeForClub(StoreTeamRequest $request, Club $club, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $this->ensureAccess($club);
 
@@ -115,22 +104,10 @@ class TeamController extends Controller
         ]);
 
         if ($request->hasFile('logo')) {
-            $team
-                ->addMediaFromRequest('logo')
-                ->toMediaCollection('logo');
+            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        // Create contact persons
-        if ($request->has('contact_persons')) {
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                $team->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-            }
-        }
+        $syncContactPersons($team, $request->input('contact_persons', []));
 
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
     }
@@ -167,7 +144,7 @@ class TeamController extends Controller
         ]);
     }
 
-    public function update(UpdateTeamRequest $request, Team $team): RedirectResponse
+    public function update(UpdateTeamRequest $request, Team $team, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $this->ensureAccess($team);
 
@@ -188,41 +165,10 @@ class TeamController extends Controller
 
         if ($request->hasFile('logo')) {
             $team->clearMediaCollection('logo');
-            $team
-                ->addMediaFromRequest('logo')
-                ->toMediaCollection('logo');
+            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
         }
 
-        // Sync contact persons
-        if ($request->has('contact_persons')) {
-            $existingIds = [];
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                if (isset($contactPerson['id'])) {
-                    // Update existing
-                    $team->contactPersons()->where('id', $contactPerson['id'])->update([
-                        'name' => $contactPerson['name'],
-                        'role' => $contactPerson['role'] ?? null,
-                        'phone' => $contactPerson['phone'] ?? null,
-                        'email' => $contactPerson['email'] ?? null,
-                    ]);
-                    $existingIds[] = $contactPerson['id'];
-                } else {
-                    // Create new
-                    $newContact = $team->contactPersons()->create([
-                        'name' => $contactPerson['name'],
-                        'role' => $contactPerson['role'] ?? null,
-                        'phone' => $contactPerson['phone'] ?? null,
-                        'email' => $contactPerson['email'] ?? null,
-                    ]);
-                    $existingIds[] = $newContact->id;
-                }
-            }
-            // Delete removed contact persons
-            $team->contactPersons()->whereNotIn('id', $existingIds)->delete();
-        } else {
-            // If no contact_persons provided, remove all
-            $team->contactPersons()->delete();
-        }
+        $syncContactPersons($team, $request->input('contact_persons', []));
 
         return redirect()->route('teams.show', $team)->with('success', 'Team updated.');
     }

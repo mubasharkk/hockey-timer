@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\ContactPerson\SyncContactPersons;
 use App\Http\Requests\ScanPlayerIdRequest;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Requests\UpdatePlayerRequest;
@@ -57,18 +58,14 @@ class PlayerController extends Controller
     /**
      * Step 1b: Process the scanned ID documents and create player.
      */
-    public function processScan(ScanPlayerIdRequest $request): RedirectResponse
+    public function processScan(ScanPlayerIdRequest $request, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $files = $request->file('id_documents');
         $additionalInfo = $request->input('additional_info');
 
-        // Fix image orientation before processing
         $processedFiles = $this->imageService->processMultiple($files);
-
-        // Extract data from ID documents with additional info (supports 1-2 files)
         $extractedData = $this->idDocumentService->extractFromDocuments($processedFiles, $additionalInfo);
 
-        // Check if player with this NIC already exists
         $nicNumber = $extractedData['nic_number'] ?? null;
         if ($nicNumber) {
             $existingPlayer = Player::where('nic_number', $nicNumber)->first();
@@ -79,7 +76,6 @@ class PlayerController extends Controller
             }
         }
 
-        // Create player with extracted data
         $player = Player::create([
             'user_id' => $request->user()->id,
             'name' => $extractedData['name'] ?? 'New Player',
@@ -94,12 +90,10 @@ class PlayerController extends Controller
             'is_active' => true,
         ]);
 
-        // Store address if extracted
         $address = $extractedData['address'] ?? [];
         if ($this->shouldStoreAddress($address)) {
             try {
                 $country = $address['country'] && strlen($address['country']) === 2 ? $address['country'] : 'PK';
-
                 $player->addAddress([
                     'street' => $address['street'],
                     'street_extra' => null,
@@ -113,22 +107,10 @@ class PlayerController extends Controller
             }
         }
 
-        // Create contact persons if extracted
-        foreach ($extractedData['contact_persons'] ?? [] as $contactPerson) {
-            if (!empty($contactPerson['name'])) {
-                $player->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-            }
-        }
+        $syncContactPersons($player, $extractedData['contact_persons'] ?? []);
 
-        // Store the ID documents as media (with fixed orientation)
         foreach ($processedFiles as $file) {
-            $player
-                ->addMedia($file->getRealPath())
+            $player->addMedia($file->getRealPath())
                 ->usingFileName($file->getClientOriginalName())
                 ->preservingOriginal()
                 ->toMediaCollection('id_document');
@@ -216,7 +198,7 @@ class PlayerController extends Controller
     /**
      * Store a newly created player.
      */
-    public function store(StorePlayerRequest $request): RedirectResponse
+    public function store(StorePlayerRequest $request, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $player = Player::create([
             'user_id' => Auth::id(),
@@ -246,22 +228,10 @@ class PlayerController extends Controller
         }
 
         if ($request->hasFile('photo')) {
-            $player
-                ->addMediaFromRequest('photo')
-                ->preservingOriginal()
-                ->toMediaCollection('photo');
+            $player->addMediaFromRequest('photo')->preservingOriginal()->toMediaCollection('photo');
         }
 
-        if ($request->has('contact_persons')) {
-            foreach ($request->input('contact_persons', []) as $contactPerson) {
-                $player->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-            }
-        }
+        $syncContactPersons($player, $request->input('contact_persons', []));
 
         return redirect()->route('players.show', $player)->with('success', 'Player created.');
     }
@@ -269,7 +239,7 @@ class PlayerController extends Controller
     /**
      * Update the specified player.
      */
-    public function update(UpdatePlayerRequest $request, Player $player): RedirectResponse
+    public function update(UpdatePlayerRequest $request, Player $player, SyncContactPersons $syncContactPersons): RedirectResponse
     {
         $this->ensureAccess($player);
 
@@ -286,28 +256,7 @@ class PlayerController extends Controller
             'is_active' => $request->boolean('is_active', true),
         ]);
 
-        // Sync contact persons
-        $submittedIds = [];
-        foreach ($request->input('contact_persons', []) as $contactPerson) {
-            if (!empty($contactPerson['id'])) {
-                $player->contactPersons()->where('id', $contactPerson['id'])->update([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-                $submittedIds[] = $contactPerson['id'];
-            } else {
-                $newContact = $player->contactPersons()->create([
-                    'name' => $contactPerson['name'],
-                    'role' => $contactPerson['role'] ?? null,
-                    'phone' => $contactPerson['phone'] ?? null,
-                    'email' => $contactPerson['email'] ?? null,
-                ]);
-                $submittedIds[] = $newContact->id;
-            }
-        }
-        $player->contactPersons()->whereNotIn('id', $submittedIds)->delete();
+        $syncContactPersons($player, $request->input('contact_persons', []));
 
         $address = $request->input('address', []);
         $existingAddress = $player->addresses()->first();
@@ -315,7 +264,6 @@ class PlayerController extends Controller
         if ($this->shouldStoreAddress($address)) {
             $payload = [
                 'street' => $address['street'],
-                //'street_extra' => $address['street_extra'] ?? null,
                 'city' => $address['city'],
                 'state' => $address['state'] ?? null,
                 'post_code' => $address['post_code'],
@@ -334,10 +282,7 @@ class PlayerController extends Controller
 
         if ($request->hasFile('photo')) {
             $player->clearMediaCollection('photo');
-            $player
-                ->addMediaFromRequest('photo')
-                ->preservingOriginal()
-                ->toMediaCollection('photo');
+            $player->addMediaFromRequest('photo')->preservingOriginal()->toMediaCollection('photo');
         }
 
         return redirect()->route('players.show', $player)->with('success', 'Player updated.');
