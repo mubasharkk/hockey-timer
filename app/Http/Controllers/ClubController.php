@@ -23,7 +23,7 @@ class ClubController extends Controller
             ->withCount('teams')
             ->orderBy('name');
 
-        if (!backpack_user()->is_admin) {
+        if (!request()->user()->is_admin) {
             $query = $query->where('user_id', Auth::id());
         }
 
