@@ -7,14 +7,17 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
 use App\Http\Resources\GameResource;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
+    private const CACHE_TTL = 300; // 5 minutes
+
     public function __invoke(): Response
     {
         $now = Carbon::now();
         $nowString = $now->format('Y-m-d H:i:s');
-        
+
         $selectFields = [
             'id',
             'team_a_name',
@@ -29,49 +32,49 @@ class DashboardController extends Controller
             'status',
             'ended_at',
         ];
-        
-        // Query 1: Get finished/completed games (results)
-        $results = Game::query()
-            ->with('tournament:id,title')
-            ->select($selectFields)
-            ->where(function ($query) use ($nowString) {
-                // Game is finished if status is 'finished'
-                $query->where('status', 'finished')
-                    // Or if ended_at timestamp exists
-                    ->orWhereNotNull('ended_at')
-                    // Or if game datetime has passed
-                    ->orWhere(function ($q) use ($nowString) {
-                        $q->whereNotNull('game_date')
-                            ->whereNotNull('game_time')
-                            ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
-                    });
-            })
-            ->orderBy('game_date', 'desc')
-            ->orderBy('game_time', 'desc')
-            ->get();
 
-        // Query 2: Get upcoming/scheduled games
-        $upcoming = Game::query()
-            ->with('tournament:id,title')
-            ->select($selectFields)
-            ->where(function ($query) use ($nowString) {
-                // Game is upcoming if status is not 'finished' (or null)
-                $query->where(function ($q) {
-                    $q->where('status', '!=', 'finished')
-                        ->orWhereNull('status');
+        // Query 1: Get finished/completed games (results) - cached
+        $results = Cache::remember('dashboard_results', self::CACHE_TTL, function () use ($selectFields, $nowString) {
+            return Game::query()
+                ->with('tournament:id,title')
+                ->select($selectFields)
+                ->where(function ($query) use ($nowString) {
+                    $query->where('status', 'finished')
+                        ->orWhereNotNull('ended_at')
+                        ->orWhere(function ($q) use ($nowString) {
+                            $q->whereNotNull('game_date')
+                                ->whereNotNull('game_time')
+                                ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
+                        });
                 })
-                    // And ended_at is null
-                    ->whereNull('ended_at')
-                    // And either datetime is missing or hasn't passed yet
-                    ->where(function ($q) use ($nowString) {
-                        $q->whereNull('game_date')
-                            ->orWhereNull('game_time')
-                            ->orWhereRaw("CONCAT(game_date, ' ', game_time) >= ?", [$nowString]);
-                    });
-            })
-            ->orderBy('game_date', 'asc')
-            ->orderBy('game_time', 'asc')
-            ->get();
+                ->orderBy('game_date', 'desc')
+                ->orderBy('game_time', 'desc')
+                ->limit(20)
+                ->get();
+        });
+
+        // Query 2: Get upcoming/scheduled games - cached
+        $upcoming = Cache::remember('dashboard_upcoming', self::CACHE_TTL, function () use ($selectFields, $nowString) {
+            return Game::query()
+                ->with('tournament:id,title')
+                ->select($selectFields)
+                ->where(function ($query) use ($nowString) {
+                    $query->where(function ($q) {
+                        $q->where('status', '!=', 'finished')
+                            ->orWhereNull('status');
+                    })
+                        ->whereNull('ended_at')
+                        ->where(function ($q) use ($nowString) {
+                            $q->whereNull('game_date')
+                                ->orWhereNull('game_time')
+                                ->orWhereRaw("CONCAT(game_date, ' ', game_time) >= ?", [$nowString]);
+                        });
+                })
+                ->orderBy('game_date', 'asc')
+                ->orderBy('game_time', 'asc')
+                ->limit(20)
+                ->get();
+        });
 
         return Inertia::render('Dashboard', [
             'upcoming' => GameResource::collection($upcoming),

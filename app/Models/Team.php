@@ -81,6 +81,22 @@ class Team extends Model implements HasMedia
         return $this->morphMany(ContactPerson::class, 'contactable');
     }
 
+    // Query Scopes
+    public function scopeRegistered($query)
+    {
+        return $query->where('is_registered', true);
+    }
+
+    public function scopeByUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeByClub($query, int $clubId)
+    {
+        return $query->where('club_id', $clubId);
+    }
+
     public function getTypeLabelAttribute(): ?string
     {
         return self::TYPES[$this->type] ?? null;

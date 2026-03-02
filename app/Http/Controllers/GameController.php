@@ -15,17 +15,44 @@ use App\Http\Resources\TournamentResource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class GameController extends Controller
 {
+    /**
+     * Eager load game relations for summary/timer/report views.
+     * Avoids duplicate loading of teams.players + homeTeam.players + awayTeam.players.
+     */
+    private function loadGameRelations(Game $game, bool $withEvents = false): Game
+    {
+        $relations = [
+            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'sessions' => fn ($q) => $q->orderBy('number'),
+        ];
+
+        if ($withEvents) {
+            $relations['events'] = fn ($q) => $q->orderBy('occurred_at');
+        }
+
+        return $game->load($relations);
+    }
+
     public function __construct(private GameService $gameService)
     {
     }
 
     public function create(Request $request): Response
     {
+        // Cache tournaments for 5 minutes - rarely change
+        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () => 
+            Tournament::with(['pools.teams:id,name'])
+                ->orderBy('title')
+                ->get(['id', 'title', 'slug', 'venue'])
+        );
+
         $registeredTeams = Team::query()
             ->where('user_id', Auth::id())
             ->with([
@@ -35,10 +62,6 @@ class GameController extends Controller
             ])
             ->orderBy('name')
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
-
-        $tournaments = Tournament::with(['pools.teams:id,name'])
-            ->orderBy('title')
-            ->get(['id', 'title', 'slug', 'venue']);
 
         return Inertia::render('Game/Create', [
             'teams' => TeamResource::collection($registeredTeams),
@@ -52,17 +75,15 @@ class GameController extends Controller
     {
         $game = $this->gameService->createGame($request->validated(), Auth::user());
 
+        // Invalidate tournaments cache on create
+        Cache::forget('tournaments.with_pools');
+
         return redirect()->route('games.summary', $game);
     }
 
     public function showSummary(Game $game): Response
     {
-        $game->load([
-            'teams.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
-            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
-            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
-            'sessions' => fn ($q) => $q->orderBy('number'),
-        ]);
+        $this->loadGameRelations($game);
 
         return Inertia::render('Game/Summary', [
             'game' => GameResource::make($game),
@@ -71,13 +92,7 @@ class GameController extends Controller
 
     public function showTimer(Game $game): Response|RedirectResponse
     {
-        $game->load([
-            'teams.players',
-            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
-            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
-            'sessions' => fn ($q) => $q->orderBy('number'),
-            'events' => fn ($q) => $q->orderBy('occurred_at'),
-        ]);
+        $this->loadGameRelations($game, true);
 
         $isFinished = $game->status === 'finished' || $game->events->contains('event_type', 'game_end');
         if ($isFinished) {
@@ -94,13 +109,7 @@ class GameController extends Controller
 
     public function showReport(Game $game): Response
     {
-        $game->load([
-            'homeTeam.players',
-            'awayTeam.players',
-            'teams.players',
-            'sessions' => fn ($q) => $q->orderBy('number'),
-            'events' => fn ($q) => $q->orderBy('occurred_at'),
-        ]);
+        $this->loadGameRelations($game, true);
 
         return Inertia::render('Game/Report', [
             'game' => GameResource::make($game),
@@ -142,16 +151,18 @@ class GameController extends Controller
 
     public function edit(Game $game): Response
     {
-        $game->load(['teams.players']);
+        $game->load(['homeTeam.players', 'awayTeam.players']);
 
         $teams = Team::where('user_id', Auth::id())
             ->orderBy('name')
             ->with(['media', 'club'])
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
 
-        $tournaments = Tournament::with(['pools.teams:id,name'])
-            ->orderBy('title')
-            ->get(['id', 'title', 'slug', 'venue']);
+        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () => 
+            Tournament::with(['pools.teams:id,name'])
+                ->orderBy('title')
+                ->get(['id', 'title', 'slug', 'venue'])
+        );
 
         return Inertia::render('Game/Edit', [
             'game' => GameResource::make($game),
@@ -171,6 +182,9 @@ class GameController extends Controller
     public function destroy(Game $game): RedirectResponse
     {
         $game->delete();
+
+        // Invalidate cache
+        Cache::forget('tournaments.with_pools');
 
         return redirect()->route('dashboard')->with('success', 'Game deleted.');
     }

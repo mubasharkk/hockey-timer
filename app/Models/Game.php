@@ -81,30 +81,63 @@ class Game extends Model
         return $this->belongsTo(Tournament::class);
     }
 
-    public function homeFinalScore(): int
+    // Query Scopes
+    public function scopeFinished($query)
     {
-        if (! $this->home_team_id) {
-            return 0;
+        return $query->where('status', 'finished')
+            ->orWhereNotNull('ended_at');
+    }
+
+    public function scopeUpcoming($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('status', '!=', 'finished')
+                ->orWhereNull('status');
+        })->whereNull('ended_at');
+    }
+
+    public function scopeByUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeWithRelations($query)
+    {
+        return $query->with(['tournament:id,title']);
+    }
+
+    /**
+     * Get all goal counts in a single query. Returns [home => n, away => n].
+     * Use this instead of homeFinalScore() + awayFinalScore() to avoid N+1.
+     */
+    public function getGoalCounts(): array
+    {
+        if (! $this->home_team_id && ! $this->away_team_id) {
+            return ['home' => 0, 'away' => 0];
         }
 
-        return (int) Event::query()
+        $counts = Event::query()
+            ->select('team_id', DB::raw('COUNT(*) as total'))
             ->where('game_id', $this->id)
-            ->where('team_id', $this->home_team_id)
             ->where('event_type', 'goal')
-            ->count();
+            ->whereIn('team_id', [$this->home_team_id, $this->away_team_id])
+            ->groupBy('team_id')
+            ->pluck('total', 'team_id');
+
+        return [
+            'home' => (int) ($counts[$this->home_team_id] ?? 0),
+            'away' => (int) ($counts[$this->away_team_id] ?? 0),
+        ];
+    }
+
+    public function homeFinalScore(): int
+    {
+        return $this->getGoalCounts()['home'];
     }
 
     public function awayFinalScore(): int
     {
-        if (! $this->away_team_id) {
-            return 0;
-        }
-
-        return (int) Event::query()
-            ->where('game_id', $this->id)
-            ->where('team_id', $this->away_team_id)
-            ->where('event_type', 'goal')
-            ->count();
+        return $this->getGoalCounts()['away'];
     }
 
     /**

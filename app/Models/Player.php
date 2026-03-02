@@ -72,6 +72,22 @@ class Player extends Model implements HasMedia
         return $this->hasMany(Event::class);
     }
 
+    // Query Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeByUser($query, int $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeByGender($query, string $gender)
+    {
+        return $query->where('gender', $gender);
+    }
+
     /**
      * Search players by NIC or pass number.
      */

@@ -19,7 +19,9 @@ class TournamentController extends Controller
 {
     public function index(): Response
     {
-        $tournaments = Tournament::orderByDesc('id')->get();
+        $tournaments = Tournament::with(['pools', 'media'])
+            ->orderByDesc('id')
+            ->paginate(15);
 
         return Inertia::render('Tournaments/Index', [
             'tournaments' => TournamentResource::collection($tournaments),
