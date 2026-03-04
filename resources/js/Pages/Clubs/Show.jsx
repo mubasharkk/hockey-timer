@@ -28,7 +28,7 @@ export default function Show({ auth, club }) {
 
     const teams = currentClub?.teams ?? [];
     const contactPersons = currentClub?.contact_persons ?? [];
-    const canManage = currentClub?.user_id === auth?.user?.id;
+    const canManage = currentClub?.user_id === auth?.user?.id || auth?.user?.is_admin === 1;
 
     const handleDelete = () => {
         deleteClub(route('clubs.destroy', currentClub.id), {

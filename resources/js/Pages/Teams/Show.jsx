@@ -16,7 +16,7 @@ export default function Show({ auth, team }) {
     const players = Array.isArray(currentTeam?.players) ? currentTeam.players : currentTeam?.players?.data || [];
     const contactPersons = Array.isArray(currentTeam?.contact_persons) ? currentTeam.contact_persons : currentTeam?.contact_persons?.data || [];
 
-    const canManage = currentTeam?.user_id === auth?.user?.id;
+    const canManage = currentTeam?.user_id === auth?.user?.id || auth?.user?.is_admin === 1;
 
     const confirmRemove = (player) => setConfirming(player);
     const closeModal = () => setConfirming(null);

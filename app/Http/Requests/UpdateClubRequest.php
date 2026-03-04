@@ -2,15 +2,18 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\AuthorizesOwnership;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateClubRequest extends FormRequest
 {
+    use AuthorizesOwnership;
+
     public function authorize(): bool
     {
         $club = $this->route('club');
 
-        return $club && $club->user_id === $this->user()?->id;
+        return $club && $this->userOwnsOrAdmin($club);
     }
 
     public function rules(): array

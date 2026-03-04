@@ -2,21 +2,24 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\AuthorizesOwnership;
 use App\Models\Team;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateTeamRequest extends FormRequest
 {
+    use AuthorizesOwnership;
+
     public function authorize(): bool
     {
         $team = $this->route('team');
 
-        if (! $team || ! $team->is_registered) {
+        if (!$team || !$team->is_registered) {
             return false;
         }
 
-        return $team->user_id === $this->user()?->id;
+        return $this->userOwnsOrAdmin($team);
     }
 
     public function rules(): array
