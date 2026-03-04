@@ -11,8 +11,6 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
     const currentTournament = tournament?.data ?? tournament;
     const [tab, setTab] = useState('upcoming');
 
-    const hasTournamentLogo = currentTournament?.logo_url;
-
     const upcomingGames = useMemo(() => {
         return (currentTournament.games || []).filter((g) => {
             if (!g.game_date) return false;
@@ -32,20 +30,26 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
     return (
         <PublicLayout fullWidth>
             <Head title={currentTournament.title} />
-            <div className="px-0 sm:px-[calc(50vw-50%)] py-10">
+            <div className="px-0 sm:px-[calc(50vw-50%)]">
                 <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
                     {/* Logos - App and Tournament side by side */}
-                    <div className="flex items-center justify-center gap-8">
-                        {/* Tournament Logo */}
-                        {currentTournament.logo_url && (
-                            <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-2 items-center justify-center gap-8">
+                        {/* App Logo - Left */}
+                        <div className="flex justify-end">
+                            <Link href="/" className="flex items-center gap-2">
+                                <ApplicationLogo className="h-48 fill-current text-green-700" />
+                            </Link>
+                        </div>
+                        {/* Tournament Logo - Right */}
+                        <div className="flex justify-start">
+                            {currentTournament.logo_url && (
                                 <img
                                     src={currentTournament.logo_url}
                                     alt={`${currentTournament.title} logo`}
                                     className="h-48 object-contain"
                                 />
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
