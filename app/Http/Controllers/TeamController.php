@@ -40,10 +40,13 @@ class TeamController extends Controller
 
     public function create(): Response
     {
-        $clubs = Club::query()
-            ->where('user_id', Auth::id())
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        $query = Club::query()->orderBy('name');
+
+        if (!request()->user()->is_admin) {
+            $query->where('user_id', Auth::id());
+        }
+
+        $clubs = $query->get(['id', 'name']);
 
         return Inertia::render('Teams/Create', [
             'clubs' => ClubResource::collection($clubs),
