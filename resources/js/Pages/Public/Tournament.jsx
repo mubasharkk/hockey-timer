@@ -36,7 +36,7 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                             <img
                                 src={currentTournament.logo_url}
                                 alt={`${currentTournament.title} logo`}
-                                className="h-auto max-h-[100px] w-full rounded-lg object-contain"
+                                className="h-auto max-h-[140px] w-full max-w-xs rounded-xl border border-gray-200 bg-white object-contain p-4 shadow-md"
                             />
                         </div>
                     )}
