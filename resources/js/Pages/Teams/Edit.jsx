@@ -6,7 +6,7 @@ import { faArrowLeft, faFloppyDisk, faPlus, faTrash } from '@fortawesome/free-so
 export default function Edit({ auth, team, clubs, teamTypes }) {
     const currentTeam = team?.data ?? team;
     const clubList = clubs?.data ?? clubs ?? [];
-    const { data, setData, put, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         _method: 'put',
         club_id: currentTeam?.club_id ?? '',
         name: currentTeam?.name ?? '',
@@ -43,7 +43,7 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('teams.update', currentTeam.id), {
+        post(route('teams.update', currentTeam.id), {
             forceFormData: true,
             onSuccess: () => reset('logo'),
         });

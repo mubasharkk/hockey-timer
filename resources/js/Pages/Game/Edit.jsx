@@ -14,7 +14,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         const parsed = moment(time, ['HH:mm:ss', 'HH:mm'], true);
         return parsed.isValid() ? parsed.format('HH:mm') : time;
     };
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         home_team_id: currentGame.home_team_id,
         away_team_id: currentGame.away_team_id,
         tournament_id: currentGame.tournament_id || '',
@@ -57,7 +57,7 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('games.update', currentGame.id));
+        post(route('games.update', currentGame.id));
     };
 
     return (
