@@ -26,7 +26,7 @@ trait EnsuresOwnership
      */
     protected function hasAccess(Model $model, string $ownerField = 'user_id'): bool
     {
-        if (backpack_user()?->is_admin) {
+        if (Auth::user()?->is_admin) {
             return true;
         }
 
