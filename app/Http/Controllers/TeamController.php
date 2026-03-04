@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\ContactPerson\SyncContactPersons;
+use App\Actions\Teams\CreateTeamAction;
+use App\Actions\Teams\DeleteTeamAction;
+use App\Actions\Teams\GetClubsForTeamSelectAction;
+use App\Actions\Teams\UpdateTeamAction;
 use App\Http\Controllers\Concerns\EnsuresOwnership;
 use App\Http\Requests\StoreTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
@@ -18,6 +21,7 @@ use Inertia\Response;
 class TeamController extends Controller
 {
     use EnsuresOwnership;
+
     public function index(): Response
     {
         $query = Team::query()
@@ -38,18 +42,10 @@ class TeamController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(GetClubsForTeamSelectAction $getClubs): Response
     {
-        $query = Club::query()->orderBy('name');
-
-        if (!request()->user()->is_admin) {
-            $query->where('user_id', Auth::id());
-        }
-
-        $clubs = $query->get(['id', 'name']);
-
         return Inertia::render('Teams/Create', [
-            'clubs' => ClubResource::collection($clubs),
+            'clubs' => ClubResource::collection($getClubs->execute()),
             'teamTypes' => Team::TYPES,
         ]);
     }
@@ -65,52 +61,25 @@ class TeamController extends Controller
         ]);
     }
 
-    public function store(StoreTeamRequest $request, SyncContactPersons $syncContactPersons): RedirectResponse
+    public function store(StoreTeamRequest $request, CreateTeamAction $createTeam): RedirectResponse
     {
-        $team = Team::create([
-            'user_id' => Auth::id(),
-            'club_id' => $request->input('club_id') ?: null,
-            'name' => $request->string('name'),
-            'type' => $request->string('type') ?: null,
-            'coach' => $request->string('coach') ?: null,
-            'manager' => $request->string('manager') ?: null,
-            'email' => $request->string('email') ?: null,
-            'phone' => $request->string('phone') ?: null,
-            'description' => $request->string('description') ?: null,
-            'is_registered' => true,
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
-        }
-
-        $syncContactPersons($team, $request->input('contact_persons', []));
+        $team = $createTeam->execute(
+            $request->validated(),
+            $request->hasFile('logo') ? $request->file('logo') : null
+        );
 
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
     }
 
-    public function storeForClub(StoreTeamRequest $request, Club $club, SyncContactPersons $syncContactPersons): RedirectResponse
+    public function storeForClub(StoreTeamRequest $request, Club $club, CreateTeamAction $createTeam): RedirectResponse
     {
         $this->ensureAccess($club);
 
-        $team = Team::create([
-            'user_id' => Auth::id(),
-            'club_id' => $club->id,
-            'name' => $request->string('name'),
-            'type' => $request->string('type') ?: null,
-            'coach' => $request->string('coach') ?: null,
-            'manager' => $request->string('manager') ?: null,
-            'email' => $request->string('email') ?: null,
-            'phone' => $request->string('phone') ?: null,
-            'description' => $request->string('description') ?: null,
-            'is_registered' => true,
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
-        }
-
-        $syncContactPersons($team, $request->input('contact_persons', []));
+        $data = array_merge($request->validated(), ['club_id' => $club->id]);
+        $team = $createTeam->execute(
+            $data,
+            $request->hasFile('logo') ? $request->file('logo') : null
+        );
 
         return redirect()->route('teams.show', $team)->with('success', 'Team registered. Add players next.');
     }
@@ -129,60 +98,38 @@ class TeamController extends Controller
         ]);
     }
 
-    public function edit(Team $team): Response
+    public function edit(Team $team, GetClubsForTeamSelectAction $getClubs): Response
     {
         $this->ensureAccess($team);
 
         $team->load(['contactPersons', 'club']);
 
-        $clubs = Club::query()
-            ->where('user_id', Auth::id())
-            ->orderBy('name')
-            ->get(['id', 'name']);
-
         return Inertia::render('Teams/Edit', [
             'team' => TeamResource::make($team),
-            'clubs' => ClubResource::collection($clubs),
+            'clubs' => ClubResource::collection($getClubs->execute()),
             'teamTypes' => Team::TYPES,
         ]);
     }
 
-    public function update(UpdateTeamRequest $request, Team $team, SyncContactPersons $syncContactPersons): RedirectResponse
+    public function update(UpdateTeamRequest $request, Team $team, UpdateTeamAction $updateTeam): RedirectResponse
     {
         $this->ensureAccess($team);
 
-        $team->update([
-            'club_id' => $request->input('club_id') ?: null,
-            'name' => $request->string('name'),
-            'type' => $request->string('type') ?: null,
-            'coach' => $request->string('coach') ?: null,
-            'manager' => $request->string('manager') ?: null,
-            'email' => $request->string('email') ?: null,
-            'phone' => $request->string('phone') ?: null,
-            'description' => $request->string('description') ?: null,
-        ]);
-
-        if ($request->boolean('remove_logo')) {
-            $team->clearMediaCollection('logo');
-        }
-
-        if ($request->hasFile('logo')) {
-            $team->clearMediaCollection('logo');
-            $team->addMediaFromRequest('logo')->toMediaCollection('logo');
-        }
-
-        $syncContactPersons($team, $request->input('contact_persons', []));
+        $updateTeam->execute(
+            $team,
+            $request->validated(),
+            $request->hasFile('logo') ? $request->file('logo') : null
+        );
 
         return redirect()->route('teams.show', $team)->with('success', 'Team updated.');
     }
 
-    public function destroy(Team $team): RedirectResponse
+    public function destroy(Team $team, DeleteTeamAction $deleteTeam): RedirectResponse
     {
         $this->ensureAccess($team);
 
-        $team->delete();
+        $deleteTeam->execute($team);
 
         return redirect()->route('teams.index')->with('success', 'Team deleted.');
     }
-
 }
