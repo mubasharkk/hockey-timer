@@ -6,7 +6,7 @@ import AddressForm from '@/Components/AddressForm';
 
 export default function Edit({ auth, club }) {
     const currentClub = club?.data ?? club;
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         _method: 'put',
         name: currentClub?.name ?? '',
         email: currentClub?.email ?? '',
@@ -44,7 +44,7 @@ export default function Edit({ auth, club }) {
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('clubs.update', currentClub.id), { forceFormData: true });
+        put(route('clubs.update', currentClub.id), { forceFormData: true });
     };
 
     return (
