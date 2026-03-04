@@ -9,13 +9,7 @@ export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
     const [liveData, setLiveData] = useState(game || null);
     const [loading, setLoading] = useState(false);
-    const [displaySeconds, setDisplaySeconds] = useState(game?.timer_seconds ?? game?.current_seconds ?? 0);
-    const currentSessionData = useMemo(() => {
-        const raw = liveData?.current_session;
-        if (raw && typeof raw === 'object' && raw.data) return raw.data;
-        return raw || null;
-    }, [liveData?.current_session]);
-
+    // Trust server timer_seconds as the single source of truth
     const isFinished = useMemo(
         () => liveData?.status === 'finished',
         [liveData?.status]
@@ -28,44 +22,18 @@ export default function Ticker({ game, gameId }) {
     const awayTeam = teams.find((t) => t.side === 'away') || { name: liveData?.team_b_name ?? game?.team_b_name };
 
     const effectiveSeconds = useMemo(() => {
-        if (!liveData) return displaySeconds ?? 0;
-
-        if (isFinished) {
-            const finishedValue = currentSessionData?.actual_duration_seconds ?? currentSessionData?.planned_duration_seconds;
-            if (finishedValue != null) return finishedValue;
+        // Trust server timer_seconds as the single source of truth
+        if (liveData?.timer_seconds !== undefined && liveData?.timer_seconds !== null) {
+            return liveData.timer_seconds;
         }
-
-        if (liveData.is_break) {
-            const pausedValue = displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
-            if (pausedValue) return pausedValue;
-            if (currentSessionData?.actual_duration_seconds != null) return currentSessionData.actual_duration_seconds;
-        }
-
-        return displaySeconds ?? liveData.timer_seconds ?? liveData.current_seconds ?? 0;
-    }, [displaySeconds, liveData, isFinished, currentSessionData?.actual_duration_seconds, currentSessionData?.planned_duration_seconds]);
+        return 0;
+    }, [liveData?.timer_seconds]);
 
     const events = liveData?.events || [];
 
-    const resolveSessionNumber = () => {
-        const raw = currentSessionData ?? liveData?.current_period;
-        if (typeof raw === 'number') return raw;
-        if (raw && typeof raw === 'object' && raw.number) return raw.number;
-        const ended = events.filter((e) => e.event_type === 'session_end').length;
-        const total = Array.isArray(liveData?.sessions)
-            ? liveData.sessions.length
-            : typeof liveData?.sessions === 'number'
-                ? liveData.sessions
-                : ended + 1;
-        return Math.min(total || 1, ended + 1) || 1;
-    };
-    const resolveSessionTotal = () => {
-        if (Array.isArray(liveData?.sessions)) return liveData.sessions.length;
-        if (typeof liveData?.sessions === 'number') return liveData.sessions;
-        if (typeof liveData?.session_count === 'number') return liveData.session_count;
-        return null;
-    };
-    const currentSession = resolveSessionNumber();
-    const totalSessions = resolveSessionTotal();
+    // Use server-provided session data directly
+    const currentSession = liveData?.current_period ?? 1;
+    const totalSessions = liveData?.session_count ?? null;
     const recentEvents = useMemo(
         () =>
             [...events]
@@ -101,19 +69,6 @@ export default function Ticker({ game, gameId }) {
             clearInterval(interval);
         };
     }, [gameId, form.data.game]);
-
-    useEffect(() => {
-        if (liveData?.timer_seconds !== undefined && liveData?.timer_seconds !== null) {
-            setDisplaySeconds(liveData.timer_seconds);
-        } else if (liveData?.current_seconds !== undefined && liveData?.current_seconds !== null) {
-            setDisplaySeconds(liveData.current_seconds);
-        } else if (currentSessionData?.actual_duration_seconds !== undefined && currentSessionData?.actual_duration_seconds !== null) {
-            setDisplaySeconds(currentSessionData.actual_duration_seconds);
-        }
-    }, [liveData?.timer_seconds, liveData?.current_seconds, currentSessionData?.actual_duration_seconds]);
-
-    // Keep timer display in lockstep with the authoritative value coming from the server
-    // (avoid drifting when the main timer is paused or adjusted).
 
     return (
         <PublicLayout fullWidth>
@@ -218,7 +173,7 @@ export default function Ticker({ game, gameId }) {
                                     <h3 className="text-base font-semibold text-white">Recent Events</h3>
                                     <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
                                 </div>
-                                <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100 sm:grid-cols-3">
+                                <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100">
                                     {recentEvents.map((e) => (
                                         <div
                                             key={e.id || e.occurred_at || Math.random()}
@@ -272,7 +227,7 @@ const TeamLogo = ({ team, align = 'center', bare = false }) => {
                 <img
                     src={team.logo_url}
                     alt={`${team.name || 'Team'} logo`}
-                    className={`h-14 w-14 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-slate-800 bg-slate-900/60'}`}
+                    className={`w-36 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-slate-800 bg-slate-900/60'}`}
                 />
             )}
         </div>
