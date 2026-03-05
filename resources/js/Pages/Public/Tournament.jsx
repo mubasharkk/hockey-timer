@@ -78,7 +78,7 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                         )}
                     </div>
 
-                    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="">
                         <div className="mb-4 flex items-center gap-3">
                             <h3 className="text-sm font-semibold text-gray-900">Pool Standings</h3>
                         </div>

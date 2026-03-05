@@ -47,21 +47,25 @@ class GameController extends Controller
     public function create(Request $request): Response
     {
         // Cache tournaments for 5 minutes - rarely change
-        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () => 
+        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () =>
             Tournament::with(['pools.teams:id,name'])
                 ->orderBy('title')
                 ->get(['id', 'title', 'slug', 'venue'])
         );
 
         $registeredTeams = Team::query()
-            ->where('user_id', Auth::id())
             ->with([
                 'media',
                 'club',
                 'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             ])
-            ->orderBy('name')
-            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
+            ->orderBy('name');
+
+        if (!request()->user()->is_admin) {
+            $registeredTeams = $registeredTeams->where('user_id', Auth::id());
+        }
+
+        $registeredTeams = $registeredTeams->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
 
         return Inertia::render('Game/Create', [
             'teams' => TeamResource::collection($registeredTeams),
