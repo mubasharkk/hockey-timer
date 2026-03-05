@@ -15,10 +15,6 @@ class UpdateTeamRequest extends FormRequest
     {
         $team = $this->route('team');
 
-        if (!$team || !$team->is_registered) {
-            return false;
-        }
-
         return $this->userOwnsOrAdmin($team);
     }
 
