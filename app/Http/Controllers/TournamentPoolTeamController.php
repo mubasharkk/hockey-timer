@@ -19,7 +19,14 @@ class TournamentPoolTeamController extends Controller
     public function edit(Tournament $tournament): Response
     {
         $tournament->load('pools.teams');
-        $teams = Team::where('user_id', Auth::id())->orderBy('name')->get();
+
+        $teams = Team::query()->orderBy('name');
+
+        if (!request()->user()->is_admin) {
+            $teams = $teams->where('user_id', Auth::id());
+        }
+
+        $teams = $teams->get();
 
         return Inertia::render('Tournaments/AssignTeams', [
             'tournament' => TournamentResource::make($tournament),
