@@ -157,12 +157,11 @@ class GameController extends Controller
     {
         $game->load(['homeTeam.players', 'awayTeam.players']);
 
-        $teams = Team::where('user_id', Auth::id())
-            ->orderBy('name')
+        $teams = Team::orderBy('name')
             ->with(['media', 'club'])
             ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
 
-        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () => 
+        $tournaments = Cache::remember('tournaments.with_pools', 300, fn () =>
             Tournament::with(['pools.teams:id,name'])
                 ->orderBy('title')
                 ->get(['id', 'title', 'slug', 'venue'])
