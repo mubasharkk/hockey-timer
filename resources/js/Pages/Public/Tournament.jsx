@@ -80,7 +80,7 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
 
                     <div className="">
                         <div className="mb-4 flex items-center gap-3">
-                            <h3 className="text-sm font-semibold text-gray-900">Pool Standings</h3>
+                            <h3 className="text-md font-semibold text-gray-900">Pool Standings</h3>
                         </div>
                         <PoolResults results={poolResults} />
                     </div>
