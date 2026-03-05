@@ -18,13 +18,13 @@ class StoreGameRequest extends FormRequest
             'home_team_id' => [
                 'required',
                 'integer',
-                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('user_id', auth()->id())),
+                Rule::exists('teams', 'id'),
             ],
             'away_team_id' => [
                 'required',
                 'integer',
                 'different:home_team_id',
-                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('user_id', auth()->id())),
+                Rule::exists('teams', 'id'),
             ],
             'tournament_id' => ['nullable', 'integer', 'exists:tournaments,id'],
             'venue' => ['required', 'string', 'max:255'],
