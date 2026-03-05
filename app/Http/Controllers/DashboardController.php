@@ -34,24 +34,22 @@ class DashboardController extends Controller
         ];
 
         // Query 1: Get finished/completed games (results) - cached
-        $results = Cache::remember('dashboard_results', self::CACHE_TTL, function () use ($selectFields, $nowString) {
-            return Game::query()
-                ->with('tournament:id,title')
-                ->select($selectFields)
-                ->where(function ($query) use ($nowString) {
-                    $query->where('status', 'finished')
-                        ->orWhereNotNull('ended_at')
-                        ->orWhere(function ($q) use ($nowString) {
-                            $q->whereNotNull('game_date')
-                                ->whereNotNull('game_time')
-                                ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
-                        });
-                })
-                ->orderBy('game_date', 'desc')
-                ->orderBy('game_time', 'desc')
-                ->limit(20)
-                ->get();
-        });
+        $results = Game::query()
+            ->with('tournament:id,title')
+            ->select($selectFields)
+            ->where(function ($query) use ($nowString) {
+                $query->where('status', 'finished')
+                    ->orWhereNotNull('ended_at')
+                    ->orWhere(function ($q) use ($nowString) {
+                        $q->whereNotNull('game_date')
+                            ->whereNotNull('game_time')
+                            ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
+                    });
+            })
+            ->orderBy('game_date', 'desc')
+            ->orderBy('game_time', 'desc')
+            ->limit(20)
+            ->get();
 
         // Query 2: Get upcoming/scheduled games - cached
         $upcoming = Cache::remember('dashboard_upcoming', self::CACHE_TTL, function () use ($selectFields, $nowString) {
