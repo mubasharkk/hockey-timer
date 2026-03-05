@@ -23,6 +23,7 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
     const currentTournament = tournament?.data ?? tournament;
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
+    const [showMenu, setShowMenu] = useState(false);
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
@@ -50,32 +51,38 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Tournament</p>
                         <h2 className="text-xl font-semibold leading-tight text-gray-800">{currentTournament.title}</h2>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                            href={route('public.tournaments.show', currentTournament.slug)}
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
+                        >
+                            Public view
+                        </Link>
                         <Link
                             href={route('tournaments.edit', currentTournament.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faPen} className="h-4 w-4" />
-                            Edit
+                            <span className="hidden sm:inline">Edit</span>
                         </Link>
                         <Link
                             href={route('games.create', { tournament_id: currentTournament.id })}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faPlus} className="h-4 w-4" />
-                            New Game
+                            <span className="hidden sm:inline">New Game</span>
                         </Link>
                         <Link
                             href={route('tournaments.pools.teams.edit', currentTournament.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
                         >
                             <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-                            Assign Teams
+                            <span className="hidden sm:inline">Assign Teams</span>
                         </Link>
                         <button
                             type="button"
@@ -83,20 +90,14 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                             onClick={() => setConfirming(true)}
                         >
                             <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
-                            Delete
+                            <span className="hidden sm:inline">Delete</span>
                         </button>
                         <Link
                             href={route('tournaments.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
-                            Back
-                        </Link>
-                        <Link
-                            href={route('public.tournaments.show', currentTournament.slug)}
-                            className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
-                        >
-                            Public view
+                            <span className="hidden sm:inline">Back</span>
                         </Link>
                     </div>
                 </div>
