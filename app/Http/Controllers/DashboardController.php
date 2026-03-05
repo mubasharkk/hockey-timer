@@ -35,25 +35,24 @@ class DashboardController extends Controller
 
         // Query 1: Get finished/completed games (results) - cached
         $results = Game::query()
-            ->with('tournament:id,title')
-            ->select($selectFields)
-            ->where(function ($query) use ($nowString) {
-                $query->where('status', 'finished')
-                    ->orWhereNotNull('ended_at')
-                    ->orWhere(function ($q) use ($nowString) {
-                        $q->whereNotNull('game_date')
-                            ->whereNotNull('game_time')
-                            ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
-                    });
-            })
-            ->orderBy('game_date', 'desc')
-            ->orderBy('game_time', 'desc')
-            ->limit(20)
-            ->get();
+                ->with('tournament:id,title')
+                ->select($selectFields)
+                ->where(function ($query) use ($nowString) {
+                    $query->where('status', 'finished')
+                        ->orWhereNotNull('ended_at')
+                        ->orWhere(function ($q) use ($nowString) {
+                            $q->whereNotNull('game_date')
+                                ->whereNotNull('game_time')
+                                ->whereRaw("CONCAT(game_date, ' ', game_time) < ?", [$nowString]);
+                        });
+                })
+                ->orderBy('game_date', 'desc')
+                ->orderBy('game_time', 'desc')
+                ->limit(20)
+                ->get();
 
-        // Query 2: Get upcoming/scheduled games - cached
-        $upcoming = Cache::remember('dashboard_upcoming', self::CACHE_TTL, function () use ($selectFields, $nowString) {
-            return Game::query()
+        // Query 2: Get upcoming/scheduled games - not cached for real-time updates
+        $upcoming = Game::query()
                 ->with('tournament:id,title')
                 ->select($selectFields)
                 ->where(function ($query) use ($nowString) {
@@ -72,7 +71,6 @@ class DashboardController extends Controller
                 ->orderBy('game_time', 'asc')
                 ->limit(20)
                 ->get();
-        });
 
         return Inertia::render('Dashboard', [
             'upcoming' => GameResource::collection($upcoming),
