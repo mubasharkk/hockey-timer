@@ -176,10 +176,10 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                         )}
                     </div>
 
-                    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                    <div className="py-6">
                         <div className="mb-4 flex items-center gap-3">
                             <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-green-700" />
-                            <h3 className="text-sm font-semibold text-gray-900">Pool Standings</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Pool Standings</h3>
                         </div>
                         <PoolResults results={poolResults} />
                     </div>
