@@ -42,8 +42,8 @@ class PlayerController extends Controller
         $query = Player::with(['teams', 'media'])
             ->latest();
 
-        if (!Auth::user()?->is_admin) {
-            $query->where('user_id', Auth::id());
+        if (!request()->user()->is_admin) {
+            $query = $query->where('user_id', Auth::id());
         }
 
         return Inertia::render('Players/Index', [
