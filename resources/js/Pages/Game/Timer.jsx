@@ -186,8 +186,8 @@ export default function Timer({ auth, game, config = {} }) {
     }, [scores, scoreStorageKey]);
 
     const [confirmModal, setConfirmModal] = useState(null); // { type: 'session' | 'game' }
-    const [goalModal, setGoalModal] = useState(null); // { team, goalType, shirtNumber }
-    const [cardModal, setCardModal] = useState(null); // { team, cardType, shirtNumber, minutes }
+    const [goalModal, setGoalModal] = useState(null); // { team, goalType, playerId }
+    const [cardModal, setCardModal] = useState(null); // { team, cardType, playerId, minutes }
 
     const syncSessionState = async (overrides = {}) => {
         const targetNumber = Math.max(1, overrides.number ?? sessionIndex + 1);
@@ -425,7 +425,7 @@ export default function Timer({ auth, game, config = {} }) {
         setGoalModal({
             team,
             goalType: 'FG',
-            shirtNumber: '',
+            playerId: null,
         });
     };
 
@@ -434,27 +434,26 @@ export default function Timer({ auth, game, config = {} }) {
         setCardModal({
             team,
             cardType,
-            shirtNumber: '',
+            playerId: null,
             minutes: '',
         });
     };
 
-    const handleAddGoal = ({ team, goalType, shirtNumber }) => {
+    const handleAddGoal = ({ team, goalType, playerId }) => {
         if (!team?.id || isGameOver) return;
         setScores((prev) => ({ ...prev, [team.id]: (prev[team.id] ?? 0) + 1 }));
-        const playerName = findPlayerName(team, shirtNumber);
-        const playerId = findPlayerId(team, shirtNumber);
+        const player = playerId ? (team.players || []).find((p) => p.id === playerId) : null;
         const newEvent = {
             id: `temp-${Date.now()}`,
             team_id: team.id,
             session_number: sessionIndex + 1,
             event_type: 'goal',
             goal_type: goalType || null,
-            player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
             player_id: playerId,
+            player_shirt_number: player?.shirt_number || null,
             timer_value_seconds: currentEventSeconds,
             occurred_at: new Date().toISOString(),
-            note: playerName || null,
+            note: player?.name || null,
         };
         setEvents((prev) => [
             ...prev,
@@ -498,15 +497,14 @@ export default function Timer({ auth, game, config = {} }) {
         syncGameScores();
     };
 
-    const handleAddCard = ({ team, cardType, shirtNumber, minutes }) => {
+    const handleAddCard = ({ team, cardType, playerId, minutes }) => {
         if (!team?.id || isGameOver) return;
         const timerValue = currentEventSeconds;
-        const playerName = findPlayerName(team, shirtNumber);
-        const playerId = findPlayerId(team, shirtNumber);
+        const player = playerId ? (team.players || []).find((p) => p.id === playerId) : null;
         const minuteText = minutes
             ? `${Math.max(parseInt(minutes, 10) || 0, 0)}m`
             : `${Math.floor(timerValue / 60)}m`;
-        const note = [playerName, minuteText].filter(Boolean).join(' / ') || null;
+        const note = [player?.name, minuteText].filter(Boolean).join(' / ') || null;
 
         const newEvent = {
             id: `card-${Date.now()}`,
@@ -514,8 +512,8 @@ export default function Timer({ auth, game, config = {} }) {
             session_number: sessionIndex + 1,
             event_type: 'card',
             card_type: cardType,
-            player_shirt_number: shirtNumber ? parseInt(shirtNumber, 10) || null : null,
             player_id: playerId,
+            player_shirt_number: player?.shirt_number || null,
             timer_value_seconds: timerValue,
             occurred_at: new Date().toISOString(),
             note,
@@ -817,14 +815,19 @@ export default function Timer({ auth, game, config = {} }) {
                         </select>
                     </div>
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Player Shirt Number</label>
-                        <input
-                            type="number"
+                        <label className="block text-sm font-medium text-gray-700">Player (optional)</label>
+                        <select
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                            value={goalModal?.shirtNumber || ''}
-                            onChange={(e) => setGoalModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
-                            placeholder="Optional"
-                        />
+                            value={goalModal?.playerId || ''}
+                            onChange={(e) => setGoalModal((prev) => ({ ...prev, playerId: e.target.value ? parseInt(e.target.value) : null }))}
+                        >
+                            <option value="">Select player...</option>
+                            {(goalModal?.team?.players || []).map((player) => (
+                                <option key={player.id} value={player.id}>
+                                    #{player.shirt_number} - {player.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="flex justify-end gap-3">
                         <SecondaryButton onClick={() => setGoalModal(null)}>Cancel</SecondaryButton>
@@ -833,7 +836,7 @@ export default function Timer({ auth, game, config = {} }) {
                                 handleAddGoal({
                                     team: goalModal?.team,
                                     goalType: goalModal?.goalType,
-                                    shirtNumber: goalModal?.shirtNumber,
+                                    playerId: goalModal?.playerId,
                                 })
                             }
                         >
@@ -851,13 +854,19 @@ export default function Timer({ auth, game, config = {} }) {
                         {cardModal?.team?.name ? `${cardModal.team.name} card details` : 'Enter card details'}
                     </p>
                     <div className="space-y-2">
-                        <label className="block text-sm font-medium text-gray-700">Player Shirt Number (optional)</label>
-                        <input
-                            type="number"
+                        <label className="block text-sm font-medium text-gray-700">Player (optional)</label>
+                        <select
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                            value={cardModal?.shirtNumber || ''}
-                            onChange={(e) => setCardModal((prev) => ({ ...prev, shirtNumber: e.target.value }))}
-                        />
+                            value={cardModal?.playerId || ''}
+                            onChange={(e) => setCardModal((prev) => ({ ...prev, playerId: e.target.value ? parseInt(e.target.value) : null }))}
+                        >
+                            <option value="">-- Select Player --</option>
+                            {(cardModal?.team?.players || []).map((player) => (
+                                <option key={player.id} value={player.id}>
+                                    #{player.shirt_number} - {player.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">Minute (optional)</label>
