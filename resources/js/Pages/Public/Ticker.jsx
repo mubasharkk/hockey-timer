@@ -56,7 +56,8 @@ export default function Ticker({ game, gameId }) {
             try {
                 const res = await axios.get(`/api/public/ticker/${id}`);
                 if (isMounted) setLiveData((prev) => ({ ...(prev || {}), ...res.data }));
-            } catch (e) {
+            } catch (e)
+            {
                 // ignore errors; keep last good data
             } finally {
                 if (isMounted) setLoading(false);
@@ -73,14 +74,14 @@ export default function Ticker({ game, gameId }) {
     return (
         <PublicLayout fullWidth>
             <Head title="Live Ticker" />
-            <div className="min-h-screen bg-slate-950 px-[calc(50vw-50%)] py-6 text-slate-50">
+            <div className="min-h-screen px-[calc(50vw-50%)] py-6">
                 {!liveData && (
-                    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl shadow-green-900/20">
+                    <div className="rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-xl">
                         <form onSubmit={submit} className="flex flex-col gap-4 sm:flex-row sm:items-end">
                             <div className="flex-1">
-                                <label className="block text-sm font-semibold text-slate-200">Enter Game ID</label>
+                                <label className="block text-sm font-semibold text-gray-700">Enter Game ID</label>
                                 <input
-                                    className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-50 shadow-inner shadow-black/30 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40"
+                                    className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-inner focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/40"
                                     value={form.data.game}
                                     onChange={(e) => form.setData('game', e.target.value)}
                                     placeholder="e.g., 5"
@@ -89,7 +90,7 @@ export default function Ticker({ game, gameId }) {
                             </div>
                             <button
                                 type="submit"
-                                className="inline-flex items-center justify-center rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-900/40 transition hover:bg-green-600"
+                                className="inline-flex items-center justify-center rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-green-600"
                             >
                                 Load
                             </button>
@@ -98,7 +99,7 @@ export default function Ticker({ game, gameId }) {
                 )}
 
                 {gameId && !liveData && (
-                    <div className="mt-4 rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-100 shadow-lg shadow-red-900/20">
+                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 shadow-lg">
                         Game not found.
                     </div>
                 )}
@@ -114,34 +115,34 @@ export default function Ticker({ game, gameId }) {
                                         className="h-auto max-h-24 w-full max-w-xs object-contain"
                                     />
                                 ) : (
-                                    <div className="flex h-24 w-full max-w-xs items-center justify-center rounded-lg border border-slate-800 bg-slate-900/60 px-4 text-sm font-semibold text-slate-200">
+                                    <div className="flex h-24 w-full max-w-xs items-center justify-center rounded-lg border border-gray-200 bg-white/60 px-4 text-sm font-semibold text-gray-700">
                                         {tournament?.title}
                                     </div>
                                 )}
                             </div>
                         )}
-                        <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-green-950 p-6 shadow-2xl shadow-green-900/30">
+                        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-xl">
                             <div className="my-5">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="w-48 flex justify-start">
                                         <TeamLogo team={homeTeam} align="start" bare />
                                     </div>
                                     <div className="text-center flex-1">
-                                        <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Timer</p>
-                                        <p className="text-[6rem] font-bold text-white tabular-nums">
+                                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500">Timer</p>
+                                        <p className="text-[6rem] font-bold text-gray-900 tabular-nums">
                                             {formatSeconds(effectiveSeconds)}
                                         </p>
-                                        <p className="mx-auto text-xl font-bold text-slate-300 flex items-center justify-center gap-3">
+                                        <p className="mx-auto text-xl font-bold text-gray-600 flex items-center justify-center gap-3">
                                             <span>{totalSessions === 4 ? 'Q' : 'Session'} {currentSession}</span>
-                                            <span className="text-slate-500">/</span>
+                                            <span className="text-gray-400">/</span>
                                             <span>{totalSessions ?? ''}</span>
                                             {liveData?.is_break && !isFinished && (
-                                                <span className="rounded-full bg-amber-500/20 px-3 py-1 text-sm font-semibold text-amber-200 border border-amber-500/40">
+                                                <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-700 border border-amber-300">
                                                     Break
                                                 </span>
                                             )}
                                             {isFinished && (
-                                                <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-semibold text-red-100 border border-red-500/40">
+                                                <span className="rounded-full bg-red-100 px-3 py-1 text-sm font-semibold text-red-700 border border-red-300">
                                                     Ended
                                                 </span>
                                             )}
@@ -151,7 +152,7 @@ export default function Ticker({ game, gameId }) {
                                         <TeamLogo team={awayTeam} align="end" bare />
                                     </div>
                                 </div>
-                                <div className="mt-5 flex justify-between gap-6 text-sm text-slate-100 border-t border-slate-200 pt-10">
+                                <div className="mt-5 flex justify-between gap-6 text-sm text-gray-700 border-t border-gray-200 pt-10">
                                     <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
                                         <span className="mb-3 mt-3 text-3xl font-semibold">{homeTeam?.name || liveData.team_a_name}</span>
                                         <span className="text-5xl font-bold">{liveData.team_a_score ?? (liveData.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
@@ -162,22 +163,23 @@ export default function Ticker({ game, gameId }) {
                                     </div>
                                 </div>
                             </div>
-                            {excerpt && <p className="text-center text-sm text-slate-200">{excerpt}</p>}
-                            <div className="text-center text-sm text-slate-400">
+                            {excerpt && <p className="text-center text-sm text-gray-600">{excerpt}</p>}
+                            <div className="text-center text-sm text-gray-500">
                                 {venue}
                             </div>
                         </div>
 
+                        {/* Recent Events */}
                         <div>
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-base font-semibold text-white">Recent Events</h3>
-                                    <span className="text-xs text-slate-400">{recentEvents.length} shown</span>
-                                </div>
-                                <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-slate-100">
-                                    {recentEvents.map((e) => (
-                                        <div
-                                            key={e.id || e.occurred_at || Math.random()}
-                                            className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-3"
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-base font-semibold text-gray-900">Recent Events</h3>
+                                <span className="text-xs text-gray-500">{recentEvents.length} shown</span>
+                            </div>
+                            <div className="mt-3 grid grid-cols-1 gap-3 text-sm text-gray-700">
+                                {recentEvents.map((e) => (
+                                    <div
+                                        key={e.id || e.occurred_at || Math.random()}
+                                        className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white px-3 py-3"
                                     >
                                         <img
                                             src={eventBadge(e).icon}
@@ -186,30 +188,30 @@ export default function Ticker({ game, gameId }) {
                                         />
                                         <div className="flex flex-1 items-start justify-between gap-2">
                                             <div className="space-y-1">
-                                                <p className="font-semibold capitalize text-white">
+                                                <p className="font-semibold capitalize text-gray-900">
                                                     {eventBadge(e).label}
                                                     {e.player_shirt_number ? ` · #${e.player_shirt_number}` : ''}
                                                 </p>
-                                                <p className="text-xs font-semibold text-slate-300">
+                                                <p className="text-xs font-semibold text-gray-600">
                                                     {teamName(e.team_id, liveData?.teams)}
                                                 </p>
-                                                <p className="text-xs text-slate-300">
+                                                <p className="text-xs text-gray-500">
                                                     Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
                                                 </p>
                                                 {(e.note || e.goal_type || e.card_type) && (
-                                                    <p className="text-xs text-slate-400">
+                                                    <p className="text-xs text-gray-500">
                                                         {[e.goal_type, e.card_type, e.note].filter(Boolean).join(' · ')}
                                                     </p>
                                                 )}
                                             </div>
-                                            <p className="text-xs text-slate-400 whitespace-nowrap">
+                                            <p className="text-xs text-gray-400 whitespace-nowrap">
                                                 {e.occurred_at ? moment(e.occurred_at).format('hh:mm A') : ''}
                                             </p>
                                         </div>
                                     </div>
                                 ))}
-                                {recentEvents.length === 0 && <p className="text-xs text-slate-400">No events yet.</p>}
                             </div>
+                            {recentEvents.length === 0 && <p className="text-xs text-gray-500">No events yet.</p>}
                         </div>
                     </div>
                 )}
@@ -227,7 +229,7 @@ const TeamLogo = ({ team, align = 'center', bare = false }) => {
                 <img
                     src={team.logo_url}
                     alt={`${team.name || 'Team'} logo`}
-                    className={`w-36 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-slate-800 bg-slate-900/60'}`}
+                    className={`w-36 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-gray-200 bg-white/60'}`}
                 />
             )}
         </div>
