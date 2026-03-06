@@ -65,7 +65,7 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                             </div>
                         </div>
                         {currentTournament.sponsor_logo_urls && currentTournament.sponsor_logo_urls.length > 0 && (
-                            <div className="mt-6 rounded-md border border-gray-100 bg-gray-50 p-4 shadow-sm">
+                            <div className="mt-6">
                                 <h3 className="text-sm font-semibold text-gray-900">Sponsors</h3>
                                 <div className="mt-3 flex flex-wrap items-center gap-3">
                                     {currentTournament.sponsor_logo_urls.map((url, idx) => (
