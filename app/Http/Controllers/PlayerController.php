@@ -46,7 +46,7 @@ class PlayerController extends Controller
         }
 
         return Inertia::render('Players/Index', [
-            'players' => PlayerResource::collection($query),
+            'players' => PlayerResource::collection($query->paginate(100)),
         ]);
     }
 
