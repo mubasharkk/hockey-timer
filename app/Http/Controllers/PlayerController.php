@@ -39,8 +39,7 @@ class PlayerController extends Controller
      */
     public function index(): Response
     {
-        $query = Player::with(['teams', 'media'])
-            ->latest();
+        $query = Player::with(['media'])->latest();
 
         if (!request()->user()->is_admin) {
             $query = $query->where('user_id', Auth::id());
