@@ -42,7 +42,7 @@ class PlayerController extends Controller
         $query = Player::with(['teams', 'media'])
             ->latest();
 
-        if (!backpack_user()?->is_admin) {
+        if (!Auth::user()?->is_admin) {
             $query->where('user_id', Auth::id());
         }
 
