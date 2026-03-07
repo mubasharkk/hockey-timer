@@ -11,7 +11,6 @@ export default function PublicLayout({ children, fullWidth = false }) {
                 style={{
                     backgroundImage: 'url(/icons/background.png)',
                     backgroundRepeat: 'repeat',
-                    opacity: 0.15,
                 }}
             />
 

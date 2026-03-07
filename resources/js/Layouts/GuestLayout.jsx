@@ -11,7 +11,7 @@ export default function GuestLayout({ children }) {
                 style={{
                     backgroundImage: 'url(/icons/background.png)',
                     backgroundRepeat: 'repeat',
-                    opacity: 0.3,
+                    opacity: 0.7,
                 }}
             />
 
