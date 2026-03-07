@@ -315,8 +315,8 @@ class PlayerController extends Controller
         }
 
         $players = Player::search($query)
-            ->with(['teams:id,name', 'media'])
-            ->limit(10)
+            ->with(['media'])
+            ->limit(20)
             ->get();
 
         return response()->json(PlayerResource::collection($players));
