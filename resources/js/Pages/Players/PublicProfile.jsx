@@ -25,7 +25,7 @@ const formatDate = (dateString) => {
 
 export default function PublicProfile({ player, teams = [] }) {
     const currentPlayer = player?.data ?? player;
-    const statistics = player?.statistics ?? [];
+    const statistics = player?.statistics ?? {};
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
     const contactPersons = currentPlayer.contact_persons || [];
     const address = currentPlayer.addresses?.[0] || currentPlayer.address;
@@ -211,6 +211,7 @@ export default function PublicProfile({ player, teams = [] }) {
                 <Footer />
             </div>
         </div>
+        </>
     );
 }
 
