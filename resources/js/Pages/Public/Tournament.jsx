@@ -29,7 +29,17 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
 
     return (
         <PublicLayout fullWidth>
-            <Head title={currentTournament.title} />
+            <Head>
+                <title>{currentTournament.title}</title>
+                <meta name="description" content={currentTournament.venue || `Tournament: ${currentTournament.title}`} />
+                <meta property="og:title" content={currentTournament.title} />
+                <meta property="og:description" content={currentTournament.venue || `Tournament: ${currentTournament.title}`} />
+                {currentTournament.logo_url ? (
+                    <meta property="og:image" content={currentTournament.logo_url} />
+                ) : (
+                    <meta property="og:image" content="/icons/logo.png" />
+                )}
+            </Head>
             <div className="px-0 sm:px-[calc(50vw-50%)]">
                 <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
                     {/* Logos - App and Tournament side by side */}

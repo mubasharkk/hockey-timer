@@ -34,7 +34,18 @@ export default function PublicProfile({ player, teams = [] }) {
     const age = calculateAge(currentPlayer.date_of_birth);
 
     return (
-        <div className="relative flex min-h-screen flex-col">
+        <>
+            <Head>
+                <title>{currentPlayer.name}</title>
+                <meta name="description" content={`${currentPlayer.player_type_label || 'Player'} - ${address?.city || ''} ${address?.country?.name || ''}`.trim() || 'Player profile'} />
+                <meta property="og:title" content={currentPlayer.name} />
+                <meta property="og:description" content={`${currentPlayer.player_type_label || 'Player'} - ${address?.city || ''} ${address?.country?.name || ''}`.trim() || 'Player profile'} />
+                <meta
+                    property="og:image"
+                    content={currentPlayer.photo_url || '/icons/logo.png'}
+                />
+            </Head>
+            <div className="relative flex min-h-screen flex-col">
             {/* Background Image */}
             <div
                 className="fixed inset-0 z-0"

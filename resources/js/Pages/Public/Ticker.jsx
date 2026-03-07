@@ -73,7 +73,16 @@ export default function Ticker({ game, gameId }) {
 
     return (
         <PublicLayout fullWidth>
-            <Head title="Live Ticker" />
+            <Head>
+                <title>{liveData ? `${homeTeam.name} vs ${awayTeam.name}` : 'Live Ticker'}</title>
+                <meta name="description" content={venue || 'Live game ticker'} />
+                <meta property="og:title" content={liveData ? `${homeTeam.name} vs ${awayTeam.name}` : 'Live Ticker'} />
+                <meta property="og:description" content={venue || 'Live game ticker'} />
+                <meta
+                    property="og:image"
+                    content={tournament?.logo_url || '/icons/logo.png'}
+                />
+            </Head>
             <div className="min-h-screen px-[calc(50vw-50%)] py-6">
                 {!liveData && (
                     <div className="rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-xl">

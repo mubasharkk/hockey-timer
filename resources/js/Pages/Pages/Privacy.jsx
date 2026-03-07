@@ -2,10 +2,12 @@ import { Head } from '@inertiajs/react';
 import Footer from '@/Components/Footer';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
+import PublicLayout from "@/Layouts/PublicLayout.jsx";
 
 export default function Privacy() {
     return (
-        <div className="flex min-h-screen flex-col bg-gray-100">
+        <PublicLayout>
+        <div className="flex min-h-screen flex-col ">
             <Head title="Privacy Policy" />
 
             <div className="flex-1 py-12">
@@ -57,8 +59,7 @@ export default function Privacy() {
                     </div>
                 </div>
             </div>
-
-            <Footer />
         </div>
+        </PublicLayout>
     );
 }
