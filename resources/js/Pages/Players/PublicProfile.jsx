@@ -34,10 +34,18 @@ export default function PublicProfile({ player, teams = [] }) {
     const age = calculateAge(currentPlayer.date_of_birth);
 
     return (
-        <div className="flex min-h-screen flex-col bg-gradient-to-br from-green-50 via-white to-emerald-50">
-            <Head title={`${currentPlayer.name} - Player Profile`} />
+        <div className="relative flex min-h-screen flex-col">
+            {/* Background Image */}
+            <div
+                className="fixed inset-0 z-0"
+                style={{
+                    backgroundImage: 'url(/icons/background.png)',
+                    backgroundRepeat: 'repeat',
+                    opacity: 0.3,
+                }}
+            />
 
-            <div className="flex-1">
+            <div className="relative z-10 flex min-h-screen flex-col">
                 {/* Header */}
                 <div className="px-4 py-6 text-white sm:py-8" style={{ backgroundColor: '#01411C' }}>
                     <div className="mx-auto max-w-4xl">
@@ -48,7 +56,7 @@ export default function PublicProfile({ player, teams = [] }) {
                             </Link>
                         </div>
 
-                        {/* Photo, Name, and Logo (md: logo on right) */}
+                        {/* Photo, Name and Logo */}
                         <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:gap-6 sm:text-left">
                             {/* Photo */}
                             <div className="flex-shrink-0">
@@ -86,9 +94,9 @@ export default function PublicProfile({ player, teams = [] }) {
                 </div>
 
                 {/* Content */}
-                <div className="mx-auto max-w-4xl px-4 py-6">
+                <div className="flex-1 mx-auto max-w-4xl px-4 py-6">
                     {/* Basic Info */}
-                    <div className="mb-6 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+                    <div className="mb-6 rounded-xl border border-gray-200 bg-white/90 px-6 py-4 shadow-sm backdrop-blur-sm">
                         <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
                             {(guardian || father) && (
                                 <div>
@@ -160,8 +168,8 @@ export default function PublicProfile({ player, teams = [] }) {
                         </div>
                     </div>
 
-                    {/* Statistics - Compact inline */}
-                    <div className="mb-6 flex flex-wrap items-center justify-center gap-6 rounded-xl border border-gray-200 bg-white px-6 py-4 shadow-sm">
+                    {/* Statistics */}
+                    <div className="mb-6 flex flex-wrap items-center justify-center gap-6 rounded-xl border border-gray-200 bg-white/90 px-6 py-4 shadow-sm backdrop-blur-sm">
                         <StatItem icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" />
                         <StatItem icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" />
                         <StatItem icon={faFlag} label="Yellow" value={statistics.yellow_cards || 0} color="text-yellow-600" />
@@ -170,7 +178,7 @@ export default function PublicProfile({ player, teams = [] }) {
 
                     {/* Teams Card */}
                     {playerTeams.length > 0 && (
-                        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <div className="rounded-xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
                             <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {playerTeams.map((team) => (
@@ -187,11 +195,10 @@ export default function PublicProfile({ player, teams = [] }) {
                             </div>
                         </div>
                     )}
-
                 </div>
-            </div>
 
-            <Footer />
+                <Footer />
+            </div>
         </div>
     );
 }
