@@ -56,11 +56,13 @@ class TournamentController extends Controller
             ->groupBy('game_id');
 
         $poolResults = DB::table('tournament_pool_results')
-            ->where('tournament_id', $tournament->id)
+            ->join('teams', 'teams.id', '=', 'tournament_pool_results.team_id')
+            ->where('tournament_pool_results.tournament_id', $tournament->id)
             ->orderBy('pool_id')
             ->orderByDesc('total_points')
             ->orderByDesc('goal_diff')
             ->orderBy('team_name')
+            ->select('tournament_pool_results.*', 'teams.uid as team_uid')
             ->get()
             ->map(fn ($row) => (array) $row)
             ->all();

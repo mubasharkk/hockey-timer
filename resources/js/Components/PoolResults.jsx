@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { Link } from '@inertiajs/react';
 
 export default function PoolResults({ results = [] }) {
     const grouped = useMemo(() => {
@@ -43,7 +44,13 @@ export default function PoolResults({ results = [] }) {
                             <tbody className="divide-y divide-gray-100 bg-white">
                                 {pool.rows.map((row) => (
                                     <tr key={row.team_id}>
-                                        <Td>{row.team_name}</Td>
+                                        <Td>
+                                            {row.team_uid ? (
+                                                <Link href={route('teams.public', row.team_uid)} className="text-green-700 hover:underline">
+                                                    {row.team_name}
+                                                </Link>
+                                            ) : row.team_name}
+                                        </Td>
                                         <Td align="center">{row.played}</Td>
                                         <Td align="center">{row.wins}</Td>
                                         <Td align="center">{row.draws}</Td>
