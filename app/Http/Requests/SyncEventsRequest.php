@@ -21,7 +21,7 @@ class SyncEventsRequest extends FormRequest
             'events.*.team_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('teams', 'id')->where(fn ($q) => $q->where('game_id', $game?->id)),
+                Rule::exists('teams', 'id')->where(fn ($q) => $q->whereIn('id', array_filter([$game?->home_team_id, $game?->away_team_id]))),
             ],
             'events.*.session_number' => ['required', 'integer', 'min:1'],
             'events.*.event_type' => ['required', Rule::in(['goal', 'card', 'penalty_corner', 'penalty_stroke', 'highlight', 'session_start', 'session_end', 'game_end'])],

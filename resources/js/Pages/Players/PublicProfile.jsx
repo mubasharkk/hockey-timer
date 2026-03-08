@@ -194,7 +194,7 @@ export default function PublicProfile({ player, teams = [] }) {
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {playerTeams.map((team) => (
                                     <div key={team.id} className="flex items-center gap-3 rounded-lg p-3">
-                                        <TeamCard team={team} asDiv className="flex-1" />
+                                        <TeamCard team={team} publicLink className="flex-1" />
                                         {team.pivot?.shirt_number && (
                                             <div className="flex items-center gap-1.5 rounded-md bg-green-100 px-2 py-1 text-sm font-semibold text-green-800">
                                                 <FontAwesomeIcon icon={faTshirt} className="h-3 w-3" />

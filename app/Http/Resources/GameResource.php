@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Collection;
 
 class GameResource extends JsonResource
 {
@@ -14,9 +13,8 @@ class GameResource extends JsonResource
     {
         $homeRelation = $this->relationLoaded('homeTeam') ? $this->homeTeam : null;
         $awayRelation = $this->relationLoaded('awayTeam') ? $this->awayTeam : null;
-        $teams = $this->relationLoaded('teams') ? $this->teams : new Collection();
-        $homeScore = $homeRelation?->score ?? $teams->firstWhere('side', 'home')?->score;
-        $awayScore = $awayRelation?->score ?? $teams->firstWhere('side', 'away')?->score;
+        $homeScore = $homeRelation?->score;
+        $awayScore = $awayRelation?->score;
         $tournamentRelation = $this->relationLoaded('tournament') ? $this->tournament : null;
         $tournamentResource = $tournamentRelation && ! $tournamentRelation->relationLoaded('games')
             ? TournamentResource::make($tournamentRelation)
@@ -56,7 +54,6 @@ class GameResource extends JsonResource
             'away_final_score' => $this->awayFinalScore(),
             'home_team' => TeamResource::make($this->whenLoaded('homeTeam')),
             'away_team' => TeamResource::make($this->whenLoaded('awayTeam')),
-            'teams' => TeamResource::collection($this->whenLoaded('teams')),
             'tournament' => $this->when($tournamentResource !== null, $tournamentResource),
             'events' => EventResource::collection($this->whenLoaded('events')),
             'created_at' => $this->created_at,

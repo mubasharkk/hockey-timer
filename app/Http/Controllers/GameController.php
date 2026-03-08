@@ -65,7 +65,7 @@ class GameController extends Controller
             $registeredTeams = $registeredTeams->where('user_id', Auth::id());
         }
 
-        $registeredTeams = $registeredTeams->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
+        $registeredTeams = $registeredTeams->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'club_id']);
 
         return Inertia::render('Game/Create', [
             'teams' => TeamResource::collection($registeredTeams),
@@ -159,7 +159,7 @@ class GameController extends Controller
 
         $teams = Team::orderBy('name')
             ->with(['media', 'club'])
-            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'game_id', 'is_registered', 'registered_team_id', 'club_id']);
+            ->get(['id', 'name', 'coach', 'manager', 'score', 'side', 'club_id']);
 
         $tournaments = Cache::remember('tournaments.with_pools', 300, fn () =>
             Tournament::with(['pools.teams:id,name'])

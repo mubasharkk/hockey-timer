@@ -132,4 +132,22 @@ class TeamController extends Controller
 
         return redirect()->route('teams.index')->with('success', 'Team deleted.');
     }
+
+    public function publicProfile(string $uid): Response
+    {
+        $team = Team::where('uid', $uid)->firstOrFail();
+
+        $team->load([
+            'media',
+            'club.media',
+            'club.addresses.country',
+            'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'players.media',
+            'contactPersons',
+        ]);
+
+        return Inertia::render('Teams/PublicProfile', [
+            'team' => TeamResource::make($team),
+        ]);
+    }
 }

@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use App\Models\Game;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Str;
 
 class Team extends Model implements HasMedia
 {
@@ -36,9 +36,7 @@ class Team extends Model implements HasMedia
     protected $fillable = [
         'user_id',
         'club_id',
-        'game_id',
-        'registered_team_id',
-        'is_registered',
+        'uid',
         'name',
         'type',
         'side',
@@ -50,6 +48,25 @@ class Team extends Model implements HasMedia
         'description',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (Team $team) {
+            if (empty($team->uid)) {
+                $team->uid = static::generateUniqueUid();
+            }
+        });
+    }
+
+    public static function generateUniqueUid(): string
+    {
+        do {
+            $uid = strtoupper(Str::random(8));
+            $uid = preg_replace('/[^A-Z0-9]/', substr('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', random_int(0, 35), 1), $uid);
+        } while (static::where('uid', $uid)->exists());
+
+        return $uid;
+    }
+
     protected $appends = [
         'logo_url',
     ];
@@ -57,11 +74,6 @@ class Team extends Model implements HasMedia
     public function club(): BelongsTo
     {
         return $this->belongsTo(Club::class);
-    }
-
-    public function game(): BelongsTo
-    {
-        return $this->belongsTo(Game::class, 'game_id');
     }
 
     public function players(): BelongsToMany
@@ -82,11 +94,6 @@ class Team extends Model implements HasMedia
     }
 
     // Query Scopes
-    public function scopeRegistered($query)
-    {
-        return $query->where('is_registered', true);
-    }
-
     public function scopeByUser($query, int $userId)
     {
         return $query->where('user_id', $userId);

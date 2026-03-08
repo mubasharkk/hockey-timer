@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Game;
 use App\Models\MatchSession;
 use App\Models\Team;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -19,10 +18,6 @@ class GameService
     {
         $homeTemplate = Team::findOrFail($data['home_team_id']);
         $awayTemplate = Team::findOrFail($data['away_team_id']);
-
-//        if (! $homeTemplate->is_registered || ! $awayTemplate->is_registered) {
-//            throw new \InvalidArgumentException('Teams must be registered before creating a game.');
-//        }
 
         return DB::transaction(function () use ($data, $user, $homeTemplate, $awayTemplate) {
             $game = Game::create([
@@ -49,7 +44,7 @@ class GameService
 
             $this->seedSessions($game, $data['sessions'], $data['session_duration_minutes']);
 
-            return $game->setRelation('teams', collect([$homeTemplate, $awayTemplate]));
+            return $game;
         });
     }
 

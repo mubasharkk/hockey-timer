@@ -27,7 +27,6 @@ class CreateTeamAction
             'email' => $data['email'] ?? null,
             'phone' => $data['phone'] ?? null,
             'description' => $data['description'] ?? null,
-            'is_registered' => true,
         ]);
 
         if ($logo) {

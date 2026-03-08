@@ -44,9 +44,6 @@ class GameSyncService
                     Team::updateOrCreate(
                         ['id' => $team['id'] ?? null],
                         [
-                            'game_id' => $game->id,
-                            'registered_team_id' => $team['registered_team_id'] ?? null,
-                            'is_registered' => $team['is_registered'] ?? false,
                             'name' => $team['name'],
                             'side' => $team['side'],
                             'score' => $team['score'] ?? 0,
@@ -143,7 +140,7 @@ class GameSyncService
 
             $playerName = null;
             if (!empty($event['player_shirt_number']) && !empty($event['team_id'])) {
-                $playerName = optional($game->teams()->with('players')->find($event['team_id']))
+                $playerName = optional(Team::with('players')->find($event['team_id']))
                     ?->players
                     ->firstWhere('shirt_number', $event['player_shirt_number'])
                     ?->name;

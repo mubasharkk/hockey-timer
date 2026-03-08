@@ -51,11 +51,6 @@ class Game extends Model
         'ended_at' => 'datetime',
     ];
 
-    public function teams(): HasMany
-    {
-        return $this->hasMany(Team::class, 'game_id');
-    }
-
     public function homeTeam(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'home_team_id');

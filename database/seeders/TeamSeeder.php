@@ -29,7 +29,6 @@ class TeamSeeder extends Seeder
             $team = Team::create([
                 'user_id' => $user->id,
                 'name' => "Team " . Str::upper(Str::random(4)),
-                'is_registered' => true,
                 'coach' => $faker->name(),
                 'manager' => $faker->name(),
             ]);

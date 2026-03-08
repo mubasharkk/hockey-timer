@@ -14,11 +14,9 @@ class TeamResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uid' => $this->uid,
             'user_id' => $this->user_id,
             'club_id' => $this->club_id,
-            'game_id' => $this->game_id,
-            'registered_team_id' => $this->registered_team_id,
-            'is_registered' => (bool) $this->is_registered,
             'name' => $this->name,
             'type' => $this->type,
             'type_label' => $this->type_label,

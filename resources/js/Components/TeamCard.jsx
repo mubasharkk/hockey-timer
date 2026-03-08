@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 
-export default function TeamCard({ team, showMeta = false, asDiv = false }) {
+export default function TeamCard({ team, showMeta = false, asDiv = false, publicLink = false }) {
     const content = (
         <>
             {team.logo_url ? (
@@ -36,8 +36,12 @@ export default function TeamCard({ team, showMeta = false, asDiv = false }) {
         return <div className={className}>{content}</div>;
     }
 
+    const href = publicLink && team.uid
+        ? route('teams.public', team.uid)
+        : route('teams.show', team.id);
+
     return (
-        <Link href={route('teams.show', team.id)} className={className}>
+        <Link href={href} className={className}>
             {content}
         </Link>
     );

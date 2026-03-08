@@ -99,6 +99,7 @@ Route::get('/ticker', [PublicTickerController::class, 'index'])->name('public.ti
 Route::get('/ticker/{code}', [PublicTickerController::class, 'index'])->name('public.ticker.code');
 Route::get('/public/tournaments/{slug}', [PublicTournamentController::class, 'show'])->name('public.tournaments.show');
 Route::get('/player/{identifier}', [PlayerController::class, 'publicProfile'])->name('players.public');
+Route::get('/team/{uid}', [TeamController::class, 'publicProfile'])->name('teams.public');
 
 // Static pages
 Route::get('/page/{slug}', [PageController::class, 'show'])->name('pages.show');
