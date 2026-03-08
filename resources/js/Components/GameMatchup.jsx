@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 export default function GameMatchup({ game }) {
-    console.log(game);
     const home = game.home_team || { name: game.team_a_name };
     const away = game.away_team || { name: game.team_b_name };
     const isFinished = game.status === 'finished' || !!game.ended_at;
@@ -47,12 +46,20 @@ export default function GameMatchup({ game }) {
     );
 }
 
-const TeamBlock = ({ team }) => (
-    <div className="flex flex-col items-center gap-2">
-        <Logo src={team.logo_url} alt={team.name} />
-        <div className="text-sm font-semibold text-gray-900 text-center">{team.name || 'TBD'}</div>
-    </div>
-);
+const TeamBlock = ({ team }) => {
+    const name = <div className="text-sm font-semibold text-gray-900 text-center">{team.name || 'TBD'}</div>;
+
+    return (
+        <div className="flex flex-col items-center gap-2">
+            <Logo src={team.logo_url} alt={team.name} />
+            {team.uid ? (
+                <Link href={route('teams.public', team.uid)} className="hover:text-green-700 transition">
+                    {name}
+                </Link>
+            ) : name}
+        </div>
+    );
+};
 
 const Logo = ({ src, alt }) => {
     if (src) {
