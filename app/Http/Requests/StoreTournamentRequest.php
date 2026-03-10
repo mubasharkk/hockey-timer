@@ -27,6 +27,11 @@ class StoreTournamentRequest extends FormRequest
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif', 'max:5120'],
             'sponsor_logos' => ['nullable', 'array'],
             'sponsor_logos.*' => ['image', 'mimes:jpg,jpeg,png,gif', 'max:5120'],
+            'contact_persons' => ['nullable', 'array'],
+            'contact_persons.*.name' => ['required', 'string', 'max:255'],
+            'contact_persons.*.role' => ['nullable', 'string', 'max:255'],
+            'contact_persons.*.phone' => ['nullable', 'string', 'max:50'],
+            'contact_persons.*.email' => ['nullable', 'email', 'max:255'],
         ];
     }
 }

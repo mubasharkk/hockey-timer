@@ -85,7 +85,7 @@ class TournamentController extends Controller
 
     public function edit(Tournament $tournament): Response
     {
-        $tournament->load('pools');
+        $tournament->load(['pools', 'contactPersons']);
 
         return Inertia::render('Tournaments/Edit', [
             'tournament' => TournamentResource::make($tournament),
@@ -122,6 +122,7 @@ class TournamentController extends Controller
         }
 
         $this->seedPools($tournament, (int) $request->input('pools_count', 1));
+        $this->syncContactPersons($tournament, $request->input('contact_persons', []));
 
         return redirect()->route('tournaments.index')->with('success', 'Tournament created.');
     }
@@ -158,6 +159,8 @@ class TournamentController extends Controller
             $this->seedPools($tournament, (int) $request->input('pools_count'));
         }
 
+        $this->syncContactPersons($tournament, $request->input('contact_persons', []));
+
         return redirect()->route('tournaments.index')->with('success', 'Tournament updated.');
     }
 
@@ -183,6 +186,24 @@ class TournamentController extends Controller
         }
 
         return $slug;
+    }
+
+    private function syncContactPersons(Tournament $tournament, array $contacts): void
+    {
+        $tournament->contactPersons()->delete();
+
+        foreach ($contacts as $contact) {
+            if (empty($contact['name'])) {
+                continue;
+            }
+
+            $tournament->contactPersons()->create([
+                'name' => $contact['name'],
+                'role' => $contact['role'] ?? null,
+                'phone' => $contact['phone'] ?? null,
+                'email' => $contact['email'] ?? null,
+            ]);
+        }
     }
 
     private function seedPools(Tournament $tournament, int $count): void

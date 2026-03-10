@@ -26,6 +26,7 @@ class TournamentResource extends JsonResource
             'sponsor_logo_urls' => $this->getMedia('sponsor_logos')->map->getUrl()->all(),
             'pools' => TournamentPoolResource::collection($this->whenLoaded('pools')),
             'games' => GameResource::collection($this->whenLoaded('games')),
+            'contact_persons' => ContactPersonResource::collection($this->whenLoaded('contactPersons')),
         ];
     }
 }

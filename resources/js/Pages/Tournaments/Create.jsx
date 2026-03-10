@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,7 +16,22 @@ export default function Create({ auth }) {
         pools_count: 1,
         logo: null,
         sponsor_logos: [],
+        contact_persons: [],
     });
+
+    const addContactPerson = () => {
+        setData('contact_persons', [...data.contact_persons, { name: '', role: '', phone: '', email: '' }]);
+    };
+
+    const removeContactPerson = (index) => {
+        setData('contact_persons', data.contact_persons.filter((_, i) => i !== index));
+    };
+
+    const updateContactPerson = (index, field, value) => {
+        const updated = [...data.contact_persons];
+        updated[index] = { ...updated[index], [field]: value };
+        setData('contact_persons', updated);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -142,6 +157,36 @@ export default function Create({ auth }) {
                             </div>
                         </div>
 
+                        {/* Contact Persons */}
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                                <label className="block text-sm font-medium text-gray-700">Contact Persons (optional)</label>
+                                <button
+                                    type="button"
+                                    onClick={addContactPerson}
+                                    className="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-200"
+                                >
+                                    <FontAwesomeIcon icon={faPlus} className="h-3 w-3" />
+                                    Add Contact
+                                </button>
+                            </div>
+
+                            {data.contact_persons.map((contact, index) => (
+                                <ContactPersonCard
+                                    key={index}
+                                    index={index}
+                                    contact={contact}
+                                    errors={errors}
+                                    onChange={updateContactPerson}
+                                    onRemove={removeContactPerson}
+                                />
+                            ))}
+
+                            {data.contact_persons.length === 0 && (
+                                <p className="text-xs text-gray-500">No contact persons added yet.</p>
+                            )}
+                        </div>
+
                         <div className="flex items-center justify-end">
                             <button
                                 type="submit"
@@ -158,6 +203,64 @@ export default function Create({ auth }) {
         </AuthenticatedLayout>
     );
 }
+
+const ContactPersonCard = ({ index, contact, errors, onChange, onRemove }) => (
+    <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
+        <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">Contact #{index + 1}</span>
+            <button type="button" onClick={() => onRemove(index)} className="text-red-500 hover:text-red-700">
+                <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
+            </button>
+        </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+                <label className="block text-xs font-medium text-gray-600">Name <span className="text-red-500">*</span></label>
+                <input
+                    className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
+                    value={contact.name}
+                    onChange={(e) => onChange(index, 'name', e.target.value)}
+                    placeholder="Full name"
+                    required
+                />
+                {errors[`contact_persons.${index}.name`] && (
+                    <p className="mt-1 text-xs text-red-600">{errors[`contact_persons.${index}.name`]}</p>
+                )}
+            </div>
+            <div>
+                <label className="block text-xs font-medium text-gray-600">Role (optional)</label>
+                <input
+                    className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
+                    value={contact.role}
+                    onChange={(e) => onChange(index, 'role', e.target.value)}
+                    placeholder="e.g. Tournament Director, Coordinator"
+                />
+            </div>
+            <div>
+                <label className="block text-xs font-medium text-gray-600">Phone (optional)</label>
+                <input
+                    type="tel"
+                    className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
+                    value={contact.phone}
+                    onChange={(e) => onChange(index, 'phone', e.target.value)}
+                    placeholder="+1 234 567 890"
+                />
+            </div>
+            <div>
+                <label className="block text-xs font-medium text-gray-600">Email (optional)</label>
+                <input
+                    type="email"
+                    className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-green-500 focus:ring-green-500"
+                    value={contact.email}
+                    onChange={(e) => onChange(index, 'email', e.target.value)}
+                    placeholder="contact@example.com"
+                />
+                {errors[`contact_persons.${index}.email`] && (
+                    <p className="mt-1 text-xs text-red-600">{errors[`contact_persons.${index}.email`]}</p>
+                )}
+            </div>
+        </div>
+    </div>
+);
 
 const NumberField = ({ label, value, onChange, error }) => (
     <div>
