@@ -29,28 +29,13 @@ export default function Summary({ auth, game }) {
     const relativeStart = formatRelativeStart(currentGame.game_date, currentGame.game_time, currentGame.status, currentGame.ended_at);
     const gameCode = currentGame.code;
     const sessions = currentGame.sessions || [];
-    const teams = currentGame.teams || [];
-    const homeTeam = teams.find((t) => t.side === 'home') || { name: currentGame.team_a_name };
-    const awayTeam = teams.find((t) => t.side === 'away') || { name: currentGame.team_b_name };
     const sessionCount = sessions.length;
     const now = new Date();
     const canStart = !isFinished && (scheduledAt ? now >= scheduledAt : false);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const { delete: destroy, processing } = useForm({});
-    const registeredHomeTeam = currentGame.home_team || currentGame.homeTeam;
-    const registeredAwayTeam = currentGame.away_team || currentGame.awayTeam;
 
-    const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
-        if (sideTeam && registeredTeam) {
-            return {
-                ...registeredTeam,
-                ...sideTeam,
-                name: sideTeam.name || registeredTeam.name || fallbackName,
-                players: (sideTeam.players && sideTeam.players.length ? sideTeam.players : registeredTeam.players) || [],
-            };
-        }
-
-        const team = sideTeam || registeredTeam;
+    const resolveTeam = (team, fallbackName) => {
         if (team) {
             return {
                 ...team,
@@ -58,12 +43,11 @@ export default function Summary({ auth, game }) {
                 players: team.players || [],
             };
         }
-
         return { name: fallbackName, players: [] };
     };
 
-    const homeTeamResolved = resolveTeam(homeTeam, registeredHomeTeam, currentGame.team_a_name);
-    const awayTeamResolved = resolveTeam(awayTeam, registeredAwayTeam, currentGame.team_b_name);
+    const homeTeamResolved = resolveTeam(currentGame.home_team, currentGame.team_a_name);
+    const awayTeamResolved = resolveTeam(currentGame.away_team, currentGame.team_b_name);
 
     return (
         <AuthenticatedLayout user={auth.user}>

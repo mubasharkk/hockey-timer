@@ -34,6 +34,7 @@ class PublicTickerController extends Controller
             $game = Game::with($eagerLoad)->find($gameId);
         }
 
+//        dd(GameResource::make($game)->toArray($request));
         return Inertia::render('Public/Ticker', [
             'game' => $game ? GameResource::make($game) : null,
             'gameId' => $gameId,

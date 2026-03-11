@@ -128,29 +128,21 @@ export default function Timer({ auth, game, config = {} }) {
         return () => window.clearInterval(id);
     }, [status]);
 
-    const teams = currentGame.teams || [];
-    const registeredHomeTeam = currentGame.home_team || currentGame.homeTeam;
-    const registeredAwayTeam = currentGame.away_team || currentGame.awayTeam;
-
-    const resolveTeam = (sideTeam, registeredTeam, fallbackName) => {
-        if (sideTeam || registeredTeam) {
-            const players = (sideTeam?.players && sideTeam.players.length ? sideTeam.players : registeredTeam?.players) || [];
+    const resolveTeam = (team, fallbackName) => {
+        if (team) {
             return {
-                ...registeredTeam,
-                ...sideTeam,
-                // Prefer the game-specific team id; fall back to registered team id so the UI stays interactive.
-                id: sideTeam?.id ?? registeredTeam?.id ?? null,
-                name: sideTeam?.name || registeredTeam?.name || fallbackName,
-                score: sideTeam?.score ?? registeredTeam?.score ?? 0,
-                players,
+                ...team,
+                id: team.id ?? null,
+                name: team.name || fallbackName,
+                score: team.score ?? 0,
+                players: team.players || [],
             };
         }
-
-        return { id: null, name: fallbackName, players: [] };
+        return { id: null, name: fallbackName, players: [], score: 0 };
     };
 
-    const home = resolveTeam(teams.find((t) => t.side === 'home'), registeredHomeTeam, currentGame.team_a_name);
-    const away = resolveTeam(teams.find((t) => t.side === 'away'), registeredAwayTeam, currentGame.team_b_name);
+    const home = resolveTeam(currentGame.home_team, currentGame.team_a_name);
+    const away = resolveTeam(currentGame.away_team, currentGame.team_b_name);
     const [events, setEvents] = useState(currentGame.events || []);
     const scoreStorageKey = `game_scores_${currentGame.id}`;
     const [scores, setScores] = useState(() => {

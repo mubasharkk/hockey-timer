@@ -17,9 +17,8 @@ export default function Ticker({ game, gameId }) {
     const venue = liveData?.venue ?? game?.venue ?? '';
     const excerpt = liveData?.excerpt ?? game?.excerpt ?? '';
     const tournament = liveData?.tournament ?? game?.tournament ?? null;
-    const teams = liveData?.teams ?? game?.teams ?? [];
-    const homeTeam = teams.find((t) => t.side === 'home') || { name: liveData?.team_a_name ?? game?.team_a_name };
-    const awayTeam = teams.find((t) => t.side === 'away') || { name: liveData?.team_b_name ?? game?.team_b_name };
+    const homeTeam = liveData?.home_team ?? game?.data?.home_team ?? null;
+    const awayTeam = liveData?.away_team ?? game?.data?.away_team ?? null;
 
     const effectiveSeconds = useMemo(() => {
         // Trust server timer_seconds as the single source of truth
@@ -74,9 +73,9 @@ export default function Ticker({ game, gameId }) {
     return (
         <PublicLayout fullWidth>
             <Head>
-                <title>{liveData ? `${homeTeam.name} vs ${awayTeam.name}` : 'Live Ticker'}</title>
+                <title>{liveData ? `${homeTeam?.name ?? 'Home'} vs ${awayTeam?.name ?? 'Away'}` : 'Live Ticker'}</title>
                 <meta name="description" content={venue || 'Live game ticker'} />
-                <meta property="og:title" content={liveData ? `${homeTeam.name} vs ${awayTeam.name}` : 'Live Ticker'} />
+                <meta property="og:title" content={liveData ? `${homeTeam?.name ?? 'Home'} vs ${awayTeam?.name ?? 'Away'}` : 'Live Ticker'} />
                 <meta property="og:description" content={venue || 'Live game ticker'} />
                 <meta
                     property="og:image"
@@ -164,11 +163,11 @@ export default function Ticker({ game, gameId }) {
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-gray-700 border-t border-gray-200 pt-10">
                                     <div id="score-team-a" className="flex w-1/2 flex-col items-start justify-center text-left">
                                         <span className="mb-3 mt-3 text-3xl font-semibold">{homeTeam?.name || liveData.team_a_name}</span>
-                                        <span className="text-5xl font-bold">{liveData.team_a_score ?? (liveData.teams || []).find((t) => t.side === 'home')?.score ?? 0}</span>
+                                        <span className="text-5xl font-bold">{liveData.team_a_score ?? 0}</span>
                                     </div>
                                     <div id="score-team-b" className="flex w-1/2 flex-col items-end justify-center text-right">
                                         <span className="mb-3 mt-3 text-3xl font-semibold">{awayTeam?.name || liveData.team_b_name}</span>
-                                        <span className="text-5xl font-bold">{liveData.team_b_score ?? (liveData.teams || []).find((t) => t.side === 'away')?.score ?? 0}</span>
+                                        <span className="text-5xl font-bold">{liveData.team_b_score ?? 0}</span>
                                     </div>
                                 </div>
                             </div>
@@ -202,7 +201,7 @@ export default function Ticker({ game, gameId }) {
                                                     {e.player_shirt_number ? ` · #${e.player_shirt_number}` : ''}
                                                 </p>
                                                 <p className="text-xs font-semibold text-gray-600">
-                                                    {teamName(e.team_id, liveData?.teams)}
+                                                    {teamName(e.team_id, homeTeam, awayTeam, liveData)}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
                                                     Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
@@ -273,7 +272,11 @@ const cardIcon = (type) => {
     return '/icons/red-card.png';
 };
 
-const teamName = (id, teams = []) => teams?.find((t) => t.id === id)?.name || '—';
+const teamName = (id, homeTeam, awayTeam, liveData) => {
+    if (homeTeam && (homeTeam.id === id || liveData?.home_team_id === id)) return homeTeam.name;
+    if (awayTeam && (awayTeam.id === id || liveData?.away_team_id === id)) return awayTeam.name;
+    return '—';
+};
 
 const formatSeconds = (seconds) => {
     const mins = Math.floor(seconds / 60)

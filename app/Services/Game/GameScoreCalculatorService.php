@@ -20,9 +20,9 @@ class GameScoreCalculatorService
             ->groupBy('team_id')
             ->pluck('total', 'team_id');
 
-        $home = $game->teams->firstWhere('side', 'home');
-        $away = $game->teams->firstWhere('side', 'away');
 
+        $home = $game->homeTeam;
+        $away = $game->awayTeam;
         return [
             'home' => $home ? ($goalCounts[$home->id] ?? $home->score ?? 0) : 0,
             'away' => $away ? ($goalCounts[$away->id] ?? $away->score ?? 0) : 0,

@@ -40,8 +40,9 @@ class GameSyncService
         );
 
             if (!empty($data['teams'])) {
-                collect($data['teams'])->each(function (array $team) use ($game) {
-                    Team::updateOrCreate(
+                $teamsBySide = [];
+                collect($data['teams'])->each(function (array $team) use (&$teamsBySide) {
+                    $record = Team::updateOrCreate(
                         ['id' => $team['id'] ?? null],
                         [
                             'name' => $team['name'],
@@ -51,7 +52,13 @@ class GameSyncService
                             'manager' => $team['manager'] ?? null,
                         ]
                     );
+                    $teamsBySide[$team['side']] = $record->id;
                 });
+
+                $updates = [];
+                if (isset($teamsBySide['home'])) $updates['home_team_id'] = $teamsBySide['home'];
+                if (isset($teamsBySide['away'])) $updates['away_team_id'] = $teamsBySide['away'];
+                if ($updates) $game->update($updates);
             }
 
             $this->ensurePlannedSessions($game);
