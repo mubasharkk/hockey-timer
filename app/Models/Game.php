@@ -51,6 +51,11 @@ class Game extends Model
         'ended_at' => 'datetime',
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function homeTeam(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'home_team_id');
