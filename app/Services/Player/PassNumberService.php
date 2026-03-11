@@ -44,7 +44,8 @@ class PassNumberService
      */
     private function exists(string $passNumber, ?Player $exclude = null): bool
     {
-        return Player::where('player_pass_number', $passNumber)
+        return Player::withInactive()
+            ->where('player_pass_number', $passNumber)
             ->when($exclude?->id, fn ($q) => $q->where('id', '!=', $exclude->id))
             ->exists();
     }

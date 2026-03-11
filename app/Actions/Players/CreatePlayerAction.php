@@ -59,7 +59,7 @@ class CreatePlayerAction
     private function resolvePassNumber(?string $value): string
     {
         $candidate = $value ?: $this->generatePassNumber();
-        while (Player::where('player_pass_number', $candidate)->exists()) {
+        while (Player::withInactive()->where('player_pass_number', $candidate)->exists()) {
             $candidate = $this->generatePassNumber();
         }
         return $candidate;

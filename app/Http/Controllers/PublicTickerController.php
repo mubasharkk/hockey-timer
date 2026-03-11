@@ -15,23 +15,23 @@ class PublicTickerController extends Controller
         $gameId = $request->query('game');
         $game = null;
 
+        $eagerLoad = [
+            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'homeTeam.media',
+            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'awayTeam.media',
+            'tournament',
+            'sessions' => fn ($q) => $q->orderBy('number'),
+            'events' => fn ($q) => $q->orderBy('occurred_at'),
+        ];
+
         if ($code) {
-            $game = Game::with([
-                'teams' => fn ($q) => $q->with(['players', 'media'])->orderBy('side'),
-                'tournament',
-                'sessions' => fn ($q) => $q->orderBy('number'),
-                'events' => fn ($q) => $q->orderBy('occurred_at'),
-            ])->where('code', $code)->first();
+            $game = Game::with($eagerLoad)->where('code', $code)->first();
             $gameId = $game?->id;
         }
 
-        if ($gameId) {
-            $game = Game::with([
-                'teams' => fn ($q) => $q->with(['players', 'media'])->orderBy('side'),
-                'tournament',
-                'sessions' => fn ($q) => $q->orderBy('number'),
-                'events' => fn ($q) => $q->orderBy('occurred_at'),
-            ])->find($gameId);
+        if ($gameId && !$game) {
+            $game = Game::with($eagerLoad)->find($gameId);
         }
 
         return Inertia::render('Public/Ticker', [

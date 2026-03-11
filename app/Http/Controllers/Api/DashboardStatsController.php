@@ -15,8 +15,8 @@ class DashboardStatsController extends Controller
         return response()->json([
             'clubs' => Club::count(),
             'teams' => Team::count(),
-            'players' => Player::count(),
-            'active_players' => Player::where('is_active', true)->count(),
+            'players' => Player::withInactive()->count(),
+            'active_players' => Player::count(),
         ]);
     }
 }

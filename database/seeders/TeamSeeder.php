@@ -22,8 +22,8 @@ class TeamSeeder extends Seeder
         }
 
         $faker = Faker::create();
-        $existingPasses = Player::pluck('player_pass_number')->filter()->all();
-        $existingNics = Player::pluck('nic_number')->filter()->all();
+        $existingPasses = Player::withInactive()->pluck('player_pass_number')->filter()->all();
+        $existingNics = Player::withInactive()->pluck('nic_number')->filter()->all();
 
         for ($i = 1; $i <= 8; $i++) {
             $team = Team::create([
@@ -60,7 +60,7 @@ class TeamSeeder extends Seeder
     {
         do {
             $code = Str::upper(Str::random(6));
-        } while (in_array($code, $existing, true) || Player::where('player_pass_number', $code)->exists());
+        } while (in_array($code, $existing, true) || Player::withInactive()->where('player_pass_number', $code)->exists());
 
         $existing[] = $code;
 
@@ -71,7 +71,7 @@ class TeamSeeder extends Seeder
     {
         do {
             $nic = $faker->numerify('#############');
-        } while (in_array($nic, $existing, true) || Player::where('nic_number', $nic)->exists());
+        } while (in_array($nic, $existing, true) || Player::withInactive()->where('nic_number', $nic)->exists());
 
         $existing[] = $nic;
 

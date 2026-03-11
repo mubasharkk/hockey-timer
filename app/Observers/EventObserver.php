@@ -43,7 +43,7 @@ class EventObserver
 
     private function recalculatePlayerStats(int $playerId): void
     {
-        $player = Player::find($playerId);
+        $player = Player::withInactive()->find($playerId);
         if (!$player) {
             return;
         }

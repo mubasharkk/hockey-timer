@@ -22,7 +22,7 @@ class CreatePlayerFromScannedIdAction
 
         $nic = $extracted['nic_number'] ?? null;
         if ($nic) {
-            $existing = Player::where('nic_number', $nic)->first();
+            $existing = Player::withInactive()->where('nic_number', $nic)->first();
             if ($existing) {
                 return $existing;
             }

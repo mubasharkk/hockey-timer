@@ -62,6 +62,10 @@ class CheckIfAdmin
             return $this->respondToUnauthorizedRequest($request);
         }
 
-        return $next($request);
+        try {
+            return $next($request);
+        } catch (\Exception $exception) {
+            dd($exception);
+        }
     }
 }

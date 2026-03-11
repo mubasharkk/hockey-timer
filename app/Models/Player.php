@@ -7,6 +7,7 @@ use App\Models\Traits\HasGender;
 use App\Models\Traits\HasPlayerType;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -49,6 +50,18 @@ class Player extends Model implements HasMedia
         'date_of_birth' => 'date',
         'is_active' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope('active', function (Builder $builder) {
+            $builder->where('players.is_active', true);
+        });
+    }
+
+    public function scopeWithInactive(Builder $query): Builder
+    {
+        return $query->withoutGlobalScope('active');
+    }
 
     public function user(): BelongsTo
     {

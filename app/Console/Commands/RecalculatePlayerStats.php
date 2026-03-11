@@ -15,7 +15,7 @@ class RecalculatePlayerStats extends Command
 
     public function handle(): int
     {
-        $query = Player::query();
+        $query = Player::withInactive();
 
         if ($playerId = $this->option('player')) {
             $query->where('id', $playerId);

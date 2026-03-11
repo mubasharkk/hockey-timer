@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\GameRequest;
 use App\Http\Requests\StoreGameRequest;
+use App\Http\Requests\UpdateGameRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -73,6 +73,7 @@ class GameCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
+        CRUD::setValidation(UpdateGameRequest::class);
+        CRUD::setOperationSetting('eagerLoadRelationships', true);
     }
 }

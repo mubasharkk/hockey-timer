@@ -39,7 +39,7 @@ class PlayerController extends Controller
      */
     public function index(): Response
     {
-        $query = Player::with(['teams', 'media'])->latest();
+        $query = Player::withInactive()->with(['teams', 'media'])->latest();
 
         if (!request()->user()->is_admin) {
             $query = $query->where('user_id', Auth::id());
@@ -71,7 +71,7 @@ class PlayerController extends Controller
 
         $nicNumber = $extractedData['nic_number'] ?? null;
         if ($nicNumber) {
-            $existingPlayer = Player::where('nic_number', $nicNumber)->first();
+            $existingPlayer = Player::withInactive()->where('nic_number', $nicNumber)->first();
             if ($existingPlayer) {
                 return redirect()
                     ->route('players.show', $existingPlayer)
@@ -168,7 +168,8 @@ class PlayerController extends Controller
      */
     public function publicProfile(string $identifier): Response
     {
-        $player = Player::where('player_pass_number', $identifier)
+        $player = Player::withInactive()
+            ->where('player_pass_number', $identifier)
             ->orWhere('nic_number', $identifier)
             ->orWhere('id', $identifier)
             ->firstOrFail();

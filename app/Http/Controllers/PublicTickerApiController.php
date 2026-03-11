@@ -21,7 +21,8 @@ class PublicTickerApiController extends Controller
     public function show(Game $game): JsonResponse
     {
         $game->load([
-            'teams' => fn ($q) => $q->with('media')->orderBy('side'),
+            'homeTeam.media',
+            'awayTeam.media',
             'tournament' => fn ($q) => $q->with('media'),
         ]);
 
