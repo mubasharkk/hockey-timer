@@ -48,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/teams/{team}', [TeamController::class, 'destroy'])->name('teams.destroy');
 
     // Team Players (roster management)
-    Route::get('/teams/{team}/players', [TeamPlayerController::class, 'index'])->name('teams.players.index');
+    Route::get('/teams/{team}/players', fn (\App\Models\Team $team) => redirect()->route('teams.show', $team))->name('teams.players.index');
     Route::get('/teams/{team}/players/add', [TeamPlayerController::class, 'create'])->name('teams.players.create');
     Route::get('/teams/{team}/players/search', [TeamPlayerController::class, 'search'])->name('teams.players.search');
     Route::post('/teams/{team}/players', [TeamPlayerController::class, 'store'])->name('teams.players.store');

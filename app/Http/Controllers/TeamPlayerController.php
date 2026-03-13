@@ -16,21 +16,6 @@ use Inertia\Response;
 class TeamPlayerController extends Controller
 {
     /**
-     * Display the team roster management page.
-     */
-    public function index(Team $team): Response
-    {
-        $this->ensureTeamAccess($team);
-
-        $team->load(['allPlayers.media', 'club']);
-
-        return Inertia::render('Teams/Players/Index', [
-            'team' => TeamResource::make($team),
-            'players' => PlayerResource::collection($team->allPlayers),
-        ]);
-    }
-
-    /**
      * Show the page to add a player to the team.
      */
     public function create(Team $team): Response
@@ -98,7 +83,7 @@ class TeamPlayerController extends Controller
         ]);
 
         return redirect()
-            ->route('teams.players.index', $team)
+            ->route('teams.show', $team)
             ->with('success', 'Player added to team.');
     }
 
@@ -146,7 +131,7 @@ class TeamPlayerController extends Controller
         $team->allPlayers()->detach($player->id);
 
         return redirect()
-            ->route('teams.players.index', $team)
+            ->route('teams.show', $team)
             ->with('success', 'Player removed from team.');
     }
 

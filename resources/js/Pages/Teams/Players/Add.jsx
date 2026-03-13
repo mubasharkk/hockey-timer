@@ -77,7 +77,7 @@ export default function Add({ auth, team }) {
                             <h1 className="text-2xl font-semibold text-gray-900">Add Player to Team</h1>
                         </div>
                         <Link
-                            href={route('teams.players.index', currentTeam.id)}
+                            href={route('teams.show', currentTeam.id)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50"
                         >
                             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
