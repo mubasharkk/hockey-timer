@@ -131,7 +131,7 @@ export default function Show({ auth, team }) {
                             <Info label="Type" value={currentTeam.type_label || '—'} />
                             <Info label="Coach" value={currentTeam.coach || '—'} />
                             <Info label="Manager" value={currentTeam.manager || '—'} />
-                            <Info label="Players" value={`${players.length}`} />
+                            <Info label="Players" value={`${players.filter(p => p.pivot?.is_active !== false).length} / ${players.length}`} />
                         </div>
 
                         {/* Contact Info */}
