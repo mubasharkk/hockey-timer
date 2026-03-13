@@ -1,11 +1,13 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faFloppyDisk, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export default function Edit({ auth, team, clubs, teamTypes }) {
     const currentTeam = team?.data ?? team;
     const clubList = clubs?.data ?? clubs ?? [];
+    const [logoPreview, setLogoPreview] = useState(null);
     const { data, setData, post, processing, errors, reset } = useForm({
         _method: 'put',
         club_id: currentTeam?.club_id ?? '',
@@ -178,52 +180,65 @@ export default function Edit({ auth, team, clubs, teamTypes }) {
 
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700">Team Logo (optional)</label>
-                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    className="block w-full text-sm text-gray-700"
-                                    onChange={(e) => {
-                                        const file = e.target.files[0] || null;
-                                        setData('logo', file);
-                                        if (file) {
-                                            setData('remove_logo', false);
-                                        }
-                                    }}
-                                />
-                                {team.logo_url && !data.remove_logo && (
-                                    <div className="flex items-center gap-3">
+                            <div className="flex items-start gap-4">
+                                {/* Preview */}
+                                {!data.remove_logo && (logoPreview || currentTeam.logo_url) && (
+                                    <div className="relative flex-shrink-0">
                                         <img
-                                            src={team.logo_url}
-                                            alt={`${team.name} logo`}
-                                            className="h-12 w-12 rounded-md border border-gray-200 object-cover"
+                                            src={logoPreview || currentTeam.logo_url}
+                                            alt={`${currentTeam.name} logo`}
+                                            className="h-20 w-20 rounded-lg border border-gray-200 object-cover"
                                         />
                                         <button
                                             type="button"
-                                            className="text-sm font-semibold text-red-600 hover:text-red-500"
+                                            className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white shadow hover:bg-red-600"
                                             onClick={() => {
-                                                setData('remove_logo', true);
-                                                setData('logo', null);
+                                                setData((prev) => ({ ...prev, logo: null, remove_logo: true }));
+                                                setLogoPreview(null);
                                             }}
+                                            title="Remove logo"
                                         >
-                                            Remove
+                                            <FontAwesomeIcon icon={faTrash} className="h-2.5 w-2.5" />
                                         </button>
+                                        {logoPreview && (
+                                            <span className="absolute bottom-0 left-0 right-0 rounded-b-lg bg-green-700/80 py-0.5 text-center text-[10px] font-semibold text-white">
+                                                New
+                                            </span>
+                                        )}
                                     </div>
                                 )}
-                                {data.remove_logo && (
-                                    <div className="text-xs text-gray-600">
-                                        <p>Logo will be removed on save. Upload a new file to replace instead.</p>
-                                        <button
-                                            type="button"
-                                            className="mt-1 font-semibold text-green-700 hover:text-green-600"
-                                            onClick={() => setData('remove_logo', false)}
-                                        >
-                                            Keep existing logo
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="flex-1 space-y-2">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-green-50 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-green-700 hover:file:bg-green-100"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0] || null;
+                                            setData((prev) => ({ ...prev, logo: file, remove_logo: false }));
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = (ev) => setLogoPreview(ev.target.result);
+                                                reader.readAsDataURL(file);
+                                            } else {
+                                                setLogoPreview(null);
+                                            }
+                                        }}
+                                    />
+                                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB.</p>
+                                    {data.remove_logo && !logoPreview && (
+                                        <div className="flex items-center gap-2 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                                            <span>Logo will be removed on save.</span>
+                                            <button
+                                                type="button"
+                                                className="font-semibold underline hover:text-amber-800"
+                                                onClick={() => setData('remove_logo', false)}
+                                            >
+                                                Undo
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB.</p>
                             {errors.logo && <p className="mt-1 text-xs text-red-600">{errors.logo}</p>}
                         </div>
 

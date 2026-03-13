@@ -28,13 +28,11 @@ class UpdateTeamAction
             'description' => $data['description'] ?? null,
         ]);
 
-        if (isset($data['remove_logo'])) {
-            $team->clearMediaCollection('logo');
-        }
-
         if ($logo) {
             $team->clearMediaCollection('logo');
             $team->addMediaFromRequest('logo')->toMediaCollection('logo');
+        } elseif (!empty($data['remove_logo'])) {
+            $team->clearMediaCollection('logo');
         }
 
         // Handle contact persons
