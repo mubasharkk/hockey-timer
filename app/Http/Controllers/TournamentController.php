@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTournamentRequest;
 use App\Http\Requests\UpdateTournamentRequest;
 use App\Models\Tournament;
 use App\Models\TournamentPool;
+use App\Http\Resources\GameResource;
 use App\Http\Resources\TournamentResource;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
@@ -35,18 +36,32 @@ class TournamentController extends Controller
 
     public function show(Tournament $tournament): Response
     {
-        $tournament->load([
-            'pools.teams',
-            'games' => fn ($q) => $q
-                ->orderBy('game_date')
-                ->orderBy('game_time')
-                ->with([
-                    'homeTeam.media',
-                    'awayTeam.media',
-                ]),
-        ]);
+        $tournament->load(['pools.teams']);
 
-        $gameIds = $tournament->games->pluck('id');
+        $gameEager = ['homeTeam.media', 'awayTeam.media'];
+        $today = now()->toDateString();
+
+        $upcomingGames = $tournament->games()
+            ->where(function ($q) use ($today) {
+                $q->where('game_date', '>=', $today)
+                  ->where('status', '!=', 'finished');
+            })
+            ->orderBy('game_date')
+            ->orderBy('game_time')
+            ->with($gameEager)
+            ->get();
+
+        $resultGames = $tournament->games()
+            ->where(function ($q) use ($today) {
+                $q->where('status', 'finished')
+                  ->orWhere('game_date', '<', $today);
+            })
+            ->orderByDesc('game_date')
+            ->orderByDesc('game_time')
+            ->with($gameEager)
+            ->get();
+
+        $gameIds = $upcomingGames->pluck('id')->merge($resultGames->pluck('id'));
         $goalCounts = Event::query()
             ->select('game_id', 'team_id', DB::raw('COUNT(*) as total'))
             ->whereIn('game_id', $gameIds)
@@ -78,6 +93,8 @@ class TournamentController extends Controller
 
         return Inertia::render('Tournaments/Show', [
             'tournament' => TournamentResource::make($tournament),
+            'upcomingGames' => GameResource::collection($upcomingGames),
+            'resultGames' => GameResource::collection($resultGames),
             'poolResults' => $poolResults,
             'topScorers' => $topScorers,
         ]);

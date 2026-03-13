@@ -10,7 +10,7 @@ import {
     faTrophy,
     faUsers
 } from '@fortawesome/free-solid-svg-icons';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -19,11 +19,12 @@ import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
 import TopScorers from '@/Components/TopScorers';
 
-export default function Show({ auth, tournament, poolResults = [], topScorers = [] }) {
+export default function Show({ auth, tournament, upcomingGames = [], resultGames = [], poolResults = [], topScorers = [] }) {
     const currentTournament = tournament?.data ?? tournament;
+    const upcoming = upcomingGames?.data ?? upcomingGames ?? [];
+    const results = resultGames?.data ?? resultGames ?? [];
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
-    const [showMenu, setShowMenu] = useState(false);
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
@@ -31,22 +32,6 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
             onSuccess: () => setConfirming(false),
         });
     };
-
-    const upcomingGames = useMemo(() => {
-        return (currentTournament.games || []).filter((g) => {
-            if (!g.game_date) return false;
-            const date = moment(g.game_date).startOf('day');
-            return date.isSameOrAfter(moment().startOf('day'));
-        });
-    }, [currentTournament.games]);
-
-    const resultGames = useMemo(() => {
-        return (currentTournament.games || []).filter((g) => {
-            if (!g.game_date) return true;
-            const date = moment(g.game_date).startOf('day');
-            return g.status === 'finished' || date.isBefore(moment().startOf('day'));
-        });
-    }, [currentTournament.games]);
 
     return (
         <AuthenticatedLayout
@@ -207,9 +192,9 @@ export default function Show({ auth, tournament, poolResults = [], topScorers = 
                         </div>
 
                         {tab === 'upcoming' ? (
-                            <GameList games={upcomingGames} emptyMessage="No upcoming games." />
+                            <GameList games={upcoming} emptyMessage="No upcoming games." />
                         ) : (
-                            <GameList games={resultGames} emptyMessage="No finished games yet." />
+                            <GameList games={results} emptyMessage="No finished games yet." />
                         )}
                     </div>
 
