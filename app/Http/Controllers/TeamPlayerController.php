@@ -22,11 +22,11 @@ class TeamPlayerController extends Controller
     {
         $this->ensureTeamAccess($team);
 
-        $team->load(['players.media', 'club']);
+        $team->load(['allPlayers.media', 'club']);
 
         return Inertia::render('Teams/Players/Index', [
             'team' => TeamResource::make($team),
-            'players' => PlayerResource::collection($team->players),
+            'players' => PlayerResource::collection($team->allPlayers),
         ]);
     }
 
@@ -56,7 +56,7 @@ class TeamPlayerController extends Controller
         }
 
         // Get players not already in this team
-        $existingPlayerIds = $team->players()->pluck('players.id');
+        $existingPlayerIds = $team->allPlayers()->pluck('players.id');
 
         $players = Player::search($query)
             ->whereNotIn('id', $existingPlayerIds)
@@ -83,16 +83,16 @@ class TeamPlayerController extends Controller
         $shirtNumber = $request->input('shirt_number');
 
         // Check if player already in team
-        if ($team->players()->where('players.id', $playerId)->exists()) {
+        if ($team->allPlayers()->where('players.id', $playerId)->exists()) {
             return back()->withErrors(['player_id' => 'Player is already in this team.']);
         }
 
         // Check if shirt number is taken in this team
-        if ($shirtNumber && $team->players()->wherePivot('shirt_number', $shirtNumber)->exists()) {
+        if ($shirtNumber && $team->allPlayers()->wherePivot('shirt_number', $shirtNumber)->exists()) {
             return back()->withErrors(['shirt_number' => 'This shirt number is already taken in this team.']);
         }
 
-        $team->players()->attach($playerId, [
+        $team->allPlayers()->attach($playerId, [
             'shirt_number' => $shirtNumber,
             'is_active' => true,
         ]);
@@ -118,7 +118,7 @@ class TeamPlayerController extends Controller
 
         // Check if shirt number is taken by another player in this team
         if ($shirtNumber) {
-            $taken = $team->players()
+            $taken = $team->allPlayers()
                 ->wherePivot('shirt_number', $shirtNumber)
                 ->where('players.id', '!=', $player->id)
                 ->exists();
@@ -128,7 +128,7 @@ class TeamPlayerController extends Controller
             }
         }
 
-        $team->players()->updateExistingPivot($player->id, [
+        $team->allPlayers()->updateExistingPivot($player->id, [
             'shirt_number' => $shirtNumber,
             'is_active' => $request->boolean('is_active', true),
         ]);
@@ -143,7 +143,7 @@ class TeamPlayerController extends Controller
     {
         $this->ensureTeamAccess($team);
 
-        $team->players()->detach($player->id);
+        $team->allPlayers()->detach($player->id);
 
         return redirect()
             ->route('teams.players.index', $team)

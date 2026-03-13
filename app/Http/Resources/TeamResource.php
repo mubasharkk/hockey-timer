@@ -30,6 +30,7 @@ class TeamResource extends JsonResource
             'logo_url' => $this->logo_url ?? $this->getFirstMediaUrl('logo') ?: null,
             'club' => new ClubResource($this->whenLoaded('club')),
             'players' => PlayerResource::collection($this->whenLoaded('players')),
+            'all_players' => PlayerResource::collection($this->whenLoaded('allPlayers')),
             'players_count' => $this->when(isset($this->players_count), $this->players_count),
             'contact_persons' => ContactPersonResource::collection($this->whenLoaded('contactPersons')),
             'created_at' => $this->created_at,

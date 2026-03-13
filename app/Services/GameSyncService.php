@@ -147,8 +147,8 @@ class GameSyncService
 
             $playerName = null;
             if (!empty($event['player_shirt_number']) && !empty($event['team_id'])) {
-                $playerName = optional(Team::with('players')->find($event['team_id']))
-                    ?->players
+                $playerName = optional(Team::with('allPlayers')->find($event['team_id']))
+                    ?->allPlayers
                     ->firstWhere('shirt_number', $event['player_shirt_number'])
                     ?->name;
             }
@@ -191,7 +191,7 @@ class GameSyncService
                 && in_array($created->event_type, ['goal', 'card'], true)
                 && $created->team_id
             ) {
-                $playerName = optional($created->team?->players)
+                $playerName = optional($created->team?->allPlayers)
                     ->firstWhere('shirt_number', $created->player_shirt_number)?->name;
                 if ($playerName) {
                     $created->update(['note' => $playerName]);

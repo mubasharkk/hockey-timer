@@ -13,7 +13,7 @@ export default function Show({ auth, team }) {
     const [confirmingTeamDelete, setConfirmingTeamDelete] = useState(false);
     const { delete: deletePlayer, processing: deletingPlayer } = useForm();
     const { delete: deleteTeam, processing: deletingTeam } = useForm();
-    const players = Array.isArray(currentTeam?.players) ? currentTeam.players : currentTeam?.players?.data || [];
+    const players = Array.isArray(currentTeam?.all_players) ? currentTeam.all_players : currentTeam?.all_players?.data || currentTeam?.players?.data || currentTeam?.players || [];
     const contactPersons = Array.isArray(currentTeam?.contact_persons) ? currentTeam.contact_persons : currentTeam?.contact_persons?.data || [];
 
     const canManage = auth?.user?.is_admin || currentTeam?.user_id === auth?.user?.id;
@@ -250,60 +250,73 @@ export default function Show({ auth, team }) {
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">#</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Name</th>
                                         <th className="px-3 py-2 text-left font-semibold text-gray-700">Pass</th>
-                                        <th className="px-3 py-2 text-left font-semibold text-gray-700">Status</th>
+                                        <th className="px-3 py-2 text-left font-semibold text-gray-700">Player</th>
+                                        <th className="px-3 py-2 text-left font-semibold text-gray-700">Team</th>
                                         {canManage && <th className="px-3 py-2 text-right font-semibold text-gray-700">Actions</th>}
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100">
-                                    {players.map((player) => (
-                                        <tr key={player.id}>
-                                            <td className="px-3 py-2 text-gray-800">{player.shirt_number ?? '—'}</td>
-                                            <td className="px-3 py-2 text-gray-800">
-                                                <Link
-                                                    href={route('players.show', player.id)}
-                                                    className="font-medium text-green-700 hover:text-green-600"
-                                                >
-                                                    {player.name}
-                                                </Link>
-                                            </td>
-                                            <td className="px-3 py-2 font-mono text-xs text-gray-700">{player.player_pass_number}</td>
-                                            <td className="px-3 py-2">
-                                                {player.is_active ? (
-                                                    <span className="rounded-full bg-green-100 px-2 py-1 text-[11px] font-semibold uppercase text-green-700">
-                                                        Active
-                                                    </span>
-                                                ) : (
-                                                    <span className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold uppercase text-amber-700">
-                                                        Inactive
-                                                    </span>
-                                                )}
-                                            </td>
-                                            {canManage && (
-                                                <td className="px-3 py-2 text-right text-sm font-semibold">
-                                                    <div className="flex justify-end gap-2">
-                                                        {/*<Link*/}
-                                                        {/*    href={route('teams.players.edit', [currentTeam.id, player.id])}*/}
-                                                        {/*    className="inline-flex items-center gap-1 text-green-700 hover:text-green-600"*/}
-                                                        {/*>*/}
-                                                        {/*    <FontAwesomeIcon icon={faPen} className="h-3.5 w-3.5" />*/}
-                                                        {/*    Edit*/}
-                                                        {/*</Link>*/}
-                                                        <button
-                                                            type="button"
-                                                            className="inline-flex items-center gap-1 text-red-600 hover:text-red-500"
-                                                            onClick={() => confirmRemove(player)}
+                                    {players.map((player) => {
+                                        const pivotActive = player.pivot?.is_active ?? true;
+                                        return (
+                                            <tr key={player.id} className={!pivotActive ? 'bg-gray-50/50' : ''}>
+                                                <td className="px-3 py-2 text-gray-800">{player.pivot?.shirt_number ?? player.shirt_number ?? '—'}</td>
+                                                <td className="px-3 py-2 text-gray-800">
+                                                    <div className="flex items-center gap-2">
+                                                        {player.photo_url && (
+                                                            <img src={player.photo_url} alt={player.name} className="h-7 w-7 rounded-full object-cover border border-gray-200" />
+                                                        )}
+                                                        <Link
+                                                            href={route('players.show', player.id)}
+                                                            className="font-medium text-green-700 hover:text-green-600"
                                                         >
-                                                            <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
-                                                            Remove
-                                                        </button>
+                                                            {player.name}
+                                                        </Link>
                                                     </div>
                                                 </td>
-                                            )}
-                                        </tr>
-                                    ))}
+                                                <td className="px-3 py-2 font-mono text-xs text-gray-700">{player.player_pass_number || '—'}</td>
+                                                <td className="px-3 py-2">
+                                                    {player.is_active ? (
+                                                        <span className="rounded-full bg-green-100 px-2 py-1 text-[11px] font-semibold uppercase text-green-700">
+                                                            Active
+                                                        </span>
+                                                    ) : (
+                                                        <span className="rounded-full bg-red-100 px-2 py-1 text-[11px] font-semibold uppercase text-red-700">
+                                                            Inactive
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="px-3 py-2">
+                                                    {pivotActive ? (
+                                                        <span className="rounded-full bg-green-100 px-2 py-1 text-[11px] font-semibold uppercase text-green-700">
+                                                            Active
+                                                        </span>
+                                                    ) : (
+                                                        <span className="rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold uppercase text-amber-700">
+                                                            Inactive
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                {canManage && (
+                                                    <td className="px-3 py-2 text-right text-sm font-semibold">
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                type="button"
+                                                                className="inline-flex items-center gap-1 text-red-600 hover:text-red-500"
+                                                                onClick={() => confirmRemove(player)}
+                                                            >
+                                                                <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })}
                                     {players.length === 0 && (
                                         <tr>
-                                            <td className="px-3 py-3 text-sm text-gray-500" colSpan={canManage ? 5 : 4}>
+                                            <td className="px-3 py-3 text-sm text-gray-500" colSpan={canManage ? 6 : 5}>
                                                 No players yet. Add the first player.
                                             </td>
                                         </tr>

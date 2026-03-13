@@ -89,7 +89,8 @@ class TeamController extends Controller
         $team->load([
             'media',
             'club',
-            'players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'allPlayers' => fn ($q) => $q->withInactive()->orderBy('shirt_number')->orderBy('name'),
+            'allPlayers.media',
             'contactPersons',
         ]);
 
