@@ -117,7 +117,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                                     <Dropdown.Content>
                                         {user.is_admin && (
-                                            <Dropdown.Link href="/admin">
+                                            <Dropdown.Link href="/admin" target={'_blank'}>
                                                 Admin
                                             </Dropdown.Link>
                                         )}
@@ -232,7 +232,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         <div className="mt-3 space-y-1">
                             {user.is_admin && (
-                                <ResponsiveNavLink href="/admin">
+                                <ResponsiveNavLink href="/admin" target={'_blank'}>
                                     Admin
                                 </ResponsiveNavLink>
                             )}
