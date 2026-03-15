@@ -95,7 +95,7 @@ function TeamRow({ teamId, teamName, teamUid, label, resolved, isWinner, isLoser
 
     if (resolved && teamUid) {
         return (
-            <Link href={route('teams.public', teamUid)} className="block hover:bg-gray-50 transition">
+            <Link target="_blank" href={route('teams.public', teamUid)} className="block hover:bg-gray-50 transition">
                 {content}
             </Link>
         );

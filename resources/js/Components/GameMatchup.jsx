@@ -53,7 +53,7 @@ const TeamBlock = ({ team }) => {
         <div className="flex flex-col items-center gap-2">
             <Logo src={team.logo_url} alt={team.name} />
             {team.uid ? (
-                <Link href={route('teams.public', team.uid)} className="hover:text-green-700 transition">
+                <Link target="_blank" href={route('teams.public', team.uid)} className="hover:text-green-700 transition">
                     {name}
                 </Link>
             ) : name}

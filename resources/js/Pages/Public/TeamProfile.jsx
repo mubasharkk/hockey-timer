@@ -7,7 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import ApplicationLogo from '@/Components/ApplicationLogo.jsx';
 
-export default function PublicProfile({ team }) {
+export default function TeamProfile({ team }) {
     const currentTeam = team?.data ?? team;
     const club = currentTeam.club;
     const players = currentTeam.players || [];

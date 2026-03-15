@@ -24,7 +24,7 @@ const formatDate = (dateString) => {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
-export default function PublicProfile({ player, teams = [], recentEvents = [] }) {
+export default function PlayerProfile({ player, teams = [], recentEvents = [] }) {
     const currentPlayer = player?.data ?? player;
     const statistics = currentPlayer?.statistics ?? {};
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];

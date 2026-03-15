@@ -147,7 +147,7 @@ class TeamController extends Controller
             'contactPersons',
         ]);
 
-        return Inertia::render('Teams/PublicProfile', [
+        return Inertia::render('Public/TeamProfile', [
             'team' => TeamResource::make($team),
         ]);
     }

@@ -183,7 +183,7 @@ class PlayerController extends Controller
             ->limit(20)
             ->get();
 
-        return Inertia::render('Players/PublicProfile', [
+        return Inertia::render('Public/PlayerProfile', [
             'player' => PlayerResource::make($player),
             'teams' => TeamResource::collection($player->teams),
             'recentEvents' => \App\Http\Resources\EventResource::collection($recentEvents),

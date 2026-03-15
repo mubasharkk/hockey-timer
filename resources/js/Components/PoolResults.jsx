@@ -46,7 +46,7 @@ export default function PoolResults({ results = [] }) {
                                     <tr key={row.team_id}>
                                         <Td>
                                             {row.team_uid ? (
-                                                <Link href={route('teams.public', row.team_uid)} className="text-green-700 hover:underline">
+                                                <Link target="_blank" href={route('teams.public', row.team_uid)} className="text-green-700 hover:underline">
                                                     {row.team_name}
                                                 </Link>
                                             ) : row.team_name}

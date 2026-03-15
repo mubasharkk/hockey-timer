@@ -6,7 +6,7 @@ import TeamPlayersList from '@/Components/TeamPlayersList';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faBuilding, faEnvelope, faPen, faPhone, faPlus, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faBuilding, faExternalLinkAlt, faEnvelope, faPen, faPhone, faPlus, faTrash, faUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function Show({ auth, team }) {
     const currentTeam = team?.data ?? team;
@@ -82,6 +82,15 @@ export default function Show({ auth, team }) {
                                 <span className="hidden sm:inline">Delete</span>
                             </button>
                         )}
+                        <Link
+                            href={route('teams.public', currentTeam.uid)}
+                            target="_blank"
+                            className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-gray-200 transition hover:bg-green-50 sm:px-3"
+                            title="Public Profile"
+                        >
+                            <FontAwesomeIcon icon={faExternalLinkAlt} className="h-4 w-4" />
+                            <span className="hidden sm:inline">Public</span>
+                        </Link>
                         <Link
                             href={route('teams.index')}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:px-3"

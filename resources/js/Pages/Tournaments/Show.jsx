@@ -48,6 +48,7 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         <Link
+                            target="_blank"
                             href={route('public.tournaments.show', currentTournament.slug)}
                             className="inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm ring-1 ring-green-200 transition hover:bg-green-50"
                         >

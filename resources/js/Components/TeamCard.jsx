@@ -41,7 +41,7 @@ export default function TeamCard({ team, showMeta = false, asDiv = false, public
         : route('teams.show', team.id);
 
     return (
-        <Link href={href} className={className}>
+        <Link href={href} className={className}{...(publicLink && team.uid ? {target: '_blank'} : {})} >
             {content}
         </Link>
     );
