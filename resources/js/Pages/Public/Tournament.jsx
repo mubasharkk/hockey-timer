@@ -8,6 +8,7 @@ import moment from 'moment';
 import GameMatchup from '@/Components/GameMatchup';
 import PoolResults from '@/Components/PoolResults';
 import TopScorers from '@/Components/TopScorers';
+import KnockoutBracket from '@/Components/KnockoutBracket';
 
 export default function Tournament({ tournament, poolResults = [], topScorers = [] }) {
     const currentTournament = tournament?.data ?? tournament;
@@ -106,6 +107,13 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                             </div>
                         )}
                     </div>
+
+                    {currentTournament.knockout_bracket?.rounds?.length > 0 && (
+                        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                            <h3 className="mb-4 text-sm font-semibold text-gray-900">Knockout Bracket</h3>
+                            <KnockoutBracket bracket={currentTournament.knockout_bracket} />
+                        </div>
+                    )}
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">
