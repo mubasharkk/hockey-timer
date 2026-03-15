@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Game;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,6 +28,8 @@ class StoreGameRequest extends FormRequest
                 Rule::exists('teams', 'id'),
             ],
             'tournament_id' => ['nullable', 'integer', 'exists:tournaments,id'],
+            'game_type' => ['required', 'string', Rule::in(array_keys(Game::allowedTypes()))],
+            'tournament_pool_id' => ['nullable', 'integer', 'exists:tournament_pools,id'],
             'venue' => ['required', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],

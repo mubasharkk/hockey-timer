@@ -21,6 +21,7 @@ class PublicTickerController extends Controller
             'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
             'awayTeam.media',
             'tournament',
+            'tournamentPool',
             'sessions' => fn ($q) => $q->orderBy('number'),
             'events' => fn ($q) => $q->orderBy('occurred_at'),
         ];

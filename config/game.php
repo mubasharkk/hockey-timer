@@ -21,6 +21,22 @@ return [
     | These are informational only.
     |
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Game Types
+    |--------------------------------------------------------------------------
+    |
+    | Configurable list of game types. The key is stored in the database,
+    | the value is the human-readable label shown in the UI.
+    |
+    */
+    'types' => [
+        'pool' => 'Pool / Group Stage',
+        'knockout' => 'Knockout',
+        'friendly' => 'Friendly',
+        'placement' => 'Placement',
+    ],
+
     'sports' => [
         'football' => 'Football',
         'field_hockey' => 'Field Hockey',

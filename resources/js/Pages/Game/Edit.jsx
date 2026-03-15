@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react';
 
 const sessionOptions = [1, 2, 4, 6, 8];
 
-export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {} }) {
+export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {}, gameTypes = {} }) {
     const currentGame = game?.data ?? game;
     const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
@@ -18,6 +18,8 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         home_team_id: currentGame.home_team_id,
         away_team_id: currentGame.away_team_id,
         tournament_id: currentGame.tournament_id || '',
+        game_type: currentGame.game_type || 'pool',
+        tournament_pool_id: currentGame.tournament_pool_id || '',
         venue: currentGame.venue || '',
         excerpt: currentGame.excerpt || '',
         notes: currentGame.notes || '',
@@ -36,11 +38,16 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         [tournamentList, data.tournament_id]
     );
 
-    const tournamentTeamIds = useMemo(() => {
-        if (!selectedTournament || !selectedTournament.pools) return [];
-        const ids = selectedTournament.pools.flatMap((p) => (p.teams || []).map((team) => team.id));
-        return Array.from(new Set(ids));
+    const tournamentPools = useMemo(() => {
+        if (!selectedTournament?.pools) return [];
+        return selectedTournament.pools;
     }, [selectedTournament]);
+
+    const tournamentTeamIds = useMemo(() => {
+        if (!tournamentPools.length) return [];
+        const ids = tournamentPools.flatMap((p) => (p.teams || []).map((team) => team.id));
+        return Array.from(new Set(ids));
+    }, [tournamentPools]);
 
     const filteredTeams = useMemo(() => {
         if (data.tournament_id) {
@@ -98,13 +105,38 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                             error={errors.excerpt}
                         />
 
-                        <SelectField
-                            label="Tournament (optional)"
-                            value={data.tournament_id}
-                            options={[{ value: '', label: 'No tournament' }, ...tournamentList.map((t) => ({ value: t.id, label: t.title }))]}
-                            onChange={(value) => setData('tournament_id', value)}
-                            error={errors.tournament_id}
-                        />
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <SelectField
+                                label="Tournament (optional)"
+                                value={data.tournament_id}
+                                options={[{ value: '', label: 'No tournament' }, ...tournamentList.map((t) => ({ value: t.id, label: t.title }))]}
+                                onChange={(value) => {
+                                    setData((prev) => ({
+                                        ...prev,
+                                        tournament_id: value,
+                                        tournament_pool_id: '',
+                                        game_type: value ? 'pool' : 'friendly',
+                                    }));
+                                }}
+                                error={errors.tournament_id}
+                            />
+                            <SelectField
+                                label="Game Type"
+                                value={data.game_type}
+                                options={Object.entries(gameTypes).map(([value, label]) => ({ value, label }))}
+                                onChange={(value) => setData('game_type', value)}
+                                error={errors.game_type}
+                            />
+                            {tournamentPools.length > 0 && (
+                                <SelectField
+                                    label="Pool (optional)"
+                                    value={data.tournament_pool_id}
+                                    options={[{ value: '', label: 'No specific pool' }, ...tournamentPools.map((p) => ({ value: p.id, label: `Pool ${p.name}` }))]}
+                                    onChange={(value) => setData('tournament_pool_id', value)}
+                                    error={errors.tournament_pool_id}
+                                />
+                            )}
+                        </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <Field

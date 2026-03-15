@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
+use App\Models\Game;
 use App\Models\Team;
 use App\Models\Tournament;
+use App\Models\TournamentPool;
 use App\Models\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -85,7 +87,21 @@ class GameCrudController extends CrudController
             ->entity('tournament')
             ->model(Tournament::class)
             ->attribute('title')
-            ->wrapper(['class' => 'form-group col-md-6']);
+            ->wrapper(['class' => 'form-group col-md-4']);
+
+        CRUD::field('game_type')
+            ->type('select_from_array')
+            ->label('Game Type')
+            ->options(Game::allowedTypes())
+            ->wrapper(['class' => 'form-group col-md-4']);
+
+        CRUD::field('tournament_pool_id')
+            ->type('select')
+            ->label('Pool (optional)')
+            ->entity('tournamentPool')
+            ->model(TournamentPool::class)
+            ->attribute('name')
+            ->wrapper(['class' => 'form-group col-md-4']);
 
         CRUD::field('user_id')
             ->type('select')

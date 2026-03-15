@@ -25,6 +25,8 @@ class Game extends Model
         'home_team_id',
         'away_team_id',
         'tournament_id',
+        'game_type',
+        'tournament_pool_id',
         'venue',
         'excerpt',
         'notes',
@@ -79,6 +81,16 @@ class Game extends Model
     public function tournament(): BelongsTo
     {
         return $this->belongsTo(Tournament::class);
+    }
+
+    public function tournamentPool(): BelongsTo
+    {
+        return $this->belongsTo(TournamentPool::class);
+    }
+
+    public static function allowedTypes(): array
+    {
+        return config('game.types', []);
     }
 
     // Query Scopes

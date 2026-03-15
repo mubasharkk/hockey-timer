@@ -171,10 +171,8 @@ export default function Ticker({ game, gameId }) {
                                     </div>
                                 </div>
                             </div>
-                            {excerpt && <p className="text-center text-sm text-gray-600">{excerpt}</p>}
-                            <div className="text-center text-sm text-gray-500">
-                                {venue}
-                            </div>
+                            <TickerGameMeta game={liveData} excerpt={excerpt} />
+                            {venue && <div className="text-center text-sm text-gray-500">{venue}</div>}
                         </div>
 
                         {/* Recent Events */}
@@ -276,6 +274,24 @@ const teamName = (id, homeTeam, awayTeam, liveData) => {
     if (homeTeam && (homeTeam.id === id || liveData?.home_team_id === id)) return homeTeam.name;
     if (awayTeam && (awayTeam.id === id || liveData?.away_team_id === id)) return awayTeam.name;
     return '—';
+};
+
+const GAME_TYPE_LABELS = { pool: 'Group Stage', knockout: 'Knockout', friendly: 'Friendly', placement: 'Placement' };
+
+const TickerGameMeta = ({ game, excerpt }) => {
+    const parts = [
+        game?.game_type ? GAME_TYPE_LABELS[game.game_type] || game.game_type : null,
+        excerpt || null,
+        game?.tournament_pool_name ? `Pool ${game.tournament_pool_name}` : null,
+    ].filter(Boolean);
+
+    if (!parts.length) return null;
+
+    return (
+        <p className="text-center text-sm font-medium text-gray-500">
+            {parts.join(' | ')}
+        </p>
+    );
 };
 
 const formatSeconds = (seconds) => {

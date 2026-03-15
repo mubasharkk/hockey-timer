@@ -23,6 +23,8 @@ class GameService
             $game = Game::create([
                 'user_id' => $user?->id,
                 'tournament_id' => $data['tournament_id'] ?? null,
+                'game_type' => $data['game_type'] ?? 'pool',
+                'tournament_pool_id' => $data['tournament_pool_id'] ?? null,
                 'team_a_name' => $homeTemplate->name,
                 'team_b_name' => $awayTemplate->name,
                 'home_team_id' => $homeTemplate->id,
@@ -56,6 +58,8 @@ class GameService
         return DB::transaction(function () use ($game, $data) {
             $game->update([
                 'tournament_id' => $data['tournament_id'] ?? $game->tournament_id,
+                'game_type' => $data['game_type'] ?? $game->game_type,
+                'tournament_pool_id' => $data['tournament_pool_id'] ?? $game->tournament_pool_id,
                 'venue' => $data['venue'],
                 'excerpt' => $data['excerpt'] ?? $game->excerpt,
                 'notes' => $data['notes'] ?? $game->notes,

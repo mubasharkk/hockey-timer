@@ -21,6 +21,7 @@ class PublicTournamentController extends Controller
                     ->with([
                         'homeTeam.media',
                         'awayTeam.media',
+                        'tournamentPool',
                     ]),
             ])
             ->firstOrFail();

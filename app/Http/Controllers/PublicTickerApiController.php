@@ -24,6 +24,7 @@ class PublicTickerApiController extends Controller
             'homeTeam.media',
             'awayTeam.media',
             'tournament' => fn ($q) => $q->with('media'),
+            'tournamentPool',
         ]);
 
         $sessionModels = $game->sessions()->orderBy('number')->get();

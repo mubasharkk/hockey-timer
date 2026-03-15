@@ -5,13 +5,15 @@ import { useEffect, useMemo } from 'react';
 const sessionOptions = [1, 2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-export default function Create({ auth, teams = [], sportsOptions = {}, tournaments = [], prefillTournamentId = '' }) {
+export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes = {}, tournaments = [], prefillTournamentId = '' }) {
     const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
     const { data, setData, post, processing, errors } = useForm({
         home_team_id: '',
         away_team_id: '',
         tournament_id: prefillTournamentId || '',
+        game_type: 'pool',
+        tournament_pool_id: '',
         venue: '',
         excerpt: '',
         notes: '',
@@ -35,11 +37,16 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
         [tournamentList, data.tournament_id]
     );
 
-    const tournamentTeamIds = useMemo(() => {
-        if (!selectedTournament || !selectedTournament.pools) return [];
-        const ids = selectedTournament.pools.flatMap((p) => (p.teams || []).map((team) => team.id));
-        return Array.from(new Set(ids));
+    const tournamentPools = useMemo(() => {
+        if (!selectedTournament?.pools) return [];
+        return selectedTournament.pools;
     }, [selectedTournament]);
+
+    const tournamentTeamIds = useMemo(() => {
+        if (!tournamentPools.length) return [];
+        const ids = tournamentPools.flatMap((p) => (p.teams || []).map((team) => team.id));
+        return Array.from(new Set(ids));
+    }, [tournamentPools]);
 
     const filteredTeams = useMemo(() => {
         if (data.tournament_id) {
@@ -94,21 +101,61 @@ export default function Create({ auth, teams = [], sportsOptions = {}, tournamen
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700">Tournament (optional)</label>
-                            <select
-                                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                                value={data.tournament_id}
-                                onChange={(e) => setData('tournament_id', e.target.value)}
-                            >
-                                <option value="">No tournament</option>
-                                {tournamentList.map((tournament) => (
-                                    <option key={tournament.id} value={tournament.id}>
-                                        {tournament.title}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.tournament_id && <p className="mt-1 text-xs text-red-600">{errors.tournament_id}</p>}
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Tournament (optional)</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                                    value={data.tournament_id}
+                                    onChange={(e) => {
+                                        setData((prev) => ({
+                                            ...prev,
+                                            tournament_id: e.target.value,
+                                            tournament_pool_id: '',
+                                            game_type: e.target.value ? 'pool' : 'friendly',
+                                        }));
+                                    }}
+                                >
+                                    <option value="">No tournament</option>
+                                    {tournamentList.map((tournament) => (
+                                        <option key={tournament.id} value={tournament.id}>
+                                            {tournament.title}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.tournament_id && <p className="mt-1 text-xs text-red-600">{errors.tournament_id}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Game Type</label>
+                                <select
+                                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                                    value={data.game_type}
+                                    onChange={(e) => setData('game_type', e.target.value)}
+                                >
+                                    {Object.entries(gameTypes).map(([value, label]) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
+                                </select>
+                                {errors.game_type && <p className="mt-1 text-xs text-red-600">{errors.game_type}</p>}
+                            </div>
+                            {tournamentPools.length > 0 && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Pool (optional)</label>
+                                    <select
+                                        className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                                        value={data.tournament_pool_id}
+                                        onChange={(e) => setData('tournament_pool_id', e.target.value)}
+                                    >
+                                        <option value="">No specific pool</option>
+                                        {tournamentPools.map((pool) => (
+                                            <option key={pool.id} value={pool.id}>
+                                                Pool {pool.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.tournament_pool_id && <p className="mt-1 text-xs text-red-600">{errors.tournament_pool_id}</p>}
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

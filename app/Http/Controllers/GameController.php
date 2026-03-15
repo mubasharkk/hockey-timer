@@ -70,6 +70,7 @@ class GameController extends Controller
         return Inertia::render('Game/Create', [
             'teams' => TeamResource::collection($registeredTeams),
             'sportsOptions' => config('game.sports'),
+            'gameTypes' => Game::allowedTypes(),
             'tournaments' => TournamentResource::collection($tournaments),
             'prefillTournamentId' => $request->input('tournament_id'),
         ]);
@@ -170,6 +171,7 @@ class GameController extends Controller
         return Inertia::render('Game/Edit', [
             'game' => GameResource::make($game),
             'sportsOptions' => config('game.sports'),
+            'gameTypes' => Game::allowedTypes(),
             'teams' => TeamResource::collection($teams),
             'tournaments' => TournamentResource::collection($tournaments),
         ]);

@@ -20,7 +20,7 @@ export default function GameMatchup({ game }) {
                 <div className="text-sm font-semibold uppercase tracking-wide text-gray-500">VS</div>
                 <TeamBlock team={away} />
             </div>
-            {game.excerpt && <p className="text-sm text-gray-700">{game.excerpt}</p>}
+            <GameMeta game={game} />
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-gray-600">
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
@@ -100,6 +100,24 @@ const resolveScore = (team, game, fallbackKeys = []) => {
     }
 
     return null;
+};
+
+const GAME_TYPE_LABELS = { pool: 'Group Stage', knockout: 'Knockout', friendly: 'Friendly', placement: 'Placement' };
+
+const GameMeta = ({ game }) => {
+    const parts = [
+        game.game_type ? GAME_TYPE_LABELS[game.game_type] || game.game_type : null,
+        game.excerpt || null,
+        game.tournament_pool_name ? `Pool ${game.tournament_pool_name}` : null,
+    ].filter(Boolean);
+
+    if (!parts.length) return null;
+
+    return (
+        <p className="text-xs font-medium text-gray-500">
+            {parts.join(' | ')}
+        </p>
+    );
 };
 
 const formatDateTime = (date, time) => {

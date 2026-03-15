@@ -38,7 +38,7 @@ class TournamentController extends Controller
     {
         $tournament->load(['pools.teams']);
 
-        $gameEager = ['homeTeam.media', 'awayTeam.media'];
+        $gameEager = ['homeTeam.media', 'awayTeam.media', 'tournamentPool'];
         $today = now()->toDateString();
 
         $upcomingGames = $tournament->games()

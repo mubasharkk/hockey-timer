@@ -23,6 +23,8 @@ class GameSyncService
                 ['id' => $data['id'] ?? null],
                 [
                     'tournament_id' => $data['tournament_id'] ?? $existing?->tournament_id,
+                    'game_type' => $data['game_type'] ?? $existing?->game_type ?? (isset($data['tournament_id']) ? 'pool' : 'friendly'),
+                    'tournament_pool_id' => $data['tournament_pool_id'] ?? $existing?->tournament_pool_id,
                     'team_a_name' => $data['team_a_name'],
                     'team_b_name' => $data['team_b_name'],
                     'venue' => $data['venue'],
