@@ -33,6 +33,7 @@ function BracketMatchup({ matchup, roundKey }) {
     const homeResolved = !!matchup.home_team_id;
     const awayResolved = !!matchup.away_team_id;
     const hasWinner = !!matchup.winner_team_id;
+    const isFinished = matchup.game_status === 'finished';
 
     return (
         <div className="w-52 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -41,16 +42,28 @@ function BracketMatchup({ matchup, roundKey }) {
                 teamName={matchup.home_team_name}
                 teamUid={matchup.home_team_uid}
                 label={matchup.home_label}
+                score={matchup.home_score}
+                showScore={isFinished}
                 resolved={homeResolved}
                 isWinner={hasWinner && matchup.winner_team_id === matchup.home_team_id}
                 isLoser={hasWinner && matchup.winner_team_id !== matchup.home_team_id}
             />
+            <div className="border-t border-gray-100" />
+            {matchup.game_id && matchup.game_started_at && (
+                <div className="border-t border-gray-100 bg-gray-50 px-2 py-1 text-center text-[10px] text-gray-600">
+                    <div>{new Date(matchup.game_started_at).toLocaleDateString()}</div>
+                    <div>{new Date(matchup.game_started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    {matchup.game_excerpt && <div className="mt-1 italic text-gray-500">{matchup.game_excerpt}</div>}
+                </div>
+            )}
             <div className="border-t border-gray-100" />
             <TeamRow
                 teamId={matchup.away_team_id}
                 teamName={matchup.away_team_name}
                 teamUid={matchup.away_team_uid}
                 label={matchup.away_label}
+                score={matchup.away_score}
+                showScore={isFinished}
                 resolved={awayResolved}
                 isWinner={hasWinner && matchup.winner_team_id === matchup.away_team_id}
                 isLoser={hasWinner && matchup.winner_team_id !== matchup.away_team_id}
@@ -69,7 +82,7 @@ function BracketMatchup({ matchup, roundKey }) {
     );
 }
 
-function TeamRow({ teamId, teamName, teamUid, label, resolved, isWinner, isLoser }) {
+function TeamRow({ teamId, teamName, teamUid, label, score, showScore, resolved, isWinner, isLoser }) {
     const displayName = teamName || label || 'TBD';
 
     const bgClass = isWinner
@@ -87,9 +100,12 @@ function TeamRow({ teamId, teamName, teamUid, label, resolved, isWinner, isLoser
                 : 'italic text-gray-400';
 
     const content = (
-        <div className={`flex items-center gap-2 px-3 py-2 ${bgClass}`}>
-            {isWinner && <span className="text-[10px] text-green-600">&#9654;</span>}
-            <span className={`truncate text-sm ${textClass}`}>{displayName}</span>
+        <div className={`flex items-center justify-between gap-2 px-3 py-2 ${bgClass}`}>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+                {isWinner && <span className="text-[10px] text-green-600 flex-shrink-0">&#9654;</span>}
+                <span className={`truncate text-sm ${textClass}`}>{displayName}</span>
+            </div>
+            {showScore && score !== null && <span className={`text-sm font-semibold flex-shrink-0 ${textClass}`}>{score}</span>}
         </div>
     );
 

@@ -48,6 +48,9 @@ class KnockoutBracketService
             $matchups[$slotIndex]['away_team_name'] = $away?->name;
             $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
             $matchups[$slotIndex]['away_score'] = $scores['away'];
+            $matchups[$slotIndex]['game_status'] = $game->status;
+            $matchups[$slotIndex]['game_excerpt'] = $game->excerpt;
+            $matchups[$slotIndex]['game_started_at'] = $game->started_at?->toIso8601String();
         }
 
         // Remove rounds with no games and 3rd place if no game
@@ -192,6 +195,9 @@ class KnockoutBracketService
                 $matchups[$slotIndex]['away_team_name'] = $away?->name;
                 $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
                 $matchups[$slotIndex]['away_score'] = $scores['away'];
+                $matchups[$slotIndex]['game_status'] = $game->status;
+                $matchups[$slotIndex]['game_excerpt'] = $game->excerpt;
+                $matchups[$slotIndex]['game_started_at'] = $game->started_at?->toIso8601String();
             }
         }
 
@@ -385,6 +391,9 @@ class KnockoutBracketService
             'away_team_name' => $away?->name,
             'away_team_uid' => $away?->uid,
             'away_score' => $scores['away'],
+            'game_status' => $game->status,
+            'game_excerpt' => $game->excerpt,
+            'game_started_at' => $game->started_at?->toIso8601String(),
             'winner_team_id' => null,
         ];
     }
