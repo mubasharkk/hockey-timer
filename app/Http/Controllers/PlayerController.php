@@ -176,9 +176,17 @@ class PlayerController extends Controller
 
         $player->load(['addresses', 'media', 'teams.club', 'teams.media', 'contactPersons']);
 
+        $recentEvents = Event::where('player_id', $player->id)
+            ->whereIn('event_type', ['goal', 'card'])
+            ->with(['game.tournament', 'team'])
+            ->orderByDesc('occurred_at')
+            ->limit(20)
+            ->get();
+
         return Inertia::render('Players/PublicProfile', [
             'player' => PlayerResource::make($player),
-            'teams' => TeamResource::collection($player->teams)
+            'teams' => TeamResource::collection($player->teams),
+            'recentEvents' => \App\Http\Resources\EventResource::collection($recentEvents),
         ]);
     }
 

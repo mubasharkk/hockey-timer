@@ -4,6 +4,7 @@ import TeamCard from '@/Components/TeamCard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faFutbol, faFlag, faUser, faUserShield, faLocationDot, faIdCard, faDroplet, faTshirt, faCakeCandles, faPhone } from '@fortawesome/free-solid-svg-icons';
 import ApplicationLogo from "@/Components/ApplicationLogo.jsx";
+import PlayerRecentEvents from "@/Components/PlayerRecentEvents.jsx";
 
 const calculateAge = (dob) => {
     if (!dob) return null;
@@ -23,9 +24,9 @@ const formatDate = (dateString) => {
     return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
-export default function PublicProfile({ player, teams = [] }) {
+export default function PublicProfile({ player, teams = [], recentEvents = [] }) {
     const currentPlayer = player?.data ?? player;
-    const statistics = player?.statistics ?? {};
+    const statistics = currentPlayer?.statistics ?? {};
     const playerTeams = Array.isArray(teams) ? teams : teams?.data || [];
     const contactPersons = currentPlayer.contact_persons || [];
     const address = currentPlayer.addresses?.[0] || currentPlayer.address;
@@ -181,15 +182,16 @@ export default function PublicProfile({ player, teams = [] }) {
 
                     {/* Statistics */}
                     <div className="mb-6 flex flex-wrap items-center justify-center gap-6 rounded-xl border border-gray-200 bg-white/90 px-6 py-4 shadow-sm backdrop-blur-sm">
-                        <StatItem icon={faFutbol} label="Goals" value={statistics.goals || 0} color="text-green-600" />
+                        <StatItem icon={faFutbol} label="Goals" value={statistics.total_goals || 0} color="text-green-600" />
                         <StatItem icon={faTrophy} label="Games" value={statistics.total_games || 0} color="text-green-700" />
-                        <StatItem icon={faFlag} label="Yellow" value={statistics.yellow_cards || 0} color="text-yellow-600" />
-                        <StatItem icon={faFlag} label="Red" value={statistics.red_cards || 0} color="text-red-600" />
+                        <StatItem icon={faFlag} label="Green" value={statistics.total_green_cards || 0} color="text-green-500" />
+                        <StatItem icon={faFlag} label="Yellow" value={statistics.total_yellow_cards || 0} color="text-yellow-600" />
+                        <StatItem icon={faFlag} label="Red" value={statistics.total_red_cards || 0} color="text-red-600" />
                     </div>
 
                     {/* Teams Card */}
                     {playerTeams.length > 0 && (
-                        <div className="rounded-xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
+                        <div className="mb-6 rounded-xl border border-gray-200 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
                             <h2 className="mb-4 text-lg font-semibold text-gray-900">Teams</h2>
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                 {playerTeams.map((team) => (
@@ -206,6 +208,9 @@ export default function PublicProfile({ player, teams = [] }) {
                             </div>
                         </div>
                     )}
+
+                    {/* Recent Events */}
+                    <PlayerRecentEvents events={recentEvents} />
                 </div>
 
                 <Footer />

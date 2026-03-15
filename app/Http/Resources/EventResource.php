@@ -47,6 +47,7 @@ class EventResource extends JsonResource
                 'game_date' => $game->game_date,
                 'game_time' => $game->game_time,
                 'code' => $game->code,
+                'tournament_name' => $game->relationLoaded('tournament') ? $game->tournament?->title : null,
             ] : null,
             'team' => $team ? [
                 'id' => $team->id,
