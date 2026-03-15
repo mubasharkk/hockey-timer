@@ -37,15 +37,23 @@ class KnockoutBracketService
         } else {
             $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
             $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
+            $scores = $game->getGoalCounts();
 
             $matchups[$slotIndex]['game_id'] = $game->id;
             $matchups[$slotIndex]['home_team_id'] = $game->home_team_id;
             $matchups[$slotIndex]['home_team_name'] = $home?->name;
             $matchups[$slotIndex]['home_team_uid'] = $home?->uid;
+            $matchups[$slotIndex]['home_score'] = $scores['home'];
             $matchups[$slotIndex]['away_team_id'] = $game->away_team_id;
             $matchups[$slotIndex]['away_team_name'] = $away?->name;
             $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
+            $matchups[$slotIndex]['away_score'] = $scores['away'];
         }
+
+        // Remove rounds with no games and 3rd place if no game
+        $bracket['rounds'] = array_filter($bracket['rounds'], function ($round) {
+            return !empty($round['matchups']);
+        });
 
         $tournament->updateQuietly(['knockout_bracket' => $bracket]);
     }
@@ -173,14 +181,17 @@ class KnockoutBracketService
             } else {
                 $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
                 $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
+                $scores = $game->getGoalCounts();
 
                 $matchups[$slotIndex]['game_id'] = $game->id;
                 $matchups[$slotIndex]['home_team_id'] = $game->home_team_id;
                 $matchups[$slotIndex]['home_team_name'] = $home?->name;
                 $matchups[$slotIndex]['home_team_uid'] = $home?->uid;
+                $matchups[$slotIndex]['home_score'] = $scores['home'];
                 $matchups[$slotIndex]['away_team_id'] = $game->away_team_id;
                 $matchups[$slotIndex]['away_team_name'] = $away?->name;
                 $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
+                $matchups[$slotIndex]['away_score'] = $scores['away'];
             }
         }
 
@@ -204,6 +215,14 @@ class KnockoutBracketService
                 }
             }
         }
+
+        // Remove rounds with no games and 3rd place if no game
+        $bracket['rounds'] = array_filter($bracket['rounds'], function ($round) {
+            if ($round['key'] === '3rd_place') {
+                return !empty($round['matchups']);
+            }
+            return !empty($round['matchups']);
+        });
 
         $tournament->updateQuietly(['knockout_bracket' => $bracket]);
     }
@@ -244,6 +263,8 @@ class KnockoutBracketService
                 'away_label' => null,
                 'home_team_id' => null,
                 'away_team_id' => null,
+                'home_score' => null,
+                'away_score' => null,
                 'winner_team_id' => null,
             ];
             $nextSlotIndex = array_key_last($nextMatchups);
@@ -291,6 +312,8 @@ class KnockoutBracketService
                 'away_label' => null,
                 'home_team_id' => null,
                 'away_team_id' => null,
+                'home_score' => null,
+                'away_score' => null,
                 'winner_team_id' => null,
             ];
             $slotIndex = array_key_last($matchups);
@@ -347,6 +370,7 @@ class KnockoutBracketService
     {
         $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
         $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
+        $scores = $game->getGoalCounts();
 
         return [
             'position' => $game->knockout_position,
@@ -356,9 +380,11 @@ class KnockoutBracketService
             'home_team_id' => $game->home_team_id,
             'home_team_name' => $home?->name,
             'home_team_uid' => $home?->uid,
+            'home_score' => $scores['home'],
             'away_team_id' => $game->away_team_id,
             'away_team_name' => $away?->name,
             'away_team_uid' => $away?->uid,
+            'away_score' => $scores['away'],
             'winner_team_id' => null,
         ];
     }

@@ -58,10 +58,10 @@ function BracketMatchup({ matchup, roundKey }) {
             {matchup.game_id && (
                 <div className="border-t border-gray-100 bg-gray-50 px-2 py-1 text-center">
                     <Link
-                        href={route('games.summary', matchup.game_id)}
+                        href={route('games.report', matchup.game_id)}
                         className="text-[10px] font-semibold text-green-700 hover:text-green-800"
                     >
-                        View Game
+                        View Report
                     </Link>
                 </div>
             )}
