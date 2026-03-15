@@ -28,6 +28,8 @@ class GameResource extends JsonResource
             'game_type' => $this->game_type,
             'tournament_pool_id' => $this->tournament_pool_id,
             'tournament_pool_name' => $this->whenLoaded('tournamentPool', fn () => $this->tournamentPool?->name),
+            'knockout_round' => $this->knockout_round,
+            'knockout_position' => $this->knockout_position,
             'home_team_id' => $this->home_team_id,
             'away_team_id' => $this->away_team_id,
             'team_a_name' => $homeRelation->name ?? $this->team_a_name,

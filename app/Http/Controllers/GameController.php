@@ -71,6 +71,7 @@ class GameController extends Controller
             'teams' => TeamResource::collection($registeredTeams),
             'sportsOptions' => config('game.sports'),
             'gameTypes' => Game::allowedTypes(),
+            'knockoutRounds' => collect(Game::allowedKnockoutRounds())->map(fn ($r, $k) => ['key' => $k, 'label' => $r['label'], 'size' => $r['size']]),
             'tournaments' => TournamentResource::collection($tournaments),
             'prefillTournamentId' => $request->input('tournament_id'),
         ]);
@@ -172,6 +173,7 @@ class GameController extends Controller
             'game' => GameResource::make($game),
             'sportsOptions' => config('game.sports'),
             'gameTypes' => Game::allowedTypes(),
+            'knockoutRounds' => collect(Game::allowedKnockoutRounds())->map(fn ($r, $k) => ['key' => $k, 'label' => $r['label'], 'size' => $r['size']]),
             'teams' => TeamResource::collection($teams),
             'tournaments' => TournamentResource::collection($tournaments),
         ]);

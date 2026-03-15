@@ -22,6 +22,7 @@ class TournamentResource extends JsonResource
             'win_points' => $this->win_points,
             'draw_points' => $this->draw_points,
             'loss_points' => $this->loss_points,
+            'knockout_bracket' => $this->knockout_bracket,
             'logo_url' => $this->getFirstMediaUrl('logo') ?: null,
             'sponsor_logo_urls' => $this->getMedia('sponsor_logos')->map->getUrl()->all(),
             'pools' => TournamentPoolResource::collection($this->whenLoaded('pools')),

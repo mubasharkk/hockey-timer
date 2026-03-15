@@ -4,6 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faArrowLeft,
     faCalendarAlt,
+    faChevronDown,
+    faChevronUp,
     faPen,
     faPlus,
     faTrash,
@@ -16,6 +18,7 @@ import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import moment from 'moment';
 import GameMatchup from '@/Components/GameMatchup';
+import KnockoutBracket from '@/Components/KnockoutBracket';
 import PoolResults from '@/Components/PoolResults';
 import TopScorers from '@/Components/TopScorers';
 
@@ -25,6 +28,8 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
     const results = resultGames?.data ?? resultGames ?? [];
     const [confirming, setConfirming] = useState(false);
     const [tab, setTab] = useState('upcoming');
+    const [poolsOpen, setPoolsOpen] = useState(false);
+    const [poolTeamsOpen, setPoolTeamsOpen] = useState(false);
     const { delete: destroy, processing } = useForm();
 
     const handleDelete = () => {
@@ -111,40 +116,52 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
                             <Info label="Points (W/D/L)" value={`${currentTournament.win_points}/${currentTournament.draw_points}/${currentTournament.loss_points}`} />
                         </div>
                         {currentTournament.pools && currentTournament.pools.length > 0 && (
-                            <div className="mt-6 space-y-3">
-                                <h3 className="text-sm font-semibold text-gray-900">Pools</h3>
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {currentTournament.pools.map((pool) => (
-                                        <div key={pool.id} className="rounded-md border border-gray-100 bg-gray-50 p-3 shadow-sm">
-                                            <div className="mb-2 flex items-center justify-between">
-                                                <span className="text-sm font-semibold text-gray-800">Pool {pool.name}</span>
-                                                <span className="text-xs text-gray-500">{(pool.teams || []).length} team(s)</span>
+                            <div className="mt-4">
+                                <button
+                                    type="button"
+                                    className="flex w-full items-center justify-between rounded-md border border-gray-100 bg-gray-50 p-3"
+                                    onClick={() => setPoolTeamsOpen((v) => !v)}
+                                >
+                                    <div>
+                                        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Pools</p>
+                                        <p className="mt-1 text-sm text-gray-900">{currentTournament.pools.length} pool(s)</p>
+                                    </div>
+                                    <FontAwesomeIcon icon={poolTeamsOpen ? faChevronUp : faChevronDown} className="h-3.5 w-3.5 text-gray-400" />
+                                </button>
+                                {poolTeamsOpen && (
+                                    <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        {currentTournament.pools.map((pool) => (
+                                            <div key={pool.id} className="rounded-md border border-gray-100 bg-gray-50 p-3 shadow-sm">
+                                                <div className="mb-2 flex items-center justify-between">
+                                                    <span className="text-sm font-semibold text-gray-800">Pool {pool.name}</span>
+                                                    <span className="text-xs text-gray-500">{(pool.teams || []).length} team(s)</span>
+                                                </div>
+                                                {(pool.teams || []).length > 0 ? (
+                                                    <ul className="space-y-1 text-sm text-gray-800">
+                                                        {pool.teams.map((team) => (
+                                                            <li key={team.id} className="flex items-center gap-2 rounded bg-white px-2 py-1">
+                                                                {team.logo_url ? (
+                                                                    <img
+                                                                        src={team.logo_url}
+                                                                        alt={`${team.name} logo`}
+                                                                        className="h-6 w-6 rounded object-cover ring-1 ring-gray-200"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-[10px] font-semibold uppercase text-gray-500 ring-1 ring-gray-200">
+                                                                        {team.name?.[0]?.toUpperCase() ?? '?'}
+                                                                    </div>
+                                                                )}
+                                                                <span>{team.name}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-xs text-gray-500">No teams assigned.</p>
+                                                )}
                                             </div>
-                                            {(pool.teams || []).length > 0 ? (
-                                                <ul className="space-y-1 text-sm text-gray-800">
-                                                    {pool.teams.map((team) => (
-                                                        <li key={team.id} className="flex items-center gap-2 rounded bg-white px-2 py-1">
-                                                            {team.logo_url ? (
-                                                                <img
-                                                                    src={team.logo_url}
-                                                                    alt={`${team.name} logo`}
-                                                                    className="h-6 w-6 rounded object-cover ring-1 ring-gray-200"
-                                                                />
-                                                            ) : (
-                                                                <div className="flex h-6 w-6 items-center justify-center rounded bg-gray-100 text-[10px] font-semibold uppercase text-gray-500 ring-1 ring-gray-200">
-                                                                    {team.name?.[0]?.toUpperCase() ?? '?'}
-                                                                </div>
-                                                            )}
-                                                            <span>{team.name}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-xs text-gray-500">No teams assigned.</p>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                         {currentTournament.sponsor_logo_urls && currentTournament.sponsor_logo_urls.length > 0 && (
@@ -161,13 +178,34 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
                         )}
                     </div>
 
-                    <div className="py-6">
-                        <div className="mb-4 flex items-center gap-3">
-                            <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-green-700" />
-                            <h3 className="text-lg font-semibold text-gray-900">Pool Standings</h3>
-                        </div>
-                        <PoolResults results={poolResults} />
+                    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <button
+                            type="button"
+                            className="flex w-full items-center justify-between px-6 py-4 text-left"
+                            onClick={() => setPoolsOpen((v) => !v)}
+                        >
+                            <div className="flex items-center gap-3">
+                                <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-green-700" />
+                                <h3 className="text-lg font-semibold text-gray-900">Pool Standings</h3>
+                            </div>
+                            <FontAwesomeIcon icon={poolsOpen ? faChevronUp : faChevronDown} className="h-4 w-4 text-gray-400" />
+                        </button>
+                        {poolsOpen && (
+                            <div className="px-6 pb-6">
+                                <PoolResults results={poolResults} />
+                            </div>
+                        )}
                     </div>
+
+                    {currentTournament.knockout_bracket?.rounds?.length > 0 && (
+                        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                            <div className="mb-4 flex items-center gap-3">
+                                <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-green-700" />
+                                <h3 className="text-lg font-semibold text-gray-900">Knockout Bracket</h3>
+                            </div>
+                            <KnockoutBracket bracket={currentTournament.knockout_bracket} />
+                        </div>
+                    )}
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                         <div className="mb-4 flex items-center justify-between">

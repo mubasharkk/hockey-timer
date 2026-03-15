@@ -37,6 +37,24 @@ return [
         'placement' => 'Placement',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Knockout Rounds
+    |--------------------------------------------------------------------------
+    |
+    | Ordered list of knockout round keys. The order defines progression
+    | (earlier rounds feed into later rounds). 'size' is the number of
+    | matchups in that round for a standard bracket.
+    |
+    */
+    'knockout_rounds' => [
+        'round_of_16' => ['label' => 'Round of 16', 'size' => 8],
+        'quarterfinal' => ['label' => 'Quarterfinals', 'size' => 4],
+        'semifinal'    => ['label' => 'Semifinals',    'size' => 2],
+        '3rd_place'    => ['label' => '3rd Place',     'size' => 1],
+        'final'        => ['label' => 'Final',         'size' => 1],
+    ],
+
     'sports' => [
         'football' => 'Football',
         'field_hockey' => 'Field Hockey',

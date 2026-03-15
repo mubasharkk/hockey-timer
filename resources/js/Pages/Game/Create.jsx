@@ -5,7 +5,8 @@ import { useEffect, useMemo } from 'react';
 const sessionOptions = [1, 2, 4, 6, 8];
 const todayStr = () => new Date().toISOString().slice(0, 10);
 
-export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes = {}, tournaments = [], prefillTournamentId = '' }) {
+export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes = {}, knockoutRounds = [], tournaments = [], prefillTournamentId = '' }) {
+    const roundsList = Array.isArray(knockoutRounds) ? knockoutRounds : Object.values(knockoutRounds);
     const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
     const { data, setData, post, processing, errors } = useForm({
@@ -14,6 +15,8 @@ export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes
         tournament_id: prefillTournamentId || '',
         game_type: 'pool',
         tournament_pool_id: '',
+        knockout_round: '',
+        knockout_position: '',
         venue: '',
         excerpt: '',
         notes: '',
@@ -36,6 +39,16 @@ export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes
         () => tournamentList.find((t) => `${t.id}` === `${data.tournament_id}`),
         [tournamentList, data.tournament_id]
     );
+
+    const bracketRounds = useMemo(() => {
+        if (!selectedTournament?.knockout_bracket?.rounds) return [];
+        return selectedTournament.knockout_bracket.rounds;
+    }, [selectedTournament]);
+
+    const selectedBracketRound = useMemo(() => {
+        if (!data.knockout_round || !bracketRounds.length) return null;
+        return bracketRounds.find((r) => r.key === data.knockout_round) || null;
+    }, [bracketRounds, data.knockout_round]);
 
     const tournamentPools = useMemo(() => {
         if (!selectedTournament?.pools) return [];
@@ -157,6 +170,47 @@ export default function Create({ auth, teams = [], sportsOptions = {}, gameTypes
                                 </div>
                             )}
                         </div>
+
+                        {data.game_type === 'knockout' && data.tournament_id && (
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Knockout Round</label>
+                                    <select
+                                        className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                                        value={data.knockout_round}
+                                        onChange={(e) => setData((prev) => ({ ...prev, knockout_round: e.target.value, knockout_position: '' }))}
+                                    >
+                                        <option value="">Select round</option>
+                                        {(bracketRounds.length > 0 ? bracketRounds : roundsList).map((r) => (
+                                            <option key={r.key} value={r.key}>{r.label}</option>
+                                        ))}
+                                    </select>
+                                    {errors.knockout_round && <p className="mt-1 text-xs text-red-600">{errors.knockout_round}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">Position in Round</label>
+                                    <select
+                                        className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
+                                        value={data.knockout_position}
+                                        onChange={(e) => setData('knockout_position', e.target.value)}
+                                        disabled={!data.knockout_round}
+                                    >
+                                        <option value="">Select position</option>
+                                        {selectedBracketRound
+                                            ? selectedBracketRound.matchups.map((m) => (
+                                                <option key={m.position} value={m.position}>
+                                                    Match {m.position}{m.home_label || m.away_label ? ` — ${[m.home_label, m.away_label].filter(Boolean).join(' vs ')}` : ''}
+                                                </option>
+                                            ))
+                                            : Array.from({ length: roundsList.find((r) => r.key === data.knockout_round)?.size || 4 }, (_, i) => (
+                                                <option key={i + 1} value={i + 1}>Match {i + 1}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    {errors.knockout_position && <p className="mt-1 text-xs text-red-600">{errors.knockout_position}</p>}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>

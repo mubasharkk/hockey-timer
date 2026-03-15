@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/tournaments/{tournament}', [TournamentController::class, 'destroy'])->name('tournaments.destroy');
     Route::get('/tournaments/{tournament}/pools/teams', [TournamentPoolTeamController::class, 'edit'])->name('tournaments.pools.teams.edit');
     Route::post('/tournaments/{tournament}/pools/teams', [TournamentPoolTeamController::class, 'update'])->name('tournaments.pools.teams.update');
+    Route::post('/tournaments/{tournament}/generate-bracket', [TournamentController::class, 'generateBracket'])->name('tournaments.generate-bracket');
 
     Route::get('/games/create', [GameController::class, 'create'])->name('games.create');
     Route::post('/games', [GameController::class, 'store'])->name('games.store');

@@ -27,6 +27,8 @@ class Game extends Model
         'tournament_id',
         'game_type',
         'tournament_pool_id',
+        'knockout_round',
+        'knockout_position',
         'venue',
         'excerpt',
         'notes',
@@ -91,6 +93,11 @@ class Game extends Model
     public static function allowedTypes(): array
     {
         return config('game.types', []);
+    }
+
+    public static function allowedKnockoutRounds(): array
+    {
+        return config('game.knockout_rounds', []);
     }
 
     // Query Scopes

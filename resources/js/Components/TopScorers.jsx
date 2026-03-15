@@ -1,6 +1,7 @@
 import React from 'react';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faMedal} from "@fortawesome/free-solid-svg-icons";
+import { Link } from '@inertiajs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMedal } from '@fortawesome/free-solid-svg-icons';
 
 export default function TopScorers({ scorers = [] }) {
     if (!scorers || scorers.length === 0) {
@@ -29,7 +30,18 @@ export default function TopScorers({ scorers = [] }) {
                                 <Td>{idx + 1}</Td>
                                 <Td>
                                     <div className="flex flex-col">
-                                        <span className="font-semibold text-gray-900">{row.player_name || 'Player'}</span>
+                                        {row.player_id ? (
+                                            <a
+                                                href={route('players.public', row.player_id)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="font-semibold text-green-700 hover:text-green-800 hover:underline"
+                                            >
+                                                {row.player_name || 'Player'}
+                                            </a>
+                                        ) : (
+                                            <span className="font-semibold text-gray-900">{row.player_name || 'Player'}</span>
+                                        )}
                                         {row.player_shirt_number != null && (
                                             <span className="text-xs text-gray-500">#{row.player_shirt_number}</span>
                                         )}

@@ -1,6 +1,8 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Head, Link } from '@inertiajs/react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { useMemo, useState } from 'react';
 import moment from 'moment';
 import GameMatchup from '@/Components/GameMatchup';
@@ -10,6 +12,7 @@ import TopScorers from '@/Components/TopScorers';
 export default function Tournament({ tournament, poolResults = [], topScorers = [] }) {
     const currentTournament = tournament?.data ?? tournament;
     const [tab, setTab] = useState('upcoming');
+    const [poolsOpen, setPoolsOpen] = useState(false);
 
     const upcomingGames = useMemo(() => {
         return (currentTournament.games || []).filter((g) => {
@@ -88,11 +91,20 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                         )}
                     </div>
 
-                    <div className="">
-                        <div className="mb-4 flex items-center gap-3">
+                    <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+                        <button
+                            type="button"
+                            className="flex w-full items-center justify-between px-6 py-4 text-left"
+                            onClick={() => setPoolsOpen((v) => !v)}
+                        >
                             <h3 className="text-md font-semibold text-gray-900">Pool Standings</h3>
-                        </div>
-                        <PoolResults results={poolResults} />
+                            <FontAwesomeIcon icon={poolsOpen ? faChevronUp : faChevronDown} className="h-4 w-4 text-gray-400" />
+                        </button>
+                        {poolsOpen && (
+                            <div className="px-6 pb-6">
+                                <PoolResults results={poolResults} />
+                            </div>
+                        )}
                     </div>
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">

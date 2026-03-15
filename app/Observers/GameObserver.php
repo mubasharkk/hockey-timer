@@ -1,0 +1,298 @@
+<?php
+
+namespace App\Observers;
+
+use App\Models\Game;
+use App\Models\Team;
+use App\Models\Tournament;
+
+class GameObserver
+{
+    public function saved(Game $game): void
+    {
+        if ($game->game_type !== 'knockout' || !$game->tournament_id || !$game->knockout_round || !$game->knockout_position) {
+            return;
+        }
+
+        $this->syncBracketSlot($game);
+
+        if ($game->isDirty('status') && $game->status === 'finished') {
+            $this->advanceWinner($game);
+        }
+    }
+
+    public function deleted(Game $game): void
+    {
+        if ($game->game_type !== 'knockout' || !$game->tournament_id) {
+            return;
+        }
+
+        $this->removeFromBracket($game);
+    }
+
+    /**
+     * Sync the game into its bracket slot in the tournament JSON.
+     */
+    private function syncBracketSlot(Game $game): void
+    {
+        $tournament = Tournament::find($game->tournament_id);
+        if (!$tournament) {
+            return;
+        }
+
+        $bracket = $tournament->knockout_bracket ?? ['rounds' => []];
+        $roundIndex = $this->findRoundIndex($bracket, $game->knockout_round);
+
+        if ($roundIndex === null) {
+            return;
+        }
+
+        $matchups = &$bracket['rounds'][$roundIndex]['matchups'];
+        $slotIndex = $this->findSlotIndex($matchups, $game->knockout_position);
+
+        if ($slotIndex === null) {
+            $matchups[] = $this->buildSlot($game);
+        } else {
+            $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
+            $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
+
+            $matchups[$slotIndex]['game_id'] = $game->id;
+            $matchups[$slotIndex]['home_team_id'] = $game->home_team_id;
+            $matchups[$slotIndex]['home_team_name'] = $home?->name;
+            $matchups[$slotIndex]['home_team_uid'] = $home?->uid;
+            $matchups[$slotIndex]['away_team_id'] = $game->away_team_id;
+            $matchups[$slotIndex]['away_team_name'] = $away?->name;
+            $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
+        }
+
+        $tournament->updateQuietly(['knockout_bracket' => $bracket]);
+    }
+
+    /**
+     * Determine the winner and propagate to the next round slot.
+     */
+    private function advanceWinner(Game $game): void
+    {
+        $tournament = Tournament::find($game->tournament_id);
+        if (!$tournament) {
+            return;
+        }
+
+        $bracket = $tournament->knockout_bracket ?? ['rounds' => []];
+        $roundIndex = $this->findRoundIndex($bracket, $game->knockout_round);
+
+        if ($roundIndex === null) {
+            return;
+        }
+
+        $matchups = &$bracket['rounds'][$roundIndex]['matchups'];
+        $slotIndex = $this->findSlotIndex($matchups, $game->knockout_position);
+
+        if ($slotIndex === null) {
+            return;
+        }
+
+        $scores = $game->getGoalCounts();
+        $winnerId = $scores['home'] > $scores['away'] ? $game->home_team_id : (
+            $scores['away'] > $scores['home'] ? $game->away_team_id : null
+        );
+
+        $matchups[$slotIndex]['winner_team_id'] = $winnerId;
+
+        if ($winnerId) {
+            $this->propagateToNextRound($bracket, $game, $winnerId);
+        }
+
+        $loserId = null;
+        if ($winnerId && $game->home_team_id && $game->away_team_id) {
+            $loserId = $winnerId === $game->home_team_id ? $game->away_team_id : $game->home_team_id;
+        }
+
+        if ($loserId) {
+            $this->propagateLoserTo3rdPlace($bracket, $game, $loserId);
+        }
+
+        $tournament->updateQuietly(['knockout_bracket' => $bracket]);
+    }
+
+    /**
+     * Push the winner into the next round based on position convention.
+     * Positions (2n-1) and (2n) feed into position n of the next round.
+     */
+    private function propagateToNextRound(array &$bracket, Game $game, int $winnerId): void
+    {
+        $roundKeys = array_column($bracket['rounds'], 'key');
+        $currentIndex = array_search($game->knockout_round, $roundKeys);
+
+        if ($currentIndex === false) {
+            return;
+        }
+
+        $nextRoundKey = $this->resolveNextRound($game->knockout_round);
+        if (!$nextRoundKey) {
+            return;
+        }
+
+        $nextRoundIndex = array_search($nextRoundKey, $roundKeys);
+        if ($nextRoundIndex === false) {
+            return;
+        }
+
+        $nextPosition = (int) ceil($game->knockout_position / 2);
+        $slot = ($game->knockout_position % 2 !== 0) ? 'home_team_id' : 'away_team_id';
+
+        $nextMatchups = &$bracket['rounds'][$nextRoundIndex]['matchups'];
+        $nextSlotIndex = $this->findSlotIndex($nextMatchups, $nextPosition);
+
+        if ($nextSlotIndex === null) {
+            $nextMatchups[] = [
+                'position' => $nextPosition,
+                'game_id' => null,
+                'home_label' => null,
+                'away_label' => null,
+                'home_team_id' => null,
+                'away_team_id' => null,
+                'winner_team_id' => null,
+            ];
+            $nextSlotIndex = array_key_last($nextMatchups);
+        }
+
+        $winner = Team::find($winnerId);
+        $nameSlot = str_replace('_id', '_name', $slot);
+        $uidSlot = str_replace('_id', '_uid', $slot);
+
+        $nextMatchups[$nextSlotIndex][$slot] = $winnerId;
+        $nextMatchups[$nextSlotIndex][$nameSlot] = $winner?->name;
+        $nextMatchups[$nextSlotIndex][$uidSlot] = $winner?->uid;
+
+        if ($nextMatchups[$nextSlotIndex]['game_id']) {
+            Game::where('id', $nextMatchups[$nextSlotIndex]['game_id'])
+                ->update([$slot => $winnerId]);
+        }
+    }
+
+    /**
+     * For semifinals, push the loser into the 3rd place match.
+     */
+    private function propagateLoserTo3rdPlace(array &$bracket, Game $game, int $loserId): void
+    {
+        if ($game->knockout_round !== 'semifinal') {
+            return;
+        }
+
+        $roundKeys = array_column($bracket['rounds'], 'key');
+        $thirdIndex = array_search('3rd_place', $roundKeys);
+
+        if ($thirdIndex === false) {
+            return;
+        }
+
+        $slot = ($game->knockout_position % 2 !== 0) ? 'home_team_id' : 'away_team_id';
+        $matchups = &$bracket['rounds'][$thirdIndex]['matchups'];
+        $slotIndex = $this->findSlotIndex($matchups, 1);
+
+        if ($slotIndex === null) {
+            $matchups[] = [
+                'position' => 1,
+                'game_id' => null,
+                'home_label' => null,
+                'away_label' => null,
+                'home_team_id' => null,
+                'away_team_id' => null,
+                'winner_team_id' => null,
+            ];
+            $slotIndex = array_key_last($matchups);
+        }
+
+        $loser = Team::find($loserId);
+        $nameSlot = str_replace('_id', '_name', $slot);
+        $uidSlot = str_replace('_id', '_uid', $slot);
+
+        $matchups[$slotIndex][$slot] = $loserId;
+        $matchups[$slotIndex][$nameSlot] = $loser?->name;
+        $matchups[$slotIndex][$uidSlot] = $loser?->uid;
+
+        if ($matchups[$slotIndex]['game_id']) {
+            Game::where('id', $matchups[$slotIndex]['game_id'])
+                ->update([$slot => $loserId]);
+        }
+    }
+
+    private function removeFromBracket(Game $game): void
+    {
+        $tournament = Tournament::find($game->tournament_id);
+        if (!$tournament) {
+            return;
+        }
+
+        $bracket = $tournament->knockout_bracket ?? ['rounds' => []];
+        $changed = false;
+
+        foreach ($bracket['rounds'] as &$round) {
+            foreach ($round['matchups'] as &$matchup) {
+                if (($matchup['game_id'] ?? null) === $game->id) {
+                    $matchup['game_id'] = null;
+                    $matchup['winner_team_id'] = null;
+                    $changed = true;
+                }
+            }
+        }
+
+        if ($changed) {
+            $tournament->updateQuietly(['knockout_bracket' => $bracket]);
+        }
+    }
+
+    private function resolveNextRound(string $currentRound): ?string
+    {
+        $progression = [
+            'round_of_16' => 'quarterfinal',
+            'quarterfinal' => 'semifinal',
+            'semifinal' => 'final',
+        ];
+
+        return $progression[$currentRound] ?? null;
+    }
+
+    private function findRoundIndex(array $bracket, string $roundKey): ?int
+    {
+        foreach ($bracket['rounds'] ?? [] as $i => $round) {
+            if (($round['key'] ?? null) === $roundKey) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
+    private function findSlotIndex(array $matchups, int $position): ?int
+    {
+        foreach ($matchups as $i => $m) {
+            if (($m['position'] ?? null) === $position) {
+                return $i;
+            }
+        }
+
+        return null;
+    }
+
+    private function buildSlot(Game $game): array
+    {
+        $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
+        $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
+
+        return [
+            'position' => $game->knockout_position,
+            'game_id' => $game->id,
+            'home_label' => null,
+            'away_label' => null,
+            'home_team_id' => $game->home_team_id,
+            'home_team_name' => $home?->name,
+            'home_team_uid' => $home?->uid,
+            'away_team_id' => $game->away_team_id,
+            'away_team_name' => $away?->name,
+            'away_team_uid' => $away?->uid,
+            'winner_team_id' => null,
+        ];
+    }
+}

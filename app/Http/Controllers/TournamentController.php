@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTournamentRequest;
 use App\Http\Requests\UpdateTournamentRequest;
+use App\Models\Game;
 use App\Models\Tournament;
 use App\Models\TournamentPool;
 use App\Http\Resources\GameResource;
 use App\Http\Resources\TournamentResource;
 use App\Models\Event;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -186,6 +188,45 @@ class TournamentController extends Controller
         $tournament->delete();
 
         return redirect()->route('tournaments.index')->with('success', 'Tournament deleted.');
+    }
+
+    public function generateBracket(Request $request, Tournament $tournament): RedirectResponse
+    {
+        $rounds = $request->input('rounds', []);
+        $knockoutRoundsConfig = Game::allowedKnockoutRounds();
+        $bracket = ['rounds' => []];
+
+        foreach ($rounds as $roundKey) {
+            if (!isset($knockoutRoundsConfig[$roundKey])) {
+                continue;
+            }
+
+            $size = $knockoutRoundsConfig[$roundKey]['size'];
+            $matchups = [];
+
+            for ($i = 1; $i <= $size; $i++) {
+                $matchups[] = [
+                    'position' => $i,
+                    'game_id' => null,
+                    'home_label' => null,
+                    'away_label' => null,
+                    'home_team_id' => null,
+                    'away_team_id' => null,
+                    'winner_team_id' => null,
+                ];
+            }
+
+            $bracket['rounds'][] = [
+                'key' => $roundKey,
+                'label' => $knockoutRoundsConfig[$roundKey]['label'],
+                'matchups' => $matchups,
+            ];
+        }
+
+        $tournament->update(['knockout_bracket' => $bracket]);
+
+        return redirect()->route('tournaments.show', $tournament)
+            ->with('success', 'Knockout bracket generated.');
     }
 
     private function uniqueSlug(string $title, ?int $ignoreId = null, ?string $startDate = null): string

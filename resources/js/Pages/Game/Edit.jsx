@@ -5,7 +5,8 @@ import { useEffect, useMemo } from 'react';
 
 const sessionOptions = [1, 2, 4, 6, 8];
 
-export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {}, gameTypes = {} }) {
+export default function Edit({ auth, game, teams = [], tournaments = [], sportsOptions = {}, gameTypes = {}, knockoutRounds = [] }) {
+    const roundsList = Array.isArray(knockoutRounds) ? knockoutRounds : Object.values(knockoutRounds);
     const currentGame = game?.data ?? game;
     const teamList = Array.isArray(teams) ? teams : teams?.data || [];
     const tournamentList = Array.isArray(tournaments) ? tournaments : tournaments?.data || [];
@@ -20,6 +21,8 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         tournament_id: currentGame.tournament_id || '',
         game_type: currentGame.game_type || 'pool',
         tournament_pool_id: currentGame.tournament_pool_id || '',
+        knockout_round: currentGame.knockout_round || '',
+        knockout_position: currentGame.knockout_position || '',
         venue: currentGame.venue || '',
         excerpt: currentGame.excerpt || '',
         notes: currentGame.notes || '',
@@ -37,6 +40,16 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
         () => tournamentList.find((t) => `${t.id}` === `${data.tournament_id}`),
         [tournamentList, data.tournament_id]
     );
+
+    const bracketRounds = useMemo(() => {
+        if (!selectedTournament?.knockout_bracket?.rounds) return [];
+        return selectedTournament.knockout_bracket.rounds;
+    }, [selectedTournament]);
+
+    const selectedBracketRound = useMemo(() => {
+        if (!data.knockout_round || !bracketRounds.length) return null;
+        return bracketRounds.find((r) => r.key === data.knockout_round) || null;
+    }, [bracketRounds, data.knockout_round]);
 
     const tournamentPools = useMemo(() => {
         if (!selectedTournament?.pools) return [];
@@ -137,6 +150,40 @@ export default function Edit({ auth, game, teams = [], tournaments = [], sportsO
                                 />
                             )}
                         </div>
+
+                        {data.game_type === 'knockout' && data.tournament_id && (
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <SelectField
+                                    label="Knockout Round"
+                                    value={data.knockout_round}
+                                    options={[
+                                        { value: '', label: 'Select round' },
+                                        ...(bracketRounds.length > 0 ? bracketRounds : roundsList).map((r) => ({ value: r.key, label: r.label })),
+                                    ]}
+                                    onChange={(value) => setData((prev) => ({ ...prev, knockout_round: value, knockout_position: '' }))}
+                                    error={errors.knockout_round}
+                                />
+                                <SelectField
+                                    label="Position in Round"
+                                    value={data.knockout_position}
+                                    options={[
+                                        { value: '', label: 'Select position' },
+                                        ...(selectedBracketRound
+                                            ? selectedBracketRound.matchups.map((m) => ({
+                                                value: m.position,
+                                                label: `Match ${m.position}${m.home_label || m.away_label ? ` — ${[m.home_label, m.away_label].filter(Boolean).join(' vs ')}` : ''}`,
+                                            }))
+                                            : Array.from({ length: roundsList.find((r) => r.key === data.knockout_round)?.size || 4 }, (_, i) => ({
+                                                value: i + 1,
+                                                label: `Match ${i + 1}`,
+                                            }))
+                                        ),
+                                    ]}
+                                    onChange={(value) => setData('knockout_position', value)}
+                                    error={errors.knockout_position}
+                                />
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <Field

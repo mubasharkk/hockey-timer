@@ -30,6 +30,8 @@ class StoreGameRequest extends FormRequest
             'tournament_id' => ['nullable', 'integer', 'exists:tournaments,id'],
             'game_type' => ['required', 'string', Rule::in(array_keys(Game::allowedTypes()))],
             'tournament_pool_id' => ['nullable', 'integer', 'exists:tournament_pools,id'],
+            'knockout_round' => ['nullable', 'string', Rule::in(array_keys(Game::allowedKnockoutRounds()))],
+            'knockout_position' => ['nullable', 'integer', 'min:1'],
             'venue' => ['required', 'string', 'max:255'],
             'excerpt' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],

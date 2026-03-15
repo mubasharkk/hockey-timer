@@ -28,11 +28,13 @@ class Tournament extends Model implements HasMedia
         'win_points',
         'draw_points',
         'loss_points',
+        'knockout_bracket',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'knockout_bracket' => 'array',
     ];
 
     protected $appends = [
