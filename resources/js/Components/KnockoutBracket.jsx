@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import BracketTeamRow from './BracketTeamRow';
 
 export default function KnockoutBracket({ bracket }) {
     const rounds = bracket?.rounds || [];
@@ -37,10 +38,11 @@ function BracketMatchup({ matchup, roundKey }) {
 
     return (
         <div className="w-52 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <TeamRow
+            <BracketTeamRow
                 teamId={matchup.home_team_id}
                 teamName={matchup.home_team_name}
                 teamUid={matchup.home_team_uid}
+                teamLogo={matchup.home_team_logo}
                 label={matchup.home_label}
                 score={matchup.home_score}
                 showScore={isFinished}
@@ -57,10 +59,11 @@ function BracketMatchup({ matchup, roundKey }) {
                 </div>
             )}
             <div className="border-t border-gray-100" />
-            <TeamRow
+            <BracketTeamRow
                 teamId={matchup.away_team_id}
                 teamName={matchup.away_team_name}
                 teamUid={matchup.away_team_uid}
+                teamLogo={matchup.away_team_logo}
                 label={matchup.away_label}
                 score={matchup.away_score}
                 showScore={isFinished}
@@ -82,40 +85,3 @@ function BracketMatchup({ matchup, roundKey }) {
     );
 }
 
-function TeamRow({ teamId, teamName, teamUid, label, score, showScore, resolved, isWinner, isLoser }) {
-    const displayName = teamName || label || 'TBD';
-
-    const bgClass = isWinner
-        ? 'bg-green-50'
-        : isLoser
-            ? 'bg-gray-50'
-            : 'bg-white';
-
-    const textClass = isWinner
-        ? 'font-bold text-green-800'
-        : isLoser
-            ? 'text-gray-400'
-            : resolved
-                ? 'font-semibold text-gray-900'
-                : 'italic text-gray-400';
-
-    const content = (
-        <div className={`flex items-center justify-between gap-2 px-3 py-2 ${bgClass}`}>
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-                {isWinner && <span className="text-[10px] text-green-600 flex-shrink-0">&#9654;</span>}
-                <span className={`truncate text-sm ${textClass}`}>{displayName}</span>
-            </div>
-            {showScore && score !== null && <span className={`text-sm font-semibold flex-shrink-0 ${textClass}`}>{score}</span>}
-        </div>
-    );
-
-    if (resolved && teamUid) {
-        return (
-            <Link target="_blank" href={route('teams.public', teamUid)} className="block hover:bg-gray-50 transition">
-                {content}
-            </Link>
-        );
-    }
-
-    return content;
-}
