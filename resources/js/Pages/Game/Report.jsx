@@ -31,8 +31,8 @@ export default function Report({ auth, game }) {
     const events = currentGame.events || [];
     
     // Use game properties for scores
-    const homeScore = currentGame.home_score ?? 0;
-    const awayScore = currentGame.away_score ?? 0;
+    const homeScore = currentGame.home_final_score ?? 0;
+    const awayScore = currentGame.away_final_score ?? 0;
     const homeShootout = currentGame.home_shootout_score ?? 0;
     const awayShootout = currentGame.away_shootout_score ?? 0;
     

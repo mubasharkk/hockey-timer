@@ -59,8 +59,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
             );
         }
         return {
-            homeScore: currentGame?.home_score ?? 0,
-            awayScore: currentGame?.away_score ?? 0,
+            homeScore: currentGame?.home_final_score ?? 0,
+            awayScore: currentGame?.away_final_score ?? 0,
             label: 'Final',
         };
     })();
@@ -248,7 +248,7 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="bg-yellow-100 px-3 py-2 font-semibold text-gray-700">Shootout</td>
                                             <td className="px-3 py-2 font-semibold text-gray-900">{homeShootout}</td>
                                             <td className="px-3 py-2 font-semibold text-gray-900">{awayShootout}</td>
-                                            <td colSpan={4} className="px-3 py-2 text-gray-600">Penalty Shootout</td>
+                                            <td colSpan={5} className="px-3 py-2 text-gray-600">Penalty Shootout</td>
                                         </tr>
                                     )}
                                 </tbody>
