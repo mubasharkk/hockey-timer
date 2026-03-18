@@ -160,6 +160,57 @@ class Game extends Model
     }
 
     /**
+     * Get in-game goal counts (excluding shootout goals).
+     */
+    public function getInGameGoalCounts(): array
+    {
+        if (! $this->home_team_id && ! $this->away_team_id) {
+            return ['home' => 0, 'away' => 0];
+        }
+
+        $counts = Event::query()
+            ->select('team_id', DB::raw('COUNT(*) as total'))
+            ->where('game_id', $this->id)
+            ->where('event_type', 'goal')
+            ->where(function ($query) {
+                $query->whereNull('goal_type')
+                    ->orWhereIn('goal_type', ['FG', 'PG']);
+            })
+            ->whereIn('team_id', [$this->home_team_id, $this->away_team_id])
+            ->groupBy('team_id')
+            ->pluck('total', 'team_id');
+
+        return [
+            'home' => (int) ($counts[$this->home_team_id] ?? 0),
+            'away' => (int) ($counts[$this->away_team_id] ?? 0),
+        ];
+    }
+
+    /**
+     * Get shootout goal counts.
+     */
+    public function getShootoutGoalCounts(): array
+    {
+        if (! $this->home_team_id && ! $this->away_team_id) {
+            return ['home' => 0, 'away' => 0];
+        }
+
+        $counts = Event::query()
+            ->select('team_id', DB::raw('COUNT(*) as total'))
+            ->where('game_id', $this->id)
+            ->where('event_type', 'goal')
+            ->where('goal_type', 'shootout')
+            ->whereIn('team_id', [$this->home_team_id, $this->away_team_id])
+            ->groupBy('team_id')
+            ->pluck('total', 'team_id');
+
+        return [
+            'home' => (int) ($counts[$this->home_team_id] ?? 0),
+            'away' => (int) ($counts[$this->away_team_id] ?? 0),
+        ];
+    }
+
+    /**
      * Return per-team scores for a given session. If $aggregate is true,
      * scores include all sessions up to the requested session.
      */
