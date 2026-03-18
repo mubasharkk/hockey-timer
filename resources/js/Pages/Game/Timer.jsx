@@ -804,6 +804,7 @@ export default function Timer({ auth, game, config = {} }) {
                         >
                             <option value="FG">Field Goal</option>
                             <option value="PG">Penalty Goal</option>
+                            <option value="shootout">Shootout Goal</option>
                             <option value="">Unspecified</option>
                         </select>
                     </div>
