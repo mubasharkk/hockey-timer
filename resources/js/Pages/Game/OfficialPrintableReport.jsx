@@ -59,11 +59,15 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
             );
         }
         return {
-            homeScore: home?.score ?? 0,
-            awayScore: away?.score ?? 0,
+            homeScore: currentGame?.home_score ?? 0,
+            awayScore: currentGame?.away_score ?? 0,
             label: 'Final',
         };
     })();
+
+    // Get shootout scores
+    const homeShootout = currentGame?.home_shootout_score ?? 0;
+    const awayShootout = currentGame?.away_shootout_score ?? 0;
 
     const playerRows = Math.max(home?.players?.length || 0, away?.players?.length || 0);
     const safeEvents = Array.isArray(incomingEvents) ? incomingEvents : incomingEvents?.data || [];
@@ -154,9 +158,13 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 </p>
                                 <div className="text-lg font-semibold text-gray-900 flex items-center gap-2 justify-end">
                                     <span className="uppercase text-gray-700">{home?.name || currentGame?.team_a_name}</span>
-                                    <span className="final-score text-2xl text-green-700">{finalScore.homeScore}</span>
+                                    <span className="final-score text-2xl text-green-700">
+                                        {finalScore.homeScore}{homeShootout > 0 ? `(${homeShootout})` : ''}
+                                    </span>
                                     <span className="text-gray-500">-</span>
-                                    <span className="final-score text-2xl text-green-700">{finalScore.awayScore}</span>
+                                    <span className="final-score text-2xl text-green-700">
+                                        {finalScore.awayScore}{awayShootout > 0 ? `(${awayShootout})` : ''}
+                                    </span>
                                     <span className="uppercase text-gray-700">{away?.name || currentGame?.team_b_name}</span>
                                 </div>
                             </div>
@@ -235,6 +243,14 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                             <td className="px-3 py-2 text-gray-700">{formatDateTime(session.ended_at)}</td>
                                         </tr>
                                     ))}
+                                    {(homeShootout > 0 || awayShootout > 0) && (
+                                        <tr className="border-t border-gray-200 bg-yellow-50">
+                                            <td className="bg-yellow-100 px-3 py-2 font-semibold text-gray-700">Shootout</td>
+                                            <td className="px-3 py-2 font-semibold text-gray-900">{homeShootout}</td>
+                                            <td className="px-3 py-2 font-semibold text-gray-900">{awayShootout}</td>
+                                            <td colSpan={4} className="px-3 py-2 text-gray-600">Penalty Shootout</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </section>
