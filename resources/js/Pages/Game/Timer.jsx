@@ -799,13 +799,13 @@ export default function Timer({ auth, game, config = {} }) {
                         <label className="block text-sm font-medium text-gray-700">Goal Type</label>
                         <select
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
-                            value={goalModal?.goalType || 'FG'}
-                            onChange={(e) => setGoalModal((prev) => ({ ...prev, goalType: e.target.value }))}
+                            value={goalModal?.goalType ?? ''}
+                            onChange={(e) => setGoalModal((prev) => ({ ...prev, goalType: e.target.value || null }))}
                         >
+                            <option value="">Unspecified</option>
                             <option value="FG">Field Goal</option>
                             <option value="PG">Penalty Goal</option>
                             <option value="shootout">Shootout Goal</option>
-                            <option value="">Unspecified</option>
                         </select>
                     </div>
                     <div className="space-y-2">
