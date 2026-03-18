@@ -13,8 +13,6 @@ class GameResource extends JsonResource
     {
         $homeRelation = $this->relationLoaded('homeTeam') ? $this->homeTeam : null;
         $awayRelation = $this->relationLoaded('awayTeam') ? $this->awayTeam : null;
-        $homeScore = $homeRelation?->score;
-        $awayScore = $awayRelation?->score;
         $tournamentRelation = $this->relationLoaded('tournament') ? $this->tournament : null;
         $tournamentResource = $tournamentRelation && ! $tournamentRelation->relationLoaded('games')
             ? TournamentResource::make($tournamentRelation)
@@ -22,9 +20,9 @@ class GameResource extends JsonResource
         $sessionRelation = $this->relationLoaded('sessions') ? $this->getRelation('sessions') : null;
 
         // Get score breakdowns
-        $finalScores = $this->getGoalCounts();
         $inGameScores = $this->getInGameGoalCounts();
         $shootoutScores = $this->getShootoutGoalCounts();
+        $finalScores = $this->getGoalCounts();
 
         return [
             'id' => $this->id,
@@ -56,20 +54,13 @@ class GameResource extends JsonResource
             'status' => $this->status,
             'started_at' => $this->started_at,
             'ended_at' => $this->ended_at,
-            // Total scores
-            'home_score' => $finalScores['home'],
-            'away_score' => $finalScores['away'],
-            'team_a_score' => $finalScores['home'],
-            'team_b_score' => $finalScores['away'],
-            // Final scores (for backward compatibility)
-            'home_final_score' => $finalScores['home'],
-            'away_final_score' => $finalScores['away'],
-            // In-game scores (non-shootout)
-            'home_game_score' => $inGameScores['home'],
-            'away_game_score' => $inGameScores['away'],
-            // Shootout scores
+            // Score properties
+            'home_score' => $inGameScores['home'],
+            'away_score' => $inGameScores['away'],
             'home_shootout_score' => $shootoutScores['home'],
             'away_shootout_score' => $shootoutScores['away'],
+            'home_final_score' => $finalScores['home'],
+            'away_final_score' => $finalScores['away'],
             'home_team' => TeamResource::make($this->whenLoaded('homeTeam')),
             'away_team' => TeamResource::make($this->whenLoaded('awayTeam')),
             'tournament' => $this->when($tournamentResource !== null, $tournamentResource),
