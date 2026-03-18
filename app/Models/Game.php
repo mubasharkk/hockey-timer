@@ -135,17 +135,13 @@ class Game extends Model
             return ['home' => 0, 'away' => 0];
         }
 
-        $counts = Event::query()
-            ->select('team_id', DB::raw('COUNT(*) as total'))
-            ->where('game_id', $this->id)
-            ->where('event_type', 'goal')
-            ->whereIn('team_id', [$this->home_team_id, $this->away_team_id])
-            ->groupBy('team_id')
-            ->pluck('total', 'team_id');
+        // Final score = in-game + shootout
+        $inGameScores = $this->getInGameGoalCounts();
+        $shootoutScores = $this->getShootoutGoalCounts();
 
         return [
-            'home' => (int) ($counts[$this->home_team_id] ?? 0),
-            'away' => (int) ($counts[$this->away_team_id] ?? 0),
+            'home' => $inGameScores['home'] + $shootoutScores['home'],
+            'away' => $inGameScores['away'] + $shootoutScores['away'],
         ];
     }
 
