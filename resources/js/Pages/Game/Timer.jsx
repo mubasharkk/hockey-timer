@@ -101,7 +101,8 @@ export default function Timer({ auth, game, config = {} }) {
 
                 if (reachedEnd) {
                     setLastTick(null);
-                    handleSessionEnd();
+                    // Don't auto-complete the game - just pause the timer
+                    setStatus('paused');
                     return plannedSeconds;
                 }
 

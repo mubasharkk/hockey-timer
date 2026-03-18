@@ -45,6 +45,7 @@ function BracketMatchup({ matchup, roundKey }) {
                 teamLogo={matchup.home_team_logo}
                 label={matchup.home_label}
                 score={matchup.home_score}
+                shootout={matchup.home_shootout}
                 showScore={isFinished}
                 resolved={homeResolved}
                 isWinner={hasWinner && matchup.winner_team_id === matchup.home_team_id}
@@ -66,6 +67,7 @@ function BracketMatchup({ matchup, roundKey }) {
                 teamLogo={matchup.away_team_logo}
                 label={matchup.away_label}
                 score={matchup.away_score}
+                shootout={matchup.away_shootout}
                 showScore={isFinished}
                 resolved={awayResolved}
                 isWinner={hasWinner && matchup.winner_team_id === matchup.away_team_id}

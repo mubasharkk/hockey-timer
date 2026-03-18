@@ -7,6 +7,7 @@ export default function BracketTeamRow({
     teamLogo,
     label,
     score,
+    shootout,
     showScore,
     resolved,
     isWinner,
@@ -28,13 +29,16 @@ export default function BracketTeamRow({
                 ? 'font-semibold text-gray-900'
                 : 'italic text-gray-400';
 
+    const formatScore = (score, shootout) => (shootout ? `${score}(${shootout})` : score);
+
     const content = (
         <div className={`flex items-center justify-between gap-2 px-3 py-2 ${bgClass}`}>
             <div className="flex items-center gap-2 flex-1 min-w-0">
+                {isWinner && <span className="text-[10px] text-green-600 flex-shrink-0">&#9654;</span>}
                 <TeamLogo src={teamLogo} alt={displayName} size="sm" />
                 <span className={`truncate text-sm ${textClass}`}>{displayName}</span>
             </div>
-            {showScore && score !== null && <span className={`text-sm font-semibold flex-shrink-0 ${textClass}`}>{score}</span>}
+            {showScore && score !== null && <span className={`text-sm font-semibold flex-shrink-0 ${textClass}`}>{formatScore(score, shootout)}</span>}
         </div>
     );
 

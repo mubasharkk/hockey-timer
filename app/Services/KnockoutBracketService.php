@@ -38,6 +38,7 @@ class KnockoutBracketService
             $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
             $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
             $scores = $game->getGoalCounts();
+            $shootout = $this->getShootoutCounts($game);
 
             $matchups[$slotIndex]['game_id'] = $game->id;
             $matchups[$slotIndex]['home_team_id'] = $game->home_team_id;
@@ -45,11 +46,13 @@ class KnockoutBracketService
             $matchups[$slotIndex]['home_team_uid'] = $home?->uid;
             $matchups[$slotIndex]['home_team_logo'] = $home?->logo_url;
             $matchups[$slotIndex]['home_score'] = $scores['home'];
+            $matchups[$slotIndex]['home_shootout'] = $shootout['home'];
             $matchups[$slotIndex]['away_team_id'] = $game->away_team_id;
             $matchups[$slotIndex]['away_team_name'] = $away?->name;
             $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
             $matchups[$slotIndex]['away_team_logo'] = $away?->logo_url;
             $matchups[$slotIndex]['away_score'] = $scores['away'];
+            $matchups[$slotIndex]['away_shootout'] = $shootout['away'];
             $matchups[$slotIndex]['game_status'] = $game->status;
             $matchups[$slotIndex]['game_excerpt'] = $game->excerpt;
             $matchups[$slotIndex]['game_started_at'] = $game->started_at?->toIso8601String();
@@ -187,6 +190,7 @@ class KnockoutBracketService
                 $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
                 $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
                 $scores = $game->getGoalCounts();
+                $shootout = $this->getShootoutCounts($game);
 
                 $matchups[$slotIndex]['game_id'] = $game->id;
                 $matchups[$slotIndex]['home_team_id'] = $game->home_team_id;
@@ -194,11 +198,13 @@ class KnockoutBracketService
                 $matchups[$slotIndex]['home_team_uid'] = $home?->uid;
                 $matchups[$slotIndex]['home_team_logo'] = $home?->logo_url;
                 $matchups[$slotIndex]['home_score'] = $scores['home'];
+                $matchups[$slotIndex]['home_shootout'] = $shootout['home'];
                 $matchups[$slotIndex]['away_team_id'] = $game->away_team_id;
                 $matchups[$slotIndex]['away_team_name'] = $away?->name;
                 $matchups[$slotIndex]['away_team_uid'] = $away?->uid;
                 $matchups[$slotIndex]['away_team_logo'] = $away?->logo_url;
                 $matchups[$slotIndex]['away_score'] = $scores['away'];
+                $matchups[$slotIndex]['away_shootout'] = $shootout['away'];
                 $matchups[$slotIndex]['game_status'] = $game->status;
                 $matchups[$slotIndex]['game_excerpt'] = $game->excerpt;
                 $matchups[$slotIndex]['game_started_at'] = $game->started_at?->toIso8601String();
@@ -381,6 +387,7 @@ class KnockoutBracketService
         $home = $game->home_team_id ? Team::find($game->home_team_id) : null;
         $away = $game->away_team_id ? Team::find($game->away_team_id) : null;
         $scores = $game->getGoalCounts();
+        $shootout = $this->getShootoutCounts($game);
 
         return [
             'position' => $game->knockout_position,
@@ -392,11 +399,13 @@ class KnockoutBracketService
             'home_team_uid' => $home?->uid,
             'home_team_logo' => $home?->logo_url,
             'home_score' => $scores['home'],
+            'home_shootout' => $shootout['home'],
             'away_team_id' => $game->away_team_id,
             'away_team_name' => $away?->name,
             'away_team_uid' => $away?->uid,
             'away_team_logo' => $away?->logo_url,
             'away_score' => $scores['away'],
+            'away_shootout' => $shootout['away'],
             'game_status' => $game->status,
             'game_excerpt' => $game->excerpt,
             'game_started_at' => $game->started_at?->toIso8601String(),
@@ -414,5 +423,25 @@ class KnockoutBracketService
             '3rd_place' => '3rd Place',
             default => ucfirst($key),
         };
+    }
+
+    private function getShootoutCounts(Game $game): array
+    {
+        $homeCount = $game->events()
+            ->where('event_type', 'goal')
+            ->where('goal_type', 'shootout')
+            ->where('team_id', $game->home_team_id)
+            ->count();
+
+        $awayCount = $game->events()
+            ->where('event_type', 'goal')
+            ->where('goal_type', 'shootout')
+            ->where('team_id', $game->away_team_id)
+            ->count();
+
+        return [
+            'home' => $homeCount,
+            'away' => $awayCount,
+        ];
     }
 }

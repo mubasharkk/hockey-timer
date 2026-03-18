@@ -10,6 +10,8 @@ export default function GameMatchup({ game }) {
     const isToday = game.game_date ? moment(game.game_date).isSame(moment(), 'day') : false;
     const homeScore = game?.home_final_score ?? 0;
     const awayScore = game?.away_final_score ?? 0;
+    const homeShootout = game?.home_shootout_score ?? 0;
+    const awayShootout = game?.away_shootout_score ?? 0;
 
     const showTicker = !isFinished && isToday && (game.code || game.id);
 
@@ -25,7 +27,7 @@ export default function GameMatchup({ game }) {
                 <span className="font-semibold text-gray-800">{game.venue || 'Venue TBA'}</span>
                 <span>{formatDateTime(game.game_date, game.game_time)}</span>
                 {isFinished ? (
-                    <ResultBadge homeScore={homeScore} awayScore={awayScore} />
+                    <ResultBadge homeScore={homeScore} awayScore={awayScore} homeShootout={homeShootout} awayShootout={awayShootout} />
                 ) : (
                     showTicker && (
                         <Link
@@ -78,11 +80,12 @@ const TickerIcon = () => (
     <FontAwesomeIcon icon={faPlay} className="h-3.5 w-3.5 text-green-700" />
 );
 
-const ResultBadge = ({ homeScore, awayScore }) => {
+const ResultBadge = ({ homeScore, awayScore, homeShootout = 0, awayShootout = 0 }) => {
+    const formatScore = (score, shootout) => shootout > 0 ? `${score}(${shootout})` : score;
     return (
         <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
             <span>Final Score</span>
-            <span className="text-sm font-bold text-gray-900">{`${homeScore} - ${awayScore}`}</span>
+            <span className="text-sm font-bold text-gray-900">{`${formatScore(homeScore, homeShootout)} - ${formatScore(awayScore, awayShootout)}`}</span>
         </div>
     );
 };
