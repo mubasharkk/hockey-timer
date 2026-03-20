@@ -165,7 +165,7 @@ class Game extends Model
         }
 
         $counts = Event::query()
-            ->select('team_id', DB::raw('COUNT(*) as total'))
+            ->select('team_id', DB::raw('COUNT(id) as total'))
             ->where('game_id', $this->id)
             ->where('event_type', 'goal')
             ->where(function ($query) {
@@ -192,7 +192,7 @@ class Game extends Model
         }
 
         $counts = Event::query()
-            ->select('team_id', DB::raw('COUNT(*) as total'))
+            ->select('team_id', DB::raw('COUNT(id) as total'))
             ->where('game_id', $this->id)
             ->where('event_type', 'goal')
             ->where('goal_type', 'shootout')

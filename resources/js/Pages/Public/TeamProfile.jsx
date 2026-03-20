@@ -45,7 +45,7 @@ export default function TeamProfile({ team }) {
                         <div className="mx-auto max-w-5xl">
                             <div className="mb-4 flex justify-center md:hidden">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-20 w-auto fill-current text-white" />
+                                    <ApplicationLogo className="block h-auto w-auto fill-current text-white" />
                                 </Link>
                             </div>
 
