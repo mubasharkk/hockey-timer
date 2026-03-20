@@ -18,7 +18,7 @@ echo "==> Installing Node dependencies..."
 npm ci
 
 echo "==> Building frontend assets (client + SSR)..."
-npm run build
+./node_modules/.bin/vite build && ./node_modules/.bin/vite build --ssr resources/js/ssr.jsx
 
 echo "==> Running database migrations..."
 php artisan migrate --force
