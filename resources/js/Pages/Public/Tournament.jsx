@@ -1,7 +1,7 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import TeamLogo from '@/Components/TeamLogo';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { useMemo, useState } from 'react';
@@ -12,6 +12,7 @@ import TopScorers from '@/Components/TopScorers';
 import KnockoutBracket from '@/Components/KnockoutBracket';
 
 export default function Tournament({ tournament, poolResults = [], topScorers = [] }) {
+    const { appName } = usePage().props;
     const currentTournament = tournament?.data ?? tournament;
     const [tab, setTab] = useState('upcoming');
     const [poolsOpen, setPoolsOpen] = useState(false);
@@ -37,13 +38,22 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
             <Head>
                 <title>{currentTournament.title}</title>
                 <meta name="description" content={currentTournament.venue || `Tournament: ${currentTournament.title}`} />
+
+                {/* Open Graph — WhatsApp, LinkedIn, Facebook */}
+                <meta property="og:type" content="website" />
+                <meta property="og:site_name" content={appName} />
                 <meta property="og:title" content={currentTournament.title} />
                 <meta property="og:description" content={currentTournament.venue || `Tournament: ${currentTournament.title}`} />
-                {currentTournament.logo_url ? (
-                    <meta property="og:image" content={currentTournament.logo_url} />
-                ) : (
-                    <meta property="og:image" content="/icons/logo.png" />
-                )}
+                <meta property="og:image" content={currentTournament.logo_url || '/icons/logo.png'} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt" content={currentTournament.title} />
+
+                {/* Twitter Card — LinkedIn fallback + Twitter */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={currentTournament.title} />
+                <meta name="twitter:description" content={currentTournament.venue || `Tournament: ${currentTournament.title}`} />
+                <meta name="twitter:image" content={currentTournament.logo_url || '/icons/logo.png'} />
             </Head>
             <div className="px-0 sm:px-[calc(50vw-50%)]">
                 <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
