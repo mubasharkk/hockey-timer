@@ -1,5 +1,6 @@
 import PublicLayout from '@/Layouts/PublicLayout';
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import TeamLogo from '@/Components/TeamLogo';
 import { Head, Link } from '@inertiajs/react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -56,13 +57,12 @@ export default function Tournament({ tournament, poolResults = [], topScorers = 
                         </div>
                         {/* Tournament Logo - Right */}
                         <div className="flex justify-start">
-                            {currentTournament.logo_url && (
-                                <img
-                                    src={currentTournament.logo_url}
-                                    alt={`${currentTournament.title} logo`}
-                                    className="h-48 object-contain"
-                                />
-                            )}
+                            <TeamLogo
+                                src={currentTournament.logo_url}
+                                alt={`${currentTournament.title} logo`}
+                                height="h-48"
+                                width="w-auto"
+                            />
                         </div>
                     </div>
 

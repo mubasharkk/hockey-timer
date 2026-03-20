@@ -6,6 +6,7 @@ import {
     faPhone, faGlobe, faIdCard, faTshirt, faCircleCheck, faCircleXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import ApplicationLogo from '@/Components/ApplicationLogo.jsx';
+import TeamLogo from '@/Components/TeamLogo.jsx';
 
 export default function TeamProfile({ team }) {
     const currentTeam = team?.data ?? team;
@@ -52,13 +53,14 @@ export default function TeamProfile({ team }) {
                             <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:gap-6 sm:text-left">
                                 <div className="flex-shrink-0">
                                     {currentTeam.logo_url ? (
-                                        <img
+                                        <TeamLogo
                                             src={currentTeam.logo_url}
                                             alt={currentTeam.name}
-                                            className="h-24 w-24 rounded-xl border-4 border-white/30 object-cover shadow-lg sm:h-28 sm:w-28"
+                                            height="h-24 sm:h-28"
+                                            width="w-24 sm:w-28"
                                         />
                                     ) : (
-                                        <div className="flex h-24 w-24 items-center justify-center rounded-xl border-4 border-white/30 text-3xl font-bold shadow-lg sm:h-28 sm:w-28" style={{ backgroundColor: '#026B2E' }}>
+                                        <div className="flex h-24 w-24 items-center justify-center rounded-xl text-3xl font-bold shadow-lg sm:h-28 sm:w-28" style={{ backgroundColor: '#026B2E' }}>
                                             {currentTeam.name?.charAt(0) || '?'}
                                         </div>
                                     )}
@@ -121,11 +123,7 @@ export default function TeamProfile({ team }) {
                                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
                                     {club.logo_url && (
                                         <div className="flex-shrink-0">
-                                            <img
-                                                src={club.logo_url}
-                                                alt={club.name}
-                                                className="h-16 w-16 rounded-lg border border-gray-200 object-cover"
-                                            />
+                                            <TeamLogo src={club.logo_url} alt={club.name} height="h-16" width="w-16" />
                                         </div>
                                     )}
                                     <div className="grid flex-1 grid-cols-1 gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">

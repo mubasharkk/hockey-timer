@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import ApplicationLogo from "@/Components/ApplicationLogo.jsx";
+import TeamLogo from '@/Components/TeamLogo.jsx';
 import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function Ticker({ game, gameId }) {
@@ -117,10 +118,11 @@ export default function Ticker({ game, gameId }) {
                         {(tournament?.logo_url || tournament?.title) && (
                             <div className="flex flex-col items-center justify-center gap-3 text-center">
                                 {tournament?.logo_url ? (
-                                    <img
+                                    <TeamLogo
                                         src={tournament.logo_url}
                                         alt={tournament.title || 'Tournament logo'}
-                                        className="h-auto max-h-24 w-full max-w-xs object-contain"
+                                        height="h-auto max-h-24"
+                                        width="w-full max-w-xs"
                                     />
                                 ) : (
                                     <div className="flex h-24 w-full max-w-xs items-center justify-center rounded-lg border border-gray-200 bg-white/60 px-4 text-sm font-semibold text-gray-700">
@@ -133,7 +135,7 @@ export default function Ticker({ game, gameId }) {
                             <div className="my-5">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="w-48 flex justify-start">
-                                        <TeamLogo team={homeTeam} align="start" bare />
+                                        <TeamLogo src={homeTeam?.logo_url} alt={`${homeTeam?.name || 'Home'} logo`} height="h-auto" width="w-36" />
                                     </div>
                                     <div className="text-center flex-1">
                                         <p className="text-[11px] uppercase tracking-[0.2em] text-gray-500">Timer</p>
@@ -157,7 +159,7 @@ export default function Ticker({ game, gameId }) {
                                         </p>
                                     </div>
                                     <div className="w-48 flex justify-end">
-                                        <TeamLogo team={awayTeam} align="end" bare />
+                                        <TeamLogo src={awayTeam?.logo_url} alt={`${awayTeam?.name || 'Away'} logo`} height="h-auto" width="w-36" />
                                     </div>
                                 </div>
                                 <div className="mt-5 flex justify-between gap-6 text-sm text-gray-700 border-t border-gray-200 pt-10">
@@ -225,22 +227,6 @@ export default function Ticker({ game, gameId }) {
         </PublicLayout>
     );
 }
-
-const TeamLogo = ({ team, align = 'center', bare = false }) => {
-    const justify = align === 'end' ? 'justify-end' : align === 'start' ? 'justify-start' : 'justify-center';
-
-    return (
-        <div className={`flex w-full ${justify}`}>
-            {team?.logo_url && (
-                <img
-                    src={team.logo_url}
-                    alt={`${team.name || 'Team'} logo`}
-                    className={`w-36 rounded-lg object-cover ${bare ? '' : 'ring-1 ring-gray-200 bg-white/60'}`}
-                />
-            )}
-        </div>
-    );
-};
 
 const eventBadge = (event) => {
     switch (event.event_type) {
