@@ -61,7 +61,6 @@ class TournamentController extends Controller
             ->where('tournament_id', $tournament->id)
             ->orderByDesc('goals')
             ->orderBy('team_name')
-            ->limit(10)
             ->get()
             ->map(fn ($row) => (array) $row)
             ->all();
