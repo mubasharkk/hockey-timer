@@ -290,16 +290,17 @@
                 </thead>
                 <tbody>`;
 
-            rows.forEach(row => {
+            rows.forEach((row, rowIdx) => {
                 const logoHtml = row.logo_url
                     ? `<img class="ha-team-logo" src="${row.logo_url}" alt="${row.team_name}">`
                     : `<div class="ha-team-logo-placeholder">${(row.team_name || '?').charAt(0)}</div>`;
+                const barColor = rowIdx < 2 ? color : '#e0e0e0';
 
                 html += `
                     <tr>
                         <td class="ha-col-team">
                             <div class="ha-team-cell">
-                                <div class="ha-team-color" style="background:${color}"></div>
+                                <div class="ha-team-color" style="background:${barColor}"></div>
                                 ${logoHtml}
                                 <span class="ha-team-name">${row.team_name}</span>
                             </div>
