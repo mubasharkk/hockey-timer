@@ -32,19 +32,22 @@
         .ha-pool-label {
             font-size: 13px;
             font-weight: 700;
-            color: #333;
-            margin: 16px 0 6px;
+            color: #fff;
+            background: #1a1a1a;
+            padding: 6px 10px;
+            margin: 16px 0 0;
+            border-radius: 4px 4px 0 0;
         }
 
         /* Standings table */
         .ha-table { width: 100%; border-collapse: collapse; }
-        .ha-table thead tr { background: #1a1a1a; }
         .ha-table th {
             font-size: 11px;
             font-weight: 700;
-            color: #fff;
+            color: #888;
             text-align: center;
-            padding: 6px 6px;
+            padding: 4px 6px;
+            border-bottom: 1px solid #e5e5e5;
         }
         .ha-table th.ha-col-team { text-align: left; }
         .ha-table td {
