@@ -86,7 +86,25 @@
         .ha-team-name { font-weight: 600; font-size: 13px; }
         .ha-col-pts { font-weight: 700; }
 
-        /* Upcoming matches */
+        /* Tabs */
+        .ha-tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin: 24px 0 12px; }
+        .ha-tab {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            user-select: none;
+            transition: color 0.15s;
+        }
+        .ha-tab:hover { color: #333; }
+        .ha-tab.ha-active { color: #111; border-bottom-color: #111; }
+        .ha-tab-panel { display: none; }
+        .ha-tab-panel.ha-active { display: block; }
+
+        /* Matches */
         .ha-matches { display: flex; flex-direction: column; gap: 8px; }
         .ha-match-card {
             display: flex;
@@ -328,126 +346,108 @@
         return html;
     }
 
-    function buildMatches(upcomingGames, resultGames, upcomingLimit, resultsLimit) {
+    function matchCard(g) {
+        const home = g.home_team || {};
+        const away = g.away_team || {};
+        const isLive = g.status === 'in_progress';
+        const hasScore = g.home_score != null && g.away_score != null;
+        const isKnockout = g.game_type === 'knockout';
+        return `
+        <div class="ha-match-card">
+            <div class="ha-match-meta">
+                <span class="ha-match-date">${formatDate(g.game_date, g.game_time)}</span>
+            </div>
+            <div class="ha-match-body">
+                <div class="ha-match-team">
+                    ${teamLogo(home.logo_url, home.name, 32)}
+                    <span class="ha-match-team-name">${home.name || '?'}</span>
+                </div>
+                <div class="ha-match-center">
+                    ${hasScore
+                        ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
+                        : `<div class="ha-match-vs">VS</div>`
+                    }
+                    ${(g.excerpt || g.game_type || g.tournament_pool_name) ? `
+                    <div class="ha-match-bottom">
+                        ${g.game_type ? `<span class="ha-game-type${isKnockout ? ' ha-knockout' : ''}">${g.game_type.replace('_', ' ')}</span>` : ''}
+                        ${g.tournament_pool_name ? `<span class="ha-game-type">${g.tournament_pool_name}</span>` : ''}
+                        ${g.excerpt ? `<span class="ha-match-excerpt">${g.excerpt}</span>` : ''}
+                    </div>` : ''}
+                </div>
+                <div class="ha-match-team ha-away">
+                    ${teamLogo(away.logo_url, away.name, 32)}
+                    <span class="ha-match-team-name">${away.name || '?'}</span>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    function buildMatchTabs(upcomingGames, resultGames, upcomingLimit, resultsLimit, widgetId) {
         const upcoming = (upcomingGames || []).slice(0, upcomingLimit);
+        const results  = (resultGames   || []).slice(0, resultsLimit > 0 ? resultsLimit : resultGames?.length ?? 0);
 
-        if (upcoming.length === 0) return '';
+        if (upcoming.length === 0 && results.length === 0) return '';
 
-        let html = `<h2 class="ha-section-title">Upcoming matches</h2><div class="ha-matches">`;
+        const defaultTab = upcoming.length > 0 ? 'upcoming' : 'results';
 
-        upcoming.forEach(g => {
-            const home = g.home_team || {};
-            const away = g.away_team || {};
-            const isLive = g.status === 'in_progress';
-            const hasScore = g.home_score != null && g.away_score != null;
-            const isKnockout = g.game_type === 'knockout';
-
-            const label = isKnockout
-                ? g.knockout_round || 'Knockout'
-                : (g.tournament_pool_name || null);
-
-            html += `
-            <div class="ha-match-card">
-                <div class="ha-match-meta">
-                    <span class="ha-match-date">${formatDate(g.game_date, g.game_time)}</span>
-                </div>
-                <div class="ha-match-body">
-                    <div class="ha-match-team">
-                        ${teamLogo(home.logo_url, home.name, 32)}
-                        <span class="ha-match-team-name">${home.name || '?'}</span>
-                    </div>
-                    <div class="ha-match-center">
-                        ${hasScore
-                            ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
-                            : `<div class="ha-match-vs">VS</div>`
-                        }
-                        ${(g.excerpt || g.game_type) ? `
-                        <div class="ha-match-bottom">
-                            ${g.game_type ? `<span class="ha-game-type${isKnockout ? ' ha-knockout' : ''}">${g.game_type.replace('_', ' ')}</span>` : ''}
-                            ${g.tournament_pool_name ? `<span class="ha-game-type">${g.tournament_pool_name}</span>` : ''}
-                            ${g.excerpt ? `<span class="ha-match-excerpt">${g.excerpt}</span>` : ''}
-                        </div>` : ''}
-                    </div>
-                    <div class="ha-match-team ha-away">
-                        ${teamLogo(away.logo_url, away.name, 32)}
-                        <span class="ha-match-team-name">${away.name || '?'}</span>
-                    </div>
-                </div>
-            </div>`;
-        });
-
+        let html = `<h2 class="ha-section-title">Matches</h2>`;
+        html += `<div class="ha-tabs">`;
+        if (upcoming.length > 0) html += `<div class="ha-tab${defaultTab === 'upcoming' ? ' ha-active' : ''}" data-tab="upcoming" data-widget="${widgetId}">Upcoming</div>`;
+        if (results.length  > 0) html += `<div class="ha-tab${defaultTab === 'results'  ? ' ha-active' : ''}" data-tab="results"  data-widget="${widgetId}">Results</div>`;
         html += `</div>`;
 
-        // Results
-        if (resultsLimit > 0) {
-            const results = (resultGames || []).slice(0, resultsLimit);
-            if (results.length > 0) {
-                html += `<h2 class="ha-section-title">Results</h2><div class="ha-matches">`;
-                results.forEach(g => {
-                    const home = g.home_team || {};
-                    const away = g.away_team || {};
-                    const isKnockout = g.game_type === 'knockout';
-                    html += `
-                    <div class="ha-match-card">
-                        <div class="ha-match-meta">
-                            <span class="ha-match-date">${formatDate(g.game_date, g.game_time)}</span>
-                        </div>
-                        <div class="ha-match-body">
-                            <div class="ha-match-team">
-                                ${teamLogo(home.logo_url, home.name, 32)}
-                                <span class="ha-match-team-name">${home.name || '?'}</span>
-                            </div>
-                            <div class="ha-match-center">
-                                <div class="ha-match-score">${g.home_score ?? '-'} – ${g.away_score ?? '-'}</div>
-                                ${(g.game_type || g.tournament_pool_name) ? `
-                                <div class="ha-match-bottom">
-                                    ${g.game_type ? `<span class="ha-game-type${isKnockout ? ' ha-knockout' : ''}">${g.game_type.replace('_', ' ')}</span>` : ''}
-                                    ${g.tournament_pool_name ? `<span class="ha-game-type">${g.tournament_pool_name}</span>` : ''}
-                                </div>` : ''}
-                            </div>
-                            <div class="ha-match-team ha-away">
-                                ${teamLogo(away.logo_url, away.name, 32)}
-                                <span class="ha-match-team-name">${away.name || '?'}</span>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                html += `</div>`;
-            }
+        if (upcoming.length > 0) {
+            html += `<div class="ha-tab-panel${defaultTab === 'upcoming' ? ' ha-active' : ''}" data-panel="upcoming" data-widget="${widgetId}"><div class="ha-matches">`;
+            upcoming.forEach(g => { html += matchCard(g); });
+            html += `</div></div>`;
+        }
+
+        if (results.length > 0) {
+            html += `<div class="ha-tab-panel${defaultTab === 'results' ? ' ha-active' : ''}" data-panel="results" data-widget="${widgetId}"><div class="ha-matches">`;
+            results.forEach(g => { html += matchCard(g); });
+            html += `</div></div>`;
         }
 
         return html;
     }
 
+    let widgetCounter = 0;
+
     function render(container, data, opts) {
         const { tournament, pool_results, upcoming, results, top_scorers } = data;
         const t = tournament.data || tournament;
+        const widgetId = ++widgetCounter;
 
         let html = `<div class="ha-widget">`;
 
-        // Header
         html += `
             <div class="ha-header">
                 <h1>${t.title}</h1>
                 ${t.venue ? `<p>${t.venue}</p>` : ''}
             </div>`;
 
-        // Pool standings
         html += buildStandings(pool_results);
+        html += buildMatchTabs(upcoming, results, opts.upcoming, opts.results, widgetId);
 
-        // Upcoming matches + results
-        html += buildMatches(upcoming, results, opts.upcoming, opts.results);
-
-        // Top scorers
         if (opts.topScorers > 0) {
             html += buildTopScorers(top_scorers, opts.topScorers);
         }
 
-        // Footer
         html += `<div class="ha-footer">Powered by <a href="#" target="_blank">HockeyApp</a></div>`;
-
         html += `</div>`;
+
         container.innerHTML = html;
+
+        // Wire up tab clicks
+        container.querySelectorAll(`.ha-tab[data-widget="${widgetId}"]`).forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                container.querySelectorAll(`.ha-tab[data-widget="${widgetId}"]`).forEach(t => t.classList.remove('ha-active'));
+                container.querySelectorAll(`.ha-tab-panel[data-widget="${widgetId}"]`).forEach(p => p.classList.remove('ha-active'));
+                tab.classList.add('ha-active');
+                container.querySelector(`.ha-tab-panel[data-panel="${target}"][data-widget="${widgetId}"]`).classList.add('ha-active');
+            });
+        });
     }
 
     function init(el) {
