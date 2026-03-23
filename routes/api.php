@@ -7,6 +7,7 @@ use App\Http\Controllers\SyncGameController;
 use App\Http\Controllers\SyncSessionController;
 use App\Http\Controllers\PublicTickerApiController;
 use App\Http\Controllers\Api\DashboardStatsController;
+use App\Http\Controllers\Api\TournamentController as ApiTournamentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,3 +37,7 @@ Route::get('/countries', function () {
 });
 
 Route::get('/dashboard/stats', DashboardStatsController::class);
+
+// Public tournament API
+Route::get('/tournaments', [ApiTournamentController::class, 'index']);
+Route::get('/tournaments/{slug}', [ApiTournamentController::class, 'show']);
