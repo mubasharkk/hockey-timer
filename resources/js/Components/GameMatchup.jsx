@@ -8,8 +8,8 @@ export default function GameMatchup({ game }) {
     const away = game.away_team || { name: game.team_b_name };
     const isFinished = game.status === 'finished' || !!game.ended_at;
     const isToday = game.game_date ? moment(game.game_date).isSame(moment(), 'day') : false;
-    const homeScore = game?.home_final_score ?? 0;
-    const awayScore = game?.away_final_score ?? 0;
+    const homeScore = game?.home_score ?? 0;
+    const awayScore = game?.away_score ?? 0;
     const homeShootout = game?.home_shootout_score ?? 0;
     const awayShootout = game?.away_shootout_score ?? 0;
 
@@ -82,7 +82,7 @@ const TickerIcon = () => (
 
 const ResultBadge = ({ homeScore, awayScore, homeShootout = 0, awayShootout = 0 }) => {
     const hasShootout = homeShootout > 0 || awayShootout > 0;
-    const formatScore = (score, shootout) => hasShootout ? `${score}(${shootout})` : score;
+    const formatScore = (score, shootout) => hasShootout ? `${score} (${shootout}) ` : score;
     return (
         <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
             <span>Final Score</span>
