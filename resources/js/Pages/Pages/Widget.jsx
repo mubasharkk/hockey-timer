@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import PublicLayout from '@/Layouts/PublicLayout.jsx';
 
@@ -31,6 +31,8 @@ function AttrRow({ name, type, defaultVal, description }) {
 }
 
 export default function Widget() {
+    const { appUrl } = usePage().props;
+
     return (
         <PublicLayout>
             <Head title="Widget Documentation" />
@@ -56,11 +58,11 @@ export default function Widget() {
 <div
     data-ha-tournament
     data-slug="your-tournament-slug"
-    data-api="https://yourdomain.com">
+    data-api="{appUrl}">
 </div>
 
 <!-- 2. Include the widget script (CSS is loaded automatically) -->
-<script src="https://yourdomain.com/widget/tournament.js"></script>`}
+<script src="{appUrl}/widget/tournament.js"></script>`}
                                 </CodeBlock>
                             </Section>
 
@@ -80,7 +82,7 @@ export default function Widget() {
                                         </thead>
                                         <tbody>
                                             <AttrRow name="data-slug"         type="string" defaultVal="required" description="Tournament slug from the URL (e.g. my-tournament-2026)" />
-                                            <AttrRow name="data-api"          type="string" defaultVal="required" description="Base URL of your HockeyApp instance (e.g. https://yourdomain.com)" />
+                                            <AttrRow name="data-api"          type="string" defaultVal="required" description="Base URL of your HockeyApp instance (e.g. {appUrl})" />
                                             <AttrRow name="data-upcoming"     type="number" defaultVal="10"       description="Max number of upcoming matches to display" />
                                             <AttrRow name="data-results"      type="number" defaultVal="0"        description="Max number of recent results to display (0 = hidden)" />
                                             <AttrRow name="data-top-scorers"  type="number" defaultVal="10"       description="Max number of top scorers to display (0 = hidden)" />
@@ -93,13 +95,13 @@ export default function Widget() {
                                 <CodeBlock>{`<div
     data-ha-tournament
     data-slug="ramadan-cup-2026"
-    data-api="https://yourdomain.com"
+    data-api="{appUrl}"
     data-upcoming="5"
     data-results="5"
     data-top-scorers="10">
 </div>
 
-<script src="https://yourdomain.com/widget/tournament.js"></script>`}
+<script src="{appUrl}/widget/tournament.js"></script>`}
                                 </CodeBlock>
                             </Section>
 
