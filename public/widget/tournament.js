@@ -139,7 +139,7 @@
         const awayShootout = g.away_shootout_score ?? 0;
         const hasShootout  = homeShootout > 0 || awayShootout > 0;
         const fmtScore = (score, shootout) =>
-            hasShootout ? `${score}(${shootout})` : score;
+            hasShootout ? `${score} (${shootout}) ` : score;
 
         const homeDisplay = fmtScore(g.home_score ?? '-', homeShootout);
         const awayDisplay = fmtScore(g.away_score ?? '-', awayShootout);
