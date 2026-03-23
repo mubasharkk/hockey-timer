@@ -128,9 +128,17 @@
     function matchCard(g) {
         const home = g.home_team || {};
         const away = g.away_team || {};
-        const isLive = g.status === 'in_progress';
-        const hasScore = g.home_score != null && g.away_score != null;
+        const isLive     = g.status === 'in_progress';
+        const isFinished = g.status === 'finished';
         const isKnockout = g.game_type === 'knockout';
+
+        const fmtScore = (score, shootout) =>
+            (shootout > 0) ? `${score}(${shootout})` : score;
+
+        const homeDisplay = fmtScore(g.home_final_score ?? g.home_score ?? '-', g.home_shootout_score ?? 0);
+        const awayDisplay = fmtScore(g.away_final_score ?? g.away_score ?? '-', g.away_shootout_score ?? 0);
+        const hasScore = g.home_final_score != null || g.home_score != null;
+
         return `
         <div class="ha-match-card">
             <div class="ha-match-meta">
@@ -143,7 +151,8 @@
                 </div>
                 <div class="ha-match-center">
                     ${hasScore
-                        ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
+                        ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${homeDisplay} – ${awayDisplay}</div>
+                           ${isFinished ? `<div class="ha-match-final">Final Score</div>` : ''}`
                         : `<div class="ha-match-vs">VS</div>`
                     }
                     ${(g.excerpt || g.game_type || g.tournament_pool_name) ? `

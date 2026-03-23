@@ -160,6 +160,7 @@
     letter-spacing: 2px;
 }
 .ha-match-score.ha-live { color: #e02020; }
+.ha-match-final { font-size: 10px; font-weight: 700; color: #16a34a; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 .ha-match-label {
     display: inline-block;
     font-size: 10px;
