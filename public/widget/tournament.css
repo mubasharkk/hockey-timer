@@ -1,0 +1,226 @@
+.ha-widget * { box-sizing: border-box; margin: 0; padding: 0; }
+.ha-widget {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #111;
+    background: #fff;
+    max-width: 720px;
+    width: 100%;
+}
+.ha-widget a { color: inherit; text-decoration: none; }
+
+/* Header */
+.ha-header { margin-bottom: 24px; }
+.ha-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.ha-header p { font-size: 13px; color: #555; line-height: 1.5; }
+.ha-header-meta { display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+.ha-header-date { font-size: 12px; color: #666; font-weight: 600; }
+.ha-header-sep { color: #ccc; font-size: 12px; }
+
+/* Section title */
+.ha-section-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 28px 0 12px;
+}
+
+/* Pool label */
+.ha-pool-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    background: #1a1a1a;
+    padding: 6px 10px;
+    margin: 16px 0 0;
+    border-radius: 4px 4px 0 0;
+}
+
+/* Standings table */
+.ha-table { width: 100%; border-collapse: collapse; }
+.ha-table th {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-align: center;
+    padding: 4px 6px;
+    border-bottom: 1px solid #e5e5e5;
+}
+.ha-table th.ha-col-team { text-align: left; }
+.ha-table td {
+    text-align: center;
+    padding: 7px 6px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+.ha-table td.ha-col-team { text-align: left; }
+.ha-table tr:last-child td { border-bottom: none; }
+.ha-team-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ha-team-color {
+    width: 4px;
+    height: 32px;
+    border-radius: 2px;
+    background: #ccc;
+    flex-shrink: 0;
+}
+.ha-team-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.ha-team-logo-placeholder {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #777;
+    flex-shrink: 0;
+}
+.ha-team-name { font-weight: 600; font-size: 13px; }
+.ha-col-pts { font-weight: 700; }
+
+/* Tabs */
+.ha-tabs { display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin: 24px 0 12px; }
+.ha-tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    user-select: none;
+    transition: color 0.15s;
+}
+.ha-tab:hover { color: #333; }
+.ha-tab.ha-active { color: #111; border-bottom-color: #111; }
+.ha-tab-panel { display: none; }
+.ha-tab-panel.ha-active { display: block; }
+
+/* Matches */
+.ha-matches { display: flex; flex-direction: column; gap: 8px; }
+.ha-match-card {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    gap: 8px;
+}
+.ha-match-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ha-match-date { font-size: 11px; color: #888; }
+.ha-match-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.ha-match-team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+.ha-match-team.ha-away { flex-direction: row-reverse; }
+.ha-match-team-name { font-weight: 600; font-size: 13px; }
+.ha-match-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+.ha-match-logo-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #777;
+}
+.ha-match-center { text-align: center; flex-shrink: 0; min-width: 90px; }
+.ha-match-score {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+.ha-match-score.ha-live { color: #e02020; }
+.ha-match-label {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    background: #457b9d;
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.ha-match-label.ha-knockout { background: #e63946; }
+.ha-match-bottom { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+.ha-match-excerpt { font-size: 11px; color: #999; font-style: italic; }
+.ha-game-type {
+    font-size: 10px;
+    font-weight: 700;
+    color: #555;
+    background: #f0f0f0;
+    border-radius: 4px;
+    padding: 1px 6px;
+    text-transform: capitalize;
+}
+.ha-game-type.ha-knockout { background: #e63946; color: #fff; }
+.ha-match-vs { font-size: 13px; font-weight: 700; color: #aaa; }
+
+/* Powered by */
+.ha-footer {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #bbb;
+    text-align: right;
+}
+.ha-footer a { color: #bbb; }
+
+/* Top scorers */
+.ha-scorers { width: 100%; border-collapse: collapse; }
+.ha-scorers th {
+    font-size: 11px; font-weight: 700; color: #888;
+    text-align: left; padding: 4px 8px;
+    border-bottom: 1px solid #e5e5e5;
+}
+.ha-scorers th.ha-col-right { text-align: center; }
+.ha-scorers td {
+    padding: 7px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+.ha-scorers td.ha-col-right { text-align: center; font-weight: 700; }
+.ha-scorers tr:last-child td { border-bottom: none; }
+.ha-scorer-cell { display: flex; align-items: center; gap: 8px; }
+.ha-scorer-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #f0f0f0; font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; color: #888;
+    flex-shrink: 0;
+}
+.ha-scorer-name { font-weight: 600; }
+.ha-scorer-team { font-size: 11px; color: #999; }
+
+/* Loading / error */
+.ha-loading { padding: 20px; text-align: center; color: #888; font-size: 13px; }
+.ha-error { padding: 20px; text-align: center; color: #e02020; font-size: 13px; }
