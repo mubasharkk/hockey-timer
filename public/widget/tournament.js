@@ -90,11 +90,22 @@
         .ha-matches { display: flex; flex-direction: column; gap: 8px; }
         .ha-match-card {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             padding: 10px 14px;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
+            gap: 8px;
+        }
+        .ha-match-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ha-match-date { font-size: 11px; color: #888; }
+        .ha-match-body {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             gap: 12px;
         }
         .ha-match-team {
@@ -129,7 +140,6 @@
             letter-spacing: 2px;
         }
         .ha-match-score.ha-live { color: #e02020; }
-        .ha-match-date { font-size: 11px; color: #888; margin-top: 2px; }
         .ha-match-label {
             display: inline-block;
             font-size: 10px;
@@ -166,15 +176,16 @@
         if (!dateStr) return '';
         const d = new Date(timeStr ? `${dateStr}T${timeStr}` : dateStr);
         if (isNaN(d)) return dateStr;
-        const day = String(d.getDate()).padStart(2, '0');
-        const month = d.toLocaleDateString('en-GB', { month: 'short' });
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const month = months[d.getMonth()];
+        const day = d.getDate();
         const year = d.getFullYear();
-        if (!timeStr) return `${day} ${month} ${year}`;
+        if (!timeStr) return `${month} ${day} ${year}`;
         const hours = d.getHours();
         const minutes = String(d.getMinutes()).padStart(2, '0');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         const h12 = String(hours % 12 || 12).padStart(2, '0');
-        return `${day} ${month} ${year} - ${h12}:${minutes} ${ampm}`;
+        return `${month} ${day} ${year}, ${h12}:${minutes} ${ampm}`;
     }
 
     function teamLogo(url, name, size) {
@@ -279,22 +290,26 @@
 
             html += `
             <div class="ha-match-card">
-                <div class="ha-match-team">
-                    ${teamLogo(home.logo_url, home.name, 32)}
-                    <span class="ha-match-team-name">${home.name || '?'}</span>
+                <div class="ha-match-meta">
+                    <span class="ha-match-date">${formatDate(g.game_date, g.game_time)}</span>
+                    ${label ? `<span class="ha-match-label${isKnockout ? ' ha-knockout' : ''}">${label}</span>` : ''}
                 </div>
-                <div class="ha-match-center">
-                    ${hasScore
-                        ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
-                        : `<div class="ha-match-vs">VS</div>`
-                    }
-                    <div class="ha-match-date">${formatDate(g.game_date, g.game_time)}</div>
-                    ${label ? `<div class="ha-match-label${isKnockout ? ' ha-knockout' : ''}">${label}</div>` : ''}
-                    ${g.excerpt ? `<div class="ha-match-excerpt">${g.excerpt}</div>` : ''}
-                </div>
-                <div class="ha-match-team ha-away">
-                    ${teamLogo(away.logo_url, away.name, 32)}
-                    <span class="ha-match-team-name">${away.name || '?'}</span>
+                <div class="ha-match-body">
+                    <div class="ha-match-team">
+                        ${teamLogo(home.logo_url, home.name, 32)}
+                        <span class="ha-match-team-name">${home.name || '?'}</span>
+                    </div>
+                    <div class="ha-match-center">
+                        ${hasScore
+                            ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
+                            : `<div class="ha-match-vs">VS</div>`
+                        }
+                        ${g.excerpt ? `<div class="ha-match-excerpt">${g.excerpt}</div>` : ''}
+                    </div>
+                    <div class="ha-match-team ha-away">
+                        ${teamLogo(away.logo_url, away.name, 32)}
+                        <span class="ha-match-team-name">${away.name || '?'}</span>
+                    </div>
                 </div>
             </div>`;
         });
