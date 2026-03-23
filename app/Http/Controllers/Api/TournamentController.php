@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\GameResource;
 use App\Http\Resources\TournamentResource;
 use App\Models\Team;
 use App\Models\Tournament;
@@ -37,6 +38,15 @@ class TournamentController extends Controller
             ])
             ->firstOrFail();
 
+        $upcomingGames = $tournament->games
+            ->filter(fn ($g) => $g->status !== 'finished')
+            ->values();
+
+        $gameResults = $tournament->games
+            ->filter(fn ($g) => $g->status === 'finished')
+            ->sortByDesc('game_date')
+            ->values();
+
         $poolRows = DB::table('tournament_pool_results')
             ->join('teams', 'teams.id', '=', 'tournament_pool_results.team_id')
             ->where('tournament_pool_results.tournament_id', $tournament->id)
@@ -68,9 +78,11 @@ class TournamentController extends Controller
 
         return response()->json([
             'data' => [
-                'tournament' => TournamentResource::make($tournament),
-                'pool_results' => $poolResults,
-                'top_scorers' => $topScorers,
+                'tournament'    => TournamentResource::make($tournament),
+                'pool_results'  => $poolResults,
+                'upcoming'      => GameResource::collection($upcomingGames),
+                'results'       => GameResource::collection($gameResults),
+                'top_scorers'   => $topScorers,
             ],
         ]);
     }

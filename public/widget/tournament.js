@@ -328,17 +328,8 @@
         return html;
     }
 
-    function buildMatches(games, upcomingLimit, resultsLimit) {
-        if (!games || games.length === 0) return '';
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const upcoming = games.filter(g => {
-            if (!g.game_date) return false;
-            const datePart = g.game_date.split('T')[0].split(' ')[0];
-            return new Date(datePart) >= today && g.status !== 'finished';
-        }).slice(0, upcomingLimit);
+    function buildMatches(upcomingGames, resultGames, upcomingLimit, resultsLimit) {
+        const upcoming = (upcomingGames || []).slice(0, upcomingLimit);
 
         if (upcoming.length === 0) return '';
 
@@ -389,7 +380,7 @@
 
         // Results
         if (resultsLimit > 0) {
-            const results = games.filter(g => g.status === 'finished').slice(-resultsLimit).reverse();
+            const results = (resultGames || []).slice(0, resultsLimit);
             if (results.length > 0) {
                 html += `<h2 class="ha-section-title">Results</h2><div class="ha-matches">`;
                 results.forEach(g => {
@@ -429,7 +420,7 @@
     }
 
     function render(container, data, opts) {
-        const { tournament, pool_results, top_scorers } = data;
+        const { tournament, pool_results, upcoming, results, top_scorers } = data;
         const t = tournament.data || tournament;
 
         let html = `<div class="ha-widget">`;
@@ -445,7 +436,7 @@
         html += buildStandings(pool_results);
 
         // Upcoming matches + results
-        html += buildMatches(t.games || [], opts.upcoming, opts.results);
+        html += buildMatches(upcoming, results, opts.upcoming, opts.results);
 
         // Top scorers
         if (opts.topScorers > 0) {
