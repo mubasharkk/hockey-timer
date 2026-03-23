@@ -234,7 +234,7 @@
             html += buildTopScorers(top_scorers, opts.topScorers);
         }
 
-        html += `<div class="ha-footer">Powered by <a href="#" target="_blank">HockeyApp</a></div>`;
+        html += `<div class="ha-footer">Powered by <a href="https://karachi-hockey.com.pk" target="_blank">Karachi Hockey PK</a></div>`;
         html += `</div>`;
 
         container.innerHTML = html;
