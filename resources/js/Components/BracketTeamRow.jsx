@@ -34,7 +34,6 @@ export default function BracketTeamRow({
     const content = (
         <div className={`flex items-center justify-between gap-2 px-3 py-2 ${bgClass}`}>
             <div className="flex items-center gap-2 flex-1 min-w-0">
-                {isWinner && <span className="text-[10px] text-green-600 flex-shrink-0">&#9654;</span>}
                 <TeamLogo src={teamLogo} alt={displayName} size="sm" />
                 <span className={`truncate text-sm ${textClass}`}>{displayName}</span>
             </div>
