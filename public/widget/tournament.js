@@ -153,7 +153,17 @@
             letter-spacing: 0.5px;
         }
         .ha-match-label.ha-knockout { background: #e63946; }
-        .ha-match-excerpt { font-size: 11px; color: #999; margin-top: 3px; font-style: italic; }
+        .ha-match-bottom { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+        .ha-match-excerpt { font-size: 11px; color: #999; font-style: italic; }
+        .ha-game-type {
+            font-size: 10px;
+            font-weight: 700;
+            color: #555;
+            background: #f0f0f0;
+            border-radius: 4px;
+            padding: 1px 6px;
+            text-transform: capitalize;
+        }
         .ha-match-vs { font-size: 13px; font-weight: 700; color: #aaa; }
 
         /* Powered by */
@@ -174,18 +184,16 @@
 
     function formatDate(dateStr, timeStr) {
         if (!dateStr) return '';
-        const d = new Date(timeStr ? `${dateStr}T${timeStr}` : dateStr);
-        if (isNaN(d)) return dateStr;
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const month = months[d.getMonth()];
-        const day = d.getDate();
-        const year = d.getFullYear();
-        if (!timeStr) return `${month} ${day} ${year}`;
-        const hours = d.getHours();
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const h12 = String(hours % 12 || 12).padStart(2, '0');
-        return `${month} ${day} ${year}, ${h12}:${minutes} ${ampm}`;
+        // Parse date parts directly to avoid UTC timezone shift
+        const [year, month, day] = dateStr.split('-').map(Number);
+        const monthName = months[month - 1];
+        if (!timeStr) return `${monthName} ${day} ${year}`;
+        const [rawH, rawM] = timeStr.split(':').map(Number);
+        const ampm = rawH >= 12 ? 'PM' : 'AM';
+        const h12 = String(rawH % 12 || 12).padStart(2, '0');
+        const mins = String(rawM).padStart(2, '0');
+        return `${monthName} ${day} ${year}, ${h12}:${mins} ${ampm}`;
     }
 
     function teamLogo(url, name, size) {
@@ -304,7 +312,11 @@
                             ? `<div class="ha-match-score${isLive ? ' ha-live' : ''}">${g.home_score} – ${g.away_score}</div>`
                             : `<div class="ha-match-vs">VS</div>`
                         }
-                        ${g.excerpt ? `<div class="ha-match-excerpt">${g.excerpt}</div>` : ''}
+                        ${(g.excerpt || g.game_type) ? `
+                        <div class="ha-match-bottom">
+                            ${g.game_type ? `<span class="ha-game-type">${g.game_type.replace('_', ' ')}</span>` : ''}
+                            ${g.excerpt ? `<span class="ha-match-excerpt">${g.excerpt}</span>` : ''}
+                        </div>` : ''}
                     </div>
                     <div class="ha-match-team ha-away">
                         ${teamLogo(away.logo_url, away.name, 32)}
