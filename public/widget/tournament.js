@@ -135,11 +135,14 @@
         const isFinished = g.status === 'finished';
         const isKnockout = g.game_type === 'knockout';
 
+        const homeShootout = g.home_shootout_score ?? 0;
+        const awayShootout = g.away_shootout_score ?? 0;
+        const hasShootout  = homeShootout > 0 || awayShootout > 0;
         const fmtScore = (score, shootout) =>
-            (shootout > 0) ? `${score}(${shootout})` : score;
+            hasShootout ? `${score}(${shootout})` : score;
 
-        const homeDisplay = fmtScore(g.home_final_score ?? g.home_score ?? '-', g.home_shootout_score ?? 0);
-        const awayDisplay = fmtScore(g.away_final_score ?? g.away_score ?? '-', g.away_shootout_score ?? 0);
+        const homeDisplay = fmtScore(g.home_final_score ?? g.home_score ?? '-', homeShootout);
+        const awayDisplay = fmtScore(g.away_final_score ?? g.away_score ?? '-', awayShootout);
         const hasScore = g.home_final_score != null || g.home_score != null;
 
         return `
