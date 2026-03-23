@@ -141,9 +141,9 @@
         const fmtScore = (score, shootout) =>
             hasShootout ? `${score}(${shootout})` : score;
 
-        const homeDisplay = fmtScore(g.home_final_score ?? g.home_score ?? '-', homeShootout);
-        const awayDisplay = fmtScore(g.away_final_score ?? g.away_score ?? '-', awayShootout);
-        const hasScore = g.home_final_score != null || g.home_score != null;
+        const homeDisplay = fmtScore(g.home_score ?? '-', homeShootout);
+        const awayDisplay = fmtScore(g.away_score ?? '-', awayShootout);
+        const hasScore = g.home_score != null;
 
         return `
         <div class="ha-match-card">
