@@ -248,7 +248,7 @@
         const opts = {
             upcoming:   parseInt(el.getAttribute('data-upcoming')   ?? '10', 10),
             results:    parseInt(el.getAttribute('data-results')     ?? '0',  10),
-            topScorers: parseInt(el.getAttribute('data-top-scorers') ?? '10', 10),
+            topScorers: parseInt(el.getAttribute('data-top-scorers') ?? '0', 10),
         };
 
         el.innerHTML = `<div class="ha-loading">Loading tournament data...</div>`;
