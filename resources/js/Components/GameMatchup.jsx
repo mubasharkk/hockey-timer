@@ -81,7 +81,8 @@ const TickerIcon = () => (
 );
 
 const ResultBadge = ({ homeScore, awayScore, homeShootout = 0, awayShootout = 0 }) => {
-    const formatScore = (score, shootout) => shootout > 0 ? `${score}(${shootout})` : score;
+    const hasShootout = homeShootout > 0 || awayShootout > 0;
+    const formatScore = (score, shootout) => hasShootout ? `${score}(${shootout})` : score;
     return (
         <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-green-700 ring-1 ring-green-100">
             <span>Final Score</span>
