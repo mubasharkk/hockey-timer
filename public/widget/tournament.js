@@ -316,6 +316,7 @@
                         ${(g.excerpt || g.game_type) ? `
                         <div class="ha-match-bottom">
                             ${g.game_type ? `<span class="ha-game-type${isKnockout ? ' ha-knockout' : ''}">${g.game_type.replace('_', ' ')}</span>` : ''}
+                            ${g.tournament_pool_name ? `<span class="ha-game-type">${g.tournament_pool_name}</span>` : ''}
                             ${g.excerpt ? `<span class="ha-match-excerpt">${g.excerpt}</span>` : ''}
                         </div>` : ''}
                     </div>
