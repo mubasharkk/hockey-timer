@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TournamentResource;
+use App\Models\Team;
 use App\Models\Tournament;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -36,15 +37,24 @@ class TournamentController extends Controller
             ])
             ->firstOrFail();
 
-        $poolResults = DB::table('tournament_pool_results')
+        $poolRows = DB::table('tournament_pool_results')
             ->join('teams', 'teams.id', '=', 'tournament_pool_results.team_id')
             ->where('tournament_pool_results.tournament_id', $tournament->id)
             ->orderBy('pool_id')
             ->orderByDesc('total_points')
             ->orderBy('team_name')
             ->select('tournament_pool_results.*', 'teams.uid as team_uid')
+            ->get();
+
+        // Attach logo URLs via Spatie MediaLibrary
+        $teamIds = $poolRows->pluck('team_id')->unique()->all();
+        $teamLogos = Team::whereIn('id', $teamIds)
+            ->with('media')
             ->get()
-            ->map(fn ($row) => (array) $row)
+            ->mapWithKeys(fn ($team) => [$team->id => $team->getFirstMediaUrl('logo') ?: null]);
+
+        $poolResults = $poolRows
+            ->map(fn ($row) => array_merge((array) $row, ['logo_url' => $teamLogos[$row->team_id] ?? null]))
             ->all();
 
         $topScorers = DB::table('tournament_top_scorers')
