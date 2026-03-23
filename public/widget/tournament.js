@@ -17,6 +17,9 @@
         .ha-header { margin-bottom: 24px; }
         .ha-header h1 { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
         .ha-header p { font-size: 13px; color: #555; line-height: 1.5; }
+        .ha-header-meta { display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+        .ha-header-date { font-size: 12px; color: #666; font-weight: 600; }
+        .ha-header-sep { color: #ccc; font-size: 12px; }
 
         /* Section title */
         .ha-section-title {
@@ -35,13 +38,13 @@
 
         /* Standings table */
         .ha-table { width: 100%; border-collapse: collapse; }
+        .ha-table thead tr { background: #1a1a1a; }
         .ha-table th {
             font-size: 11px;
             font-weight: 700;
-            color: #888;
+            color: #fff;
             text-align: center;
-            padding: 4px 6px;
-            border-bottom: 1px solid #e5e5e5;
+            padding: 6px 6px;
         }
         .ha-table th.ha-col-team { text-align: left; }
         .ha-table td {
@@ -420,10 +423,17 @@
 
         let html = `<div class="ha-widget">`;
 
+        const startDate = t.start_date ? formatDate(t.start_date, null) : null;
+        const endDate   = t.end_date   ? formatDate(t.end_date,   null) : null;
+        const dateRange = startDate && endDate && startDate !== endDate
+            ? `${startDate} – ${endDate}`
+            : (startDate || endDate || null);
+
         html += `
             <div class="ha-header">
                 <h1>${t.title}</h1>
                 ${t.venue ? `<p>${t.venue}</p>` : ''}
+                ${dateRange ? `<div class="ha-header-meta"><span class="ha-header-date">${dateRange}</span></div>` : ''}
             </div>`;
 
         html += buildStandings(pool_results);
