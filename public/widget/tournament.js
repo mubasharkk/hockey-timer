@@ -1,6 +1,9 @@
 (function () {
     'use strict';
 
+    // Capture script base URL immediately while currentScript is still available
+    const _scriptSrc = document.currentScript?.src || '';
+    const _scriptBase = _scriptSrc.substring(0, _scriptSrc.lastIndexOf('/') + 1);
 
     const POOL_COLORS = ['#e63946','#f4a261','#2a9d8f','#457b9d','#8338ec','#fb5607'];
 
@@ -275,12 +278,10 @@
 
     function injectStyles() {
         if (document.getElementById('ha-widget-styles')) return;
-        const src = document.currentScript?.src || '';
-        const base = src.substring(0, src.lastIndexOf('/') + 1);
         const link = document.createElement('link');
         link.id = 'ha-widget-styles';
         link.rel = 'stylesheet';
-        link.href = base + 'tournament.css';
+        link.href = _scriptBase + 'tournament.css';
         document.head.appendChild(link);
     }
 
