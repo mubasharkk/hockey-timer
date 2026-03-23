@@ -143,7 +143,7 @@
 
         const homeDisplay = fmtScore(g.home_score ?? '-', homeShootout);
         const awayDisplay = fmtScore(g.away_score ?? '-', awayShootout);
-        const hasScore = g.home_score != null;
+        const hasScore = g.home_score != null && (isFinished || isLive);
 
         return `
         <div class="ha-match-card">
