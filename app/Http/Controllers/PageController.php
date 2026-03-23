@@ -12,6 +12,7 @@ class PageController extends Controller
         'privacy',
         'terms',
         'imprint',
+        'widget',
     ];
 
     public function show(string $slug): Response
