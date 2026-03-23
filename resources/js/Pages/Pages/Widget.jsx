@@ -2,10 +2,10 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import PublicLayout from '@/Layouts/PublicLayout.jsx';
 
-function CodeBlock({ children }) {
+function CodeBlock({ children, text }) {
     return (
         <pre className="overflow-x-auto rounded-lg bg-gray-900 p-4 text-sm text-green-300">
-            <code>{children}</code>
+            <code>{text ?? children}</code>
         </pre>
     );
 }
@@ -54,16 +54,15 @@ export default function Widget() {
 
                             <Section title="Quick start">
                                 <p className="mb-3 text-gray-600">Add the container element and script tag to any HTML page:</p>
-                                <CodeBlock>{`<!-- 1. Place the widget container where you want it to appear -->
+                                <CodeBlock text={`<!-- 1. Place the widget container where you want it to appear -->
 <div
     data-ha-tournament
     data-slug="your-tournament-slug"
-    data-api="{appUrl}">
+    data-api="${appUrl}">
 </div>
 
 <!-- 2. Include the widget script (CSS is loaded automatically) -->
-<script src="{appUrl}/widget/tournament.js"></script>`}
-                                </CodeBlock>
+<script src="${appUrl}/widget/tournament.js"></script>`} />
                             </Section>
 
                             <Section title="Configuration attributes">
@@ -82,7 +81,7 @@ export default function Widget() {
                                         </thead>
                                         <tbody>
                                             <AttrRow name="data-slug"         type="string" defaultVal="required" description="Tournament slug from the URL (e.g. my-tournament-2026)" />
-                                            <AttrRow name="data-api"          type="string" defaultVal="required" description="Base URL of your HockeyApp instance (e.g. {appUrl})" />
+                                            <AttrRow name="data-api"          type="string" defaultVal="required" description={`Base URL of your HockeyApp instance (e.g. ${appUrl})`} />
                                             <AttrRow name="data-upcoming"     type="number" defaultVal="10"       description="Max number of upcoming matches to display" />
                                             <AttrRow name="data-results"      type="number" defaultVal="0"        description="Max number of recent results to display (0 = hidden)" />
                                             <AttrRow name="data-top-scorers"  type="number" defaultVal="10"       description="Max number of top scorers to display (0 = hidden)" />
@@ -92,17 +91,16 @@ export default function Widget() {
                             </Section>
 
                             <Section title="Full example">
-                                <CodeBlock>{`<div
+                                <CodeBlock text={`<div
     data-ha-tournament
     data-slug="ramadan-cup-2026"
-    data-api="{appUrl}"
+    data-api="${appUrl}"
     data-upcoming="5"
     data-results="5"
     data-top-scorers="10">
 </div>
 
-<script src="{appUrl}/widget/tournament.js"></script>`}
-                                </CodeBlock>
+<script src="${appUrl}/widget/tournament.js"></script>`} />
                             </Section>
 
                             <Section title="What the widget displays">
