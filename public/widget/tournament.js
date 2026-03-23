@@ -164,6 +164,7 @@
             padding: 1px 6px;
             text-transform: capitalize;
         }
+        .ha-game-type.ha-knockout { background: #e63946; color: #fff; }
         .ha-match-vs { font-size: 13px; font-weight: 700; color: #aaa; }
 
         /* Powered by */
@@ -185,8 +186,9 @@
     function formatDate(dateStr, timeStr) {
         if (!dateStr) return '';
         const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        // Parse date parts directly to avoid UTC timezone shift
-        const [year, month, day] = dateStr.split('-').map(Number);
+        // Strip time component if present (e.g. "2026-03-23 00:00:00" or "2026-03-23T00:00:00Z")
+        const datePart = dateStr.split('T')[0].split(' ')[0];
+        const [year, month, day] = datePart.split('-').map(Number);
         const monthName = months[month - 1];
         if (!timeStr) return `${monthName} ${day} ${year}`;
         const [rawH, rawM] = timeStr.split(':').map(Number);
@@ -300,7 +302,6 @@
             <div class="ha-match-card">
                 <div class="ha-match-meta">
                     <span class="ha-match-date">${formatDate(g.game_date, g.game_time)}</span>
-                    ${label ? `<span class="ha-match-label${isKnockout ? ' ha-knockout' : ''}">${label}</span>` : ''}
                 </div>
                 <div class="ha-match-body">
                     <div class="ha-match-team">
@@ -314,7 +315,7 @@
                         }
                         ${(g.excerpt || g.game_type) ? `
                         <div class="ha-match-bottom">
-                            ${g.game_type ? `<span class="ha-game-type">${g.game_type.replace('_', ' ')}</span>` : ''}
+                            ${g.game_type ? `<span class="ha-game-type${isKnockout ? ' ha-knockout' : ''}">${g.game_type.replace('_', ' ')}</span>` : ''}
                             ${g.excerpt ? `<span class="ha-match-excerpt">${g.excerpt}</span>` : ''}
                         </div>` : ''}
                     </div>
