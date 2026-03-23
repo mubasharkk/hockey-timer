@@ -215,7 +215,7 @@
         html += buildStandings(pool_results);
         html += buildMatchTabs(upcoming, results, opts.upcoming, opts.results, widgetId);
 
-        if (opts.topScorers > 0) {
+        if (opts.topScorers > 0 && top_scorers?.length > 0) {
             html += buildTopScorers(top_scorers, opts.topScorers);
         }
 
@@ -248,7 +248,7 @@
         const opts = {
             upcoming:   parseInt(el.getAttribute('data-upcoming')   ?? '10', 10),
             results:    parseInt(el.getAttribute('data-results')     ?? '0',  10),
-            topScorers: parseInt(el.getAttribute('data-top-scorers') ?? '0',  10),
+            topScorers: parseInt(el.getAttribute('data-top-scorers') ?? '10', 10),
         };
 
         el.innerHTML = `<div class="ha-loading">Loading tournament data...</div>`;
