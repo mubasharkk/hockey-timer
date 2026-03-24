@@ -80,11 +80,13 @@ export default function Widget() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <AttrRow name="data-slug"         type="string" defaultVal="required" description="Tournament slug from the URL (e.g. my-tournament-2026)" />
-                                            <AttrRow name="data-api"          type="string" defaultVal="required" description={`Base URL of your HockeyApp instance (e.g. ${appUrl})`} />
-                                            <AttrRow name="data-upcoming"     type="number" defaultVal="10"       description="Max number of upcoming matches to display" />
-                                            <AttrRow name="data-results"      type="number" defaultVal="0"        description="Max number of recent results to display (0 = hidden)" />
-                                            <AttrRow name="data-top-scorers"  type="number" defaultVal="10"       description="Max number of top scorers to display (0 = hidden)" />
+                                            <AttrRow name="data-slug"          type="string"  defaultVal="required" description="Tournament slug from the URL (e.g. my-tournament-2026)" />
+                                            <AttrRow name="data-api"           type="string"  defaultVal="required" description={`Base URL of your HockeyApp instance (e.g. ${appUrl})`} />
+                                            <AttrRow name="data-upcoming"      type="number"  defaultVal="10"       description="Max number of upcoming matches to display" />
+                                            <AttrRow name="data-results"       type="number"  defaultVal="0"        description="Max number of recent results to display (0 = hidden)" />
+                                            <AttrRow name="data-top-scorers"   type="number"  defaultVal="0"        description="Max number of top scorers to display (0 = hidden)" />
+                                            <AttrRow name="data-hide-header"   type="boolean" defaultVal="false"    description="Hide the tournament title, venue and date range" />
+                                            <AttrRow name="data-hide-branding" type="boolean" defaultVal="false"    description='Hide the "Powered by" footer' />
                                         </tbody>
                                     </table>
                                 </div>
@@ -97,7 +99,9 @@ export default function Widget() {
     data-api="${appUrl}"
     data-upcoming="5"
     data-results="5"
-    data-top-scorers="10">
+    data-top-scorers="10"
+    data-hide-header
+    data-hide-branding>
 </div>
 
 <script src="${appUrl}/widget/tournament.js"></script>`} />
@@ -121,7 +125,7 @@ export default function Widget() {
                                 <CodeBlock>{`/* Example: change the active tab underline colour */
 .ha-tab.ha-active { border-bottom-color: #e63946; color: #e63946; }
 
-/* Example: widen the widget */
+/* Example: constrain the widget width */
 .ha-widget { max-width: 960px; }`}
                                 </CodeBlock>
                             </Section>
