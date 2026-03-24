@@ -220,12 +220,14 @@
             ? `${startDate} – ${endDate}`
             : (startDate || endDate || null);
 
-        html += `
+        if (!opts.hideHeader) {
+            html += `
             <div class="ha-header">
                 <h1>${t.title}</h1>
                 ${t.venue ? `<p>${t.venue}</p>` : ''}
                 ${dateRange ? `<div class="ha-header-meta"><span class="ha-header-date">${dateRange}</span></div>` : ''}
             </div>`;
+        }
 
         html += buildStandings(pool_results);
         html += buildMatchTabs(upcoming, results, opts.upcoming, opts.results, widgetId);
@@ -234,7 +236,9 @@
             html += buildTopScorers(top_scorers, opts.topScorers);
         }
 
-        html += `<div class="ha-footer">Powered by <a href="https://karachi-hockey.com.pk" target="_blank">Karachi Hockey PK</a></div>`;
+        if (!opts.hideBranding) {
+            html += `<div class="ha-footer">Powered by <a href="https://karachi-hockey.com.pk" target="_blank">Karachi Hockey PK</a></div>`;
+        }
         html += `</div>`;
 
         container.innerHTML = html;
@@ -261,9 +265,11 @@
         }
 
         const opts = {
-            upcoming:   parseInt(el.getAttribute('data-upcoming')   ?? '10', 10),
-            results:    parseInt(el.getAttribute('data-results')     ?? '0',  10),
-            topScorers: parseInt(el.getAttribute('data-top-scorers') ?? '0', 10),
+            upcoming:      parseInt(el.getAttribute('data-upcoming')   ?? '10', 10),
+            results:       parseInt(el.getAttribute('data-results')     ?? '0',  10),
+            topScorers:    parseInt(el.getAttribute('data-top-scorers') ?? '0', 10),
+            hideBranding:  el.hasAttribute('data-hide-branding'),
+            hideHeader:    el.hasAttribute('data-hide-header'),
         };
 
         el.innerHTML = `<div class="ha-loading">Loading tournament data...</div>`;
