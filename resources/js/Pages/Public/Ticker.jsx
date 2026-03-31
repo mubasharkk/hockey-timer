@@ -10,6 +10,22 @@ export default function Ticker({ game, gameId }) {
     const form = useForm({ game: gameId || '' });
     const [liveData, setLiveData] = useState(game || null);
     const [loading, setLoading] = useState(false);
+    const [hasSnapshot, setHasSnapshot] = useState(game?.has_report_snapshot ?? false);
+    const [generatingSnapshot, setGeneratingSnapshot] = useState(false);
+
+    const handleGenerateSnapshot = async () => {
+        const id = liveData?.game_id || liveData?.id || gameId;
+        if (!id) return;
+        setGeneratingSnapshot(true);
+        try {
+            await axios.post(`/api/sync/game/${id}/snapshot`);
+            setHasSnapshot(true);
+        } catch (e) {
+            console.error('Failed to generate snapshot', e);
+        } finally {
+            setGeneratingSnapshot(false);
+        }
+    };
     // Trust server timer_seconds as the single source of truth
     const isFinished = useMemo(
         () => liveData?.status === 'finished',
@@ -55,7 +71,10 @@ export default function Ticker({ game, gameId }) {
             setLoading(true);
             try {
                 const res = await axios.get(`/api/public/ticker/${id}`);
-                if (isMounted) setLiveData((prev) => ({ ...(prev || {}), ...res.data }));
+                if (isMounted) {
+                    setLiveData((prev) => ({ ...(prev || {}), ...res.data }));
+                    if (res.data.has_report_snapshot) setHasSnapshot(true);
+                }
             } catch (e)
             {
                 // ignore errors; keep last good data
@@ -175,6 +194,29 @@ export default function Ticker({ game, gameId }) {
                             </div>
                             <TickerGameMeta game={liveData} excerpt={excerpt} />
                             {venue && <div className="text-center text-sm text-gray-500">{venue}</div>}
+                            {isFinished && (
+                                <div className="mt-4 flex flex-col items-center gap-2 border-t border-gray-100 pt-4">
+                                    {hasSnapshot ? (
+                                        <a
+                                            href={`/games/${liveData?.game_id || liveData?.id}/official-report`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                        >
+                                            View Official Report
+                                        </a>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={handleGenerateSnapshot}
+                                            disabled={generatingSnapshot}
+                                            className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 disabled:bg-green-400"
+                                        >
+                                            {generatingSnapshot ? 'Generating…' : 'Generate Official Report'}
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Recent Events */}

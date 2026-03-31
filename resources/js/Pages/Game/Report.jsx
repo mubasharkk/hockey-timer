@@ -3,9 +3,27 @@ import { Head, Link, router } from '@inertiajs/react';
 import EventTimeline from '@/Components/EventTimeline';
 import moment from 'moment';
 import GameTeamSquad from '@/Components/GameTeamSquad';
+import axios from 'axios';
+import { useState } from 'react';
 
 export default function Report({ auth, game }) {
     const currentGame = game?.data ?? game;
+    const [hasSnapshot, setHasSnapshot] = useState(currentGame?.has_report_snapshot ?? false);
+    const [snapshotGeneratedAt, setSnapshotGeneratedAt] = useState(currentGame?.report_snapshot_generated_at ?? null);
+    const [generating, setGenerating] = useState(false);
+
+    const handleGenerateSnapshot = async () => {
+        setGenerating(true);
+        try {
+            const res = await axios.post(`/api/sync/game/${currentGame.id}/snapshot`);
+            setHasSnapshot(true);
+            setSnapshotGeneratedAt(res.data.generated_at);
+        } catch (e) {
+            console.error('Failed to generate snapshot', e);
+        } finally {
+            setGenerating(false);
+        }
+    };
     if (!currentGame) {
         return (
             <AuthenticatedLayout user={auth.user}>
@@ -84,13 +102,40 @@ export default function Report({ auth, game }) {
                                     Back to Timer
                                 </Link>
                             )}
-                            <Link
-                                href={route('games.official_report', currentGame.id)}
-                                className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
-                                target="_blank"
-                                rel="noopener noreferrer">
-                                Official Report
-                            </Link>
+                            {hasSnapshot ? (
+                                <div className="flex flex-col items-end gap-1">
+                                    <Link
+                                        href={route('games.official_report', currentGame.id)}
+                                        className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Official Report
+                                    </Link>
+                                    {snapshotGeneratedAt && (
+                                        <span className="text-xs text-gray-400">
+                                            Snapshot: {moment(snapshotGeneratedAt).format('DD MMM YYYY HH:mm')}
+                                        </span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateSnapshot}
+                                        disabled={generating}
+                                        className="text-xs text-gray-500 underline hover:text-gray-700 disabled:opacity-50"
+                                    >
+                                        {generating ? 'Regenerating…' : 'Regenerate snapshot'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleGenerateSnapshot}
+                                    disabled={generating}
+                                    className="inline-flex items-center rounded-md bg-green-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:bg-green-600 disabled:bg-green-400"
+                                >
+                                    {generating ? 'Generating…' : 'Generate Official Report'}
+                                </button>
+                            )}
                         </div>
                     </div>
 

@@ -45,6 +45,7 @@ class Game extends Model
         'started_at',
         'ended_at',
         'comments',
+        'report_snapshot',
     ];
 
     protected $casts = [
@@ -52,8 +53,9 @@ class Game extends Model
         'sport_type' => 'string',
         'continue_timer_on_goal' => 'boolean',
         'game_officials' => 'string',
-        'started_at' => 'datetime',
-        'ended_at' => 'datetime',
+        'started_at'       => 'datetime',
+        'ended_at'         => 'datetime',
+        'report_snapshot'  => 'array',
     ];
 
     public function user(): BelongsTo

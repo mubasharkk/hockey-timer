@@ -41,6 +41,8 @@ class GameResource extends JsonResource
             'excerpt' => $this->excerpt,
             'notes' => $this->notes,
             'comments' => $this->comments,
+            'has_report_snapshot' => (bool) $this->report_snapshot,
+            'report_snapshot_generated_at' => $this->report_snapshot ? ($this->report_snapshot['generated_at'] ?? null) : null,
             'code' => $this->code,
             'game_date' => $this->game_date,
             'game_time' => $this->game_time,
