@@ -97,10 +97,35 @@ const GameList = ({ games, now, emptyMessage }) => {
         return <p className="text-sm text-gray-600">{emptyMessage}</p>;
     }
 
+    const grouped = useMemo(() => {
+        const map = {};
+        [...games]
+            .sort((a, b) => {
+                const da = `${a.game_date || ''} ${a.game_time || ''}`.trim();
+                const db = `${b.game_date || ''} ${b.game_time || ''}`.trim();
+                return da.localeCompare(db);
+            })
+            .forEach((game) => {
+                const key = game.game_date || 'TBD';
+                if (!map[key]) map[key] = [];
+                map[key].push(game);
+            });
+        return Object.entries(map).sort(([a], [b]) => a.localeCompare(b));
+    }, [games]);
+
     return (
-        <div className="space-y-3">
-            {games.map((game) => (
-                <GameRow key={game.id} game={game} now={now} />
+        <div className="space-y-6">
+            {grouped.map(([date, dateGames]) => (
+                <div key={date}>
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                        {date !== 'TBD' ? moment(date, 'YYYY-MM-DD').format('dddd, DD MMM YYYY') : 'Date TBD'}
+                    </div>
+                    <div className="space-y-3">
+                        {dateGames.map((game) => (
+                            <GameRow key={game.id} game={game} now={now} />
+                        ))}
+                    </div>
+                </div>
             ))}
         </div>
     );
