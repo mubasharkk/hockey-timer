@@ -44,6 +44,7 @@ class Game extends Model
         'status',
         'started_at',
         'ended_at',
+        'comments',
     ];
 
     protected $casts = [

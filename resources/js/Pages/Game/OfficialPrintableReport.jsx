@@ -383,6 +383,15 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 </tbody>
                             </table>
                         </section>
+
+                        {currentGame?.comments && (
+                            <section>
+                                <p className="text-sm font-semibold text-gray-900 py-2">Comments</p>
+                                <div className="rounded border border-gray-200 bg-gray-50 p-3 text-xs text-gray-800 whitespace-pre-wrap">
+                                    {currentGame.comments}
+                                </div>
+                            </section>
+                        )}
                     </div>
                 </div>
             </div>

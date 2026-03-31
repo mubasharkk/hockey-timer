@@ -181,6 +181,21 @@ export default function Timer({ auth, game, config = {} }) {
     const [confirmModal, setConfirmModal] = useState(null); // { type: 'session' | 'game' }
     const [goalModal, setGoalModal] = useState(null); // { team, goalType, playerId }
     const [cardModal, setCardModal] = useState(null); // { team, cardType, playerId, minutes }
+    const [commentsModal, setCommentsModal] = useState(false);
+    const [commentsDraft, setCommentsDraft] = useState(currentGame.comments || '');
+    const [commentsSaving, setCommentsSaving] = useState(false);
+
+    const handleSaveComments = async () => {
+        setCommentsSaving(true);
+        try {
+            await axios.patch(`/api/sync/game/${currentGame.id}/comments`, { comments: commentsDraft });
+        } catch (e) {
+            console.error('Failed to save comments', e);
+        } finally {
+            setCommentsSaving(false);
+            setCommentsModal(false);
+        }
+    };
 
     const syncSessionState = async (overrides = {}) => {
         const targetNumber = Math.max(1, overrides.number ?? sessionIndex + 1);
@@ -634,7 +649,7 @@ export default function Timer({ auth, game, config = {} }) {
                             {currentGame.game_officials && <p className="text-sm text-gray-600">Officials: {currentGame.game_officials}</p>}
                             {relativeStart && <p className="text-xs text-gray-500">{relativeStart}</p>}
                         </div>
-                        <div className="flex flex-col items-start gap-1 sm:items-end sm:gap-0">
+                        <div className="flex flex-col items-start gap-2 sm:items-end">
                             <Link
                                 href={route('games.report', currentGame.id)}
                                 className="text-sm font-medium text-green-700 hover:text-green-600 sm:block"
@@ -642,6 +657,13 @@ export default function Timer({ auth, game, config = {} }) {
                             >
                                 View Report →
                             </Link>
+                            <button
+                                type="button"
+                                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50"
+                                onClick={() => setCommentsModal(true)}
+                            >
+                                Comments
+                            </button>
                         </div>
                     </header>
 
@@ -875,6 +897,25 @@ export default function Timer({ auth, game, config = {} }) {
                     <div className="mt-6 flex justify-end gap-3">
                         <SecondaryButton onClick={() => setCardModal(null)}>Cancel</SecondaryButton>
                         <DangerButton onClick={() => handleAddCard(cardModal)}>Save</DangerButton>
+                    </div>
+                </div>
+            </Modal>
+            <Modal show={commentsModal} onClose={() => setCommentsModal(false)} maxWidth="md">
+                <div className="p-6 space-y-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Game Comments</h2>
+                    <p className="text-sm text-gray-600">These comments will appear on the official game report.</p>
+                    <textarea
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
+                        rows={6}
+                        value={commentsDraft}
+                        onChange={(e) => setCommentsDraft(e.target.value)}
+                        placeholder="Enter official comments, observations or notes about this game..."
+                    />
+                    <div className="flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setCommentsModal(false)}>Cancel</SecondaryButton>
+                        <DangerButton onClick={handleSaveComments} disabled={commentsSaving}>
+                            {commentsSaving ? 'Saving...' : 'Save Comments'}
+                        </DangerButton>
                     </div>
                 </div>
             </Modal>

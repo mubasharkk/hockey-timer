@@ -40,6 +40,7 @@ class GameResource extends JsonResource
             'venue' => $this->venue,
             'excerpt' => $this->excerpt,
             'notes' => $this->notes,
+            'comments' => $this->comments,
             'code' => $this->code,
             'game_date' => $this->game_date,
             'game_time' => $this->game_time,
