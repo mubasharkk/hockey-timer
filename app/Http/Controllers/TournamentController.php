@@ -94,11 +94,13 @@ class TournamentController extends Controller
             ->all();
 
         return Inertia::render('Tournaments/Show', [
-            'tournament' => TournamentResource::make($tournament),
+            'tournament'    => TournamentResource::make($tournament),
             'upcomingGames' => GameResource::collection($upcomingGames),
-            'resultGames' => GameResource::collection($resultGames),
-            'poolResults' => $poolResults,
-            'topScorers' => $topScorers,
+            'resultGames'   => GameResource::collection($resultGames),
+            'poolResults'   => $poolResults,
+            'topScorers'    => $topScorers,
+            'sportTypes'    => config('game.sports'),
+            'gameTypes'     => config('game.types'),
         ]);
     }
 

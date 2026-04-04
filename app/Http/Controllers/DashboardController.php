@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Game;
+use App\Models\Tournament;
 use Inertia\Inertia;
 use Inertia\Response;
 use Carbon\Carbon;
@@ -26,6 +27,7 @@ class DashboardController extends Controller
             'venue',
             'excerpt',
             'sport_type',
+            'game_type',
             'code',
             'game_date',
             'game_time',
@@ -72,10 +74,17 @@ class DashboardController extends Controller
                 ->limit(20)
                 ->get();
 
+        $tournaments = Cache::remember('dashboard.tournaments', self::CACHE_TTL, fn () =>
+            Tournament::orderBy('title')->get(['id', 'title'])
+        );
+
         return Inertia::render('Dashboard', [
-            'upcoming' => GameResource::collection($upcoming),
-            'results' => GameResource::collection($results),
-            'now' => $now->toIso8601String(),
+            'upcoming'    => GameResource::collection($upcoming),
+            'results'     => GameResource::collection($results),
+            'now'         => $now->toIso8601String(),
+            'tournaments' => $tournaments,
+            'sportTypes'  => config('game.sports'),
+            'gameTypes'   => config('game.types'),
         ]);
     }
 }

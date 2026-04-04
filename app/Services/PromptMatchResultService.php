@@ -48,7 +48,7 @@ class PromptMatchResultService
     /**
      * Step 2 — Persist confirmed events, mark game finished and generate report snapshot.
      */
-    public function apply(Game $game, array $events): array
+    public function apply(Game $game, array $events, ?string $prompt = null): array
     {
         $now  = now();
         $rows = array_map(fn ($e) => array_merge($e, [
@@ -60,10 +60,19 @@ class PromptMatchResultService
 
         Event::insert($rows);
 
-        $game->update([
+        $updatedFields = [
             'status'   => 'finished',
             'ended_at' => $now,
-        ]);
+        ];
+
+        if ($prompt && trim($prompt) !== '') {
+            $existing = trim($game->comments ?? '');
+            $updatedFields['comments'] = $existing !== ''
+                ? $existing . "\n\n" . trim($prompt)
+                : trim($prompt);
+        }
+
+        $game->update($updatedFields);
 
         $snapshot = $this->snapshotService->build($game->fresh());
         $game->update(['report_snapshot' => $snapshot]);

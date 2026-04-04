@@ -219,6 +219,7 @@ export default function Timer({ auth, game, config = {} }) {
         try {
             const response = await axios.post(route('games.prompt_result', currentGame.id), {
                 events: promptParsed.events,
+                prompt: promptText,
             });
             setPromptResult(response.data);
             setPromptState('success');

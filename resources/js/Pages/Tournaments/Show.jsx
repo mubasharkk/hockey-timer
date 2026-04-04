@@ -12,7 +12,7 @@ import {
     faTrophy,
     faUsers
 } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -21,8 +21,20 @@ import GameMatchup from '@/Components/GameMatchup';
 import KnockoutBracket from '@/Components/KnockoutBracket';
 import PoolResults from '@/Components/PoolResults';
 import TopScorers from '@/Components/TopScorers';
+import GameFilters from '@/Components/GameFilters';
 
-export default function Show({ auth, tournament, upcomingGames = [], resultGames = [], poolResults = [], topScorers = [] }) {
+const EMPTY_FILTERS = { sport_type: '', game_type: '' };
+
+function loadFilters(tournamentId) {
+    try {
+        const saved = localStorage.getItem(`tournament_filters_${tournamentId}`);
+        return saved ? { ...EMPTY_FILTERS, ...JSON.parse(saved) } : EMPTY_FILTERS;
+    } catch {
+        return EMPTY_FILTERS;
+    }
+}
+
+export default function Show({ auth, tournament, upcomingGames = [], resultGames = [], poolResults = [], topScorers = [], sportTypes = {}, gameTypes = {} }) {
     const currentTournament = tournament?.data ?? tournament;
     const upcoming = upcomingGames?.data ?? upcomingGames ?? [];
     const results = resultGames?.data ?? resultGames ?? [];
@@ -31,6 +43,30 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
     const [poolsOpen, setPoolsOpen] = useState(false);
     const [poolTeamsOpen, setPoolTeamsOpen] = useState(false);
     const { delete: destroy, processing } = useForm();
+
+    const [filters, setFilters] = useState(() => loadFilters(currentTournament.id));
+
+    const updateFilter = (key, value) => {
+        setFilters((prev) => {
+            const next = { ...prev, [key]: value };
+            localStorage.setItem(`tournament_filters_${currentTournament.id}`, JSON.stringify(next));
+            return next;
+        });
+    };
+
+    const clearFilters = () => {
+        localStorage.removeItem(`tournament_filters_${currentTournament.id}`);
+        setFilters(EMPTY_FILTERS);
+    };
+
+    const applyFilters = (games) => games.filter((g) => {
+        if (filters.sport_type && g.sport_type !== filters.sport_type) return false;
+        if (filters.game_type  && g.game_type  !== filters.game_type)  return false;
+        return true;
+    });
+
+    const filteredUpcoming = useMemo(() => applyFilters(upcoming), [upcoming, filters]);
+    const filteredResults  = useMemo(() => applyFilters(results),  [results,  filters]);
 
     const handleDelete = () => {
         destroy(route('tournaments.destroy', currentTournament.id), {
@@ -209,31 +245,41 @@ export default function Show({ auth, tournament, upcomingGames = [], resultGames
                     )}
 
                     <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-                        <div className="mb-4 flex items-center justify-between">
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-3">
                                 <FontAwesomeIcon icon={faCalendarAlt} className="h-4 w-4 text-green-700" />
                                 <h3 className="text-sm font-semibold text-gray-900">Games</h3>
                             </div>
-                            <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
-                                <button
-                                    className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
-                                    onClick={() => setTab('upcoming')}
-                                >
-                                    Upcoming
-                                </button>
-                                <button
-                                    className={`px-4 py-1.5 ${tab === 'results' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
-                                    onClick={() => setTab('results')}
-                                >
-                                    Results
-                                </button>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <div className="flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
+                                    <button
+                                        className={`px-4 py-1.5 ${tab === 'upcoming' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
+                                        onClick={() => setTab('upcoming')}
+                                    >
+                                        Upcoming ({filteredUpcoming.length})
+                                    </button>
+                                    <button
+                                        className={`px-4 py-1.5 ${tab === 'results' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-700'}`}
+                                        onClick={() => setTab('results')}
+                                    >
+                                        Results ({filteredResults.length})
+                                    </button>
+                                </div>
+                                <GameFilters
+                                    filters={filters}
+                                    onFilterChange={updateFilter}
+                                    onClear={clearFilters}
+                                    sportTypes={sportTypes}
+                                    gameTypes={gameTypes}
+                                    showTournament={false}
+                                />
                             </div>
                         </div>
 
                         {tab === 'upcoming' ? (
-                            <GameList games={upcoming} emptyMessage="No upcoming games." />
+                            <GameList games={filteredUpcoming} emptyMessage="No upcoming games." />
                         ) : (
-                            <GameList games={results} emptyMessage="No finished games yet." />
+                            <GameList games={filteredResults} emptyMessage="No finished games yet." />
                         )}
                     </div>
 

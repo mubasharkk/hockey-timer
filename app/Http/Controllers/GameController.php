@@ -200,10 +200,13 @@ class GameController extends Controller
 
     public function applyPromptResult(Request $request, Game $game): JsonResponse
     {
-        $request->validate(['events' => 'required|array|min:1']);
+        $request->validate([
+            'events' => 'required|array|min:1',
+            'prompt' => 'nullable|string|max:3000',
+        ]);
 
         return response()->json(
-            $this->promptMatchResultService->apply($game, $request->input('events'))
+            $this->promptMatchResultService->apply($game, $request->input('events'), $request->input('prompt'))
         );
     }
 

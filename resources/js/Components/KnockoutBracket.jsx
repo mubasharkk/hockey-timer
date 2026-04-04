@@ -52,14 +52,6 @@ function BracketMatchup({ matchup, roundKey }) {
                 isLoser={hasWinner && matchup.winner_team_id !== matchup.home_team_id}
             />
             <div className="border-t border-gray-100" />
-            {matchup.game_id && matchup.game_started_at && (
-                <div className="border-t border-gray-100 bg-gray-50 px-2 py-1 text-center text-[10px] text-gray-600">
-                    <div>{new Date(matchup.game_started_at).toLocaleDateString()}</div>
-                    <div>{new Date(matchup.game_started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    {matchup.game_excerpt && <div className="mt-1 italic text-gray-500">{matchup.game_excerpt}</div>}
-                </div>
-            )}
-            <div className="border-t border-gray-100" />
             <BracketTeamRow
                 teamId={matchup.away_team_id}
                 teamName={matchup.away_team_name}
@@ -75,11 +67,21 @@ function BracketMatchup({ matchup, roundKey }) {
             />
             {matchup.game_id && (
                 <div className="border-t border-gray-100 bg-gray-50 px-2 py-1 text-center">
+                    {matchup.game_started_at && (
+                        <div className="mb-1 text-[10px] text-gray-500">
+                            <span>{new Date(matchup.game_started_at).toLocaleDateString()}</span>
+                            {' · '}
+                            <span>{new Date(matchup.game_started_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                    )}
+                    {matchup.game_excerpt && (
+                        <div className="mb-1 text-[10px] italic text-gray-500">{matchup.game_excerpt}</div>
+                    )}
                     <Link
-                        href={route('games.report', matchup.game_id)}
+                        href={isFinished ? route('games.report', matchup.game_id) : route('games.summary', matchup.game_id)}
                         className="text-[10px] font-semibold text-green-700 hover:text-green-800"
                     >
-                        View Report
+                        {isFinished ? 'View Report' : 'View Summary'}
                     </Link>
                 </div>
             )}
