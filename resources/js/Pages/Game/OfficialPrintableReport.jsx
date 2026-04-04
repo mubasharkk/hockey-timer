@@ -68,6 +68,8 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
     // Get shootout scores
     const homeShootout = currentGame?.home_shootout_score ?? 0;
     const awayShootout = currentGame?.away_shootout_score ?? 0;
+    const hasShootout = currentGame?.has_shootout ?? (homeShootout > 0 || awayShootout > 0);
+    const fmtScore = (score, shootout) => hasShootout ? `${score}(${shootout})` : `${score}`;
 
     const playerRows = Math.max(home?.players?.length || 0, away?.players?.length || 0);
     const safeEvents = Array.isArray(incomingEvents) ? incomingEvents : incomingEvents?.data || [];
@@ -159,11 +161,11 @@ export default function OfficialPrintableReport({ auth, game, sessionScores = []
                                 <div className="text-lg font-semibold text-gray-900 flex items-center gap-2 justify-end">
                                     <span className="uppercase text-gray-700">{home?.name || currentGame?.team_a_name}</span>
                                     <span className="final-score text-2xl text-green-700">
-                                        {finalScore.homeScore}{homeShootout > 0 ? `(${homeShootout})` : ''}
+                                        {fmtScore(finalScore.homeScore, homeShootout)}
                                     </span>
-                                    <span className="text-gray-500">-</span>
+                                    <span className="text-gray-500">–</span>
                                     <span className="final-score text-2xl text-green-700">
-                                        {finalScore.awayScore}{awayShootout > 0 ? `(${awayShootout})` : ''}
+                                        {fmtScore(finalScore.awayScore, awayShootout)}
                                     </span>
                                     <span className="uppercase text-gray-700">{away?.name || currentGame?.team_b_name}</span>
                                 </div>

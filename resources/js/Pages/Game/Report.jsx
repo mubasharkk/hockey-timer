@@ -53,6 +53,8 @@ export default function Report({ auth, game }) {
     const awayScore = currentGame.away_final_score ?? 0;
     const homeShootout = currentGame.home_shootout_score ?? 0;
     const awayShootout = currentGame.away_shootout_score ?? 0;
+    const hasShootout = currentGame.has_shootout ?? (homeShootout > 0 || awayShootout > 0);
+    const fmtScore = (score, shootout) => hasShootout ? `${score}(${shootout})` : `${score}`;
     
     const cardEventsByTeamAndNumber = (() => {
         const map = {};
@@ -143,7 +145,7 @@ export default function Report({ auth, game }) {
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-semibold text-gray-900">Final Score</h2>
                             <div className="text-3xl font-bold text-gray-900">
-                                {homeScore}{homeShootout > 0 ? `(${homeShootout})` : ''} – {awayScore}{awayShootout > 0 ? `(${awayShootout})` : ''}
+                                {fmtScore(homeScore, homeShootout)} – {fmtScore(awayScore, awayShootout)}
                             </div>
                         </div>
                         <p className="mt-1 text-sm text-gray-600">

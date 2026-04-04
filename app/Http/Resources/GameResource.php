@@ -64,6 +64,7 @@ class GameResource extends JsonResource
             'away_shootout_score' => $shootoutScores['away'],
             'home_final_score' => $finalScores['home'],
             'away_final_score' => $finalScores['away'],
+            'has_shootout' => $shootoutScores['home'] > 0 || $shootoutScores['away'] > 0,
             'home_team' => TeamResource::make($this->whenLoaded('homeTeam')),
             'away_team' => TeamResource::make($this->whenLoaded('awayTeam')),
             'tournament' => $this->when($tournamentResource !== null, $tournamentResource),
