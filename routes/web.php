@@ -87,6 +87,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/games/{game}/edit', [GameController::class, 'edit'])->name('games.edit');
     Route::put('/games/{game}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('games.destroy');
+    Route::post('/games/{game}/prompt-parse', [GameController::class, 'parsePromptResult'])->name('games.prompt_parse');
+    Route::post('/games/{game}/prompt-result', [GameController::class, 'applyPromptResult'])->name('games.prompt_result');
 });
 
 Route::middleware('auth')->group(function () {

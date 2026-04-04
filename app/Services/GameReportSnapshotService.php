@@ -71,7 +71,7 @@ class GameReportSnapshotService
 
     private function buildSessions(Game $game, callable $sessionLabel): array
     {
-        return $game->sessions->map(function ($session) use ($game, $sessionLabel) {
+        return $game->getRelation('sessions')->map(function ($session) use ($game, $sessionLabel) {
             $scores   = $game->sessionScores($session->number);
             $home     = collect($scores)->firstWhere('side', 'home')['score'] ?? 0;
             $away     = collect($scores)->firstWhere('side', 'away')['score'] ?? 0;

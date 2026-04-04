@@ -6,12 +6,14 @@ use App\Models\Game;
 use App\Models\Team;
 use App\Models\Tournament;
 use App\Services\GameService;
+use App\Services\PromptMatchResultService;
 use App\Http\Requests\StoreGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use App\Http\Resources\EventResource;
 use App\Http\Resources\GameResource;
 use App\Http\Resources\TeamResource;
 use App\Http\Resources\TournamentResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,9 +42,10 @@ class GameController extends Controller
         return $game->load($relations);
     }
 
-    public function __construct(private GameService $gameService)
-    {
-    }
+    public function __construct(
+        private GameService $gameService,
+        private PromptMatchResultService $promptMatchResultService,
+    ) {}
 
     public function create(Request $request): Response
     {
@@ -184,6 +187,24 @@ class GameController extends Controller
         $this->gameService->updateGame($game, $request->validated());
 
         return redirect()->route('games.summary', $game)->with('success', 'Game updated.');
+    }
+
+    public function parsePromptResult(Request $request, Game $game): JsonResponse
+    {
+        $request->validate(['prompt' => 'required|string|max:3000']);
+
+        return response()->json(
+            $this->promptMatchResultService->parse($game, $request->input('prompt'))
+        );
+    }
+
+    public function applyPromptResult(Request $request, Game $game): JsonResponse
+    {
+        $request->validate(['events' => 'required|array|min:1']);
+
+        return response()->json(
+            $this->promptMatchResultService->apply($game, $request->input('events'))
+        );
     }
 
     public function destroy(Game $game): RedirectResponse

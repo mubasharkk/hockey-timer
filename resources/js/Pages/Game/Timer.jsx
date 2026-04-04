@@ -185,6 +185,58 @@ export default function Timer({ auth, game, config = {} }) {
     const [commentsDraft, setCommentsDraft] = useState(currentGame.comments || '');
     const [commentsSaving, setCommentsSaving] = useState(false);
 
+    const [promptModal, setPromptModal] = useState(false);
+    const [promptText, setPromptText] = useState('');
+    // idle | parsing | preview | saving | success | error
+    const [promptState, setPromptState] = useState('idle');
+    const [promptParsed, setPromptParsed] = useState(null);  // { events, unresolved, summary }
+    const [promptResult, setPromptResult] = useState(null);  // { events_count, redirect_url }
+    const [promptError, setPromptError] = useState(null);
+
+    const handlePromptParse = async () => {
+        if (!promptText.trim()) return;
+        setPromptState('parsing');
+        setPromptError(null);
+        try {
+            const response = await axios.post(route('games.prompt_parse', currentGame.id), {
+                prompt: promptText,
+            });
+            if (response.data.success) {
+                setPromptParsed(response.data);
+                setPromptState('preview');
+            } else {
+                setPromptError(response.data.error || 'No events could be extracted.');
+                setPromptState('error');
+            }
+        } catch (e) {
+            setPromptError(e.response?.data?.message || 'Something went wrong.');
+            setPromptState('error');
+        }
+    };
+
+    const handlePromptConfirm = async () => {
+        setPromptState('saving');
+        try {
+            const response = await axios.post(route('games.prompt_result', currentGame.id), {
+                events: promptParsed.events,
+            });
+            setPromptResult(response.data);
+            setPromptState('success');
+        } catch (e) {
+            setPromptError(e.response?.data?.message || 'Failed to save events.');
+            setPromptState('error');
+        }
+    };
+
+    const handlePromptClose = () => {
+        setPromptModal(false);
+        setPromptText('');
+        setPromptState('idle');
+        setPromptParsed(null);
+        setPromptResult(null);
+        setPromptError(null);
+    };
+
     const handleSaveComments = async () => {
         setCommentsSaving(true);
         try {
@@ -664,6 +716,13 @@ export default function Timer({ auth, game, config = {} }) {
                             >
                                 Comments
                             </button>
+                            <button
+                                type="button"
+                                className="rounded-md border border-green-600 bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 shadow-sm hover:bg-green-100"
+                                onClick={() => setPromptModal(true)}
+                            >
+                                Enter Result
+                            </button>
                         </div>
                     </header>
 
@@ -917,6 +976,171 @@ export default function Timer({ auth, game, config = {} }) {
                             {commentsSaving ? 'Saving...' : 'Save Comments'}
                         </DangerButton>
                     </div>
+                </div>
+            </Modal>
+            <Modal show={promptModal} onClose={handlePromptClose} maxWidth="5xl">
+                <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-semibold text-gray-900">Enter Match Result</h2>
+                        {promptState === 'preview' && (
+                            <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                                Review &amp; Confirm
+                            </span>
+                        )}
+                    </div>
+
+                    {/* ── Step 1: Input ── */}
+                    {(promptState === 'idle' || promptState === 'parsing') && (
+                        <>
+                            <p className="text-sm text-gray-600">
+                                Describe the match result in plain text — goals, cards, penalty corners/strokes,
+                                player names or shirt numbers, session/half, and times.
+                            </p>
+                            <textarea
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 text-sm"
+                                rows={7}
+                                value={promptText}
+                                onChange={(e) => setPromptText(e.target.value)}
+                                placeholder={'e.g. "First half: Ali #7 scored a field goal at 5:45. Usman got a yellow card at 11:30.\nSecond half: Bilal #11 scored a penalty stroke at 4:00. Final whistle at 15:00."'}
+                                disabled={promptState === 'parsing'}
+                            />
+                            <div className="flex justify-end gap-3">
+                                <SecondaryButton onClick={handlePromptClose} disabled={promptState === 'parsing'}>
+                                    Cancel
+                                </SecondaryButton>
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 disabled:bg-green-300"
+                                    onClick={handlePromptParse}
+                                    disabled={promptState === 'parsing' || !promptText.trim()}
+                                >
+                                    {promptState === 'parsing' ? (
+                                        <>
+                                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                            </svg>
+                                            Parsing...
+                                        </>
+                                    ) : 'Parse with AI'}
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Step 2: Preview ── */}
+                    {(promptState === 'preview' || promptState === 'saving') && promptParsed && (
+                        <>
+                            {promptParsed.summary && (
+                                <p className="text-sm font-semibold text-gray-800">{promptParsed.summary}</p>
+                            )}
+                            {promptParsed.unresolved?.length > 0 && (
+                                <div className="rounded-md bg-yellow-50 border border-yellow-200 p-3">
+                                    <p className="text-xs font-semibold text-yellow-800">Could not match:</p>
+                                    <ul className="mt-1 list-disc pl-4 text-xs text-yellow-700">
+                                        {promptParsed.unresolved.map((item, i) => <li key={i}>{item}</li>)}
+                                    </ul>
+                                </div>
+                            )}
+                            <div className="overflow-x-auto overflow-y-auto max-h-80 rounded-md border border-gray-200">
+                                <table className="min-w-full divide-y divide-gray-200 text-sm">
+                                    <thead className="bg-gray-50 sticky top-0 z-10">
+                                        <tr>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Session</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Time</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Team</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Player ID</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">#</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Name</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Event</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Type</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 bg-white">
+                                        {promptParsed.events.map((e, i) => {
+                                            const sessionCount = currentGame.sessions?.length || 2;
+                                            const sessionPrefix = sessionCount === 4 ? 'Q' : sessionCount === 2 ? 'H' : 'S';
+                                            const teamName = e.team_id === home?.id ? home?.name : e.team_id === away?.id ? away?.name : '—';
+                                            const timeLabel = e.timer_value_seconds != null
+                                                ? `${String(Math.floor(e.timer_value_seconds / 60)).padStart(2, '0')}:${String(e.timer_value_seconds % 60).padStart(2, '0')}`
+                                                : '—';
+                                            const subType = e.goal_type || e.card_type || '—';
+                                            return (
+                                                <tr key={i} className="hover:bg-gray-50">
+                                                    <td className="px-3 py-2 text-gray-700">{e.session_number ? `${sessionPrefix}${e.session_number}` : '—'}</td>
+                                                    <td className="px-3 py-2 tabular-nums text-gray-700">{timeLabel}</td>
+                                                    <td className="px-3 py-2 text-gray-700">{teamName}</td>
+                                                    <td className="px-3 py-2 tabular-nums text-gray-500">{e.player_id ?? '—'}</td>
+                                                    <td className="px-3 py-2 tabular-nums font-medium text-gray-700">{e.player_shirt_number != null ? `#${e.player_shirt_number}` : '—'}</td>
+                                                    <td className="px-3 py-2 text-gray-700">{e.note || '—'}</td>
+                                                    <td className="px-3 py-2 capitalize text-gray-700">{e.event_type?.replace(/_/g, ' ')}</td>
+                                                    <td className="px-3 py-2 text-gray-700">{subType}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <SecondaryButton onClick={() => setPromptState('idle')} disabled={promptState === 'saving'}>
+                                    Edit
+                                </SecondaryButton>
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600 disabled:bg-green-300"
+                                    onClick={handlePromptConfirm}
+                                    disabled={promptState === 'saving'}
+                                >
+                                    {promptState === 'saving' ? (
+                                        <>
+                                            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                            </svg>
+                                            Saving...
+                                        </>
+                                    ) : `Confirm & Save ${promptParsed.events.length} event${promptParsed.events.length !== 1 ? 's' : ''}`}
+                                </button>
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Step 3: Success ── */}
+                    {promptState === 'success' && promptResult && (
+                        <div className="space-y-4">
+                            <div className="rounded-md bg-green-50 border border-green-200 p-4">
+                                <p className="text-sm font-semibold text-green-800">
+                                    {promptResult.events_count} event{promptResult.events_count !== 1 ? 's' : ''} saved. Game marked as finished.
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <SecondaryButton onClick={handlePromptClose}>Close</SecondaryButton>
+                                <a
+                                    href={promptResult.redirect_url}
+                                    className="inline-flex items-center rounded-md bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-600"
+                                >
+                                    View Report →
+                                </a>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── Error ── */}
+                    {promptState === 'error' && (
+                        <div className="space-y-4">
+                            <div className="rounded-md bg-red-50 border border-red-200 p-4">
+                                <p className="text-sm font-semibold text-red-800">
+                                    {promptError || 'Something went wrong. Please try again.'}
+                                </p>
+                            </div>
+                            <div className="flex justify-end gap-3">
+                                <SecondaryButton onClick={() => { setPromptState('idle'); setPromptError(null); }}>
+                                    Try Again
+                                </SecondaryButton>
+                                <SecondaryButton onClick={handlePromptClose}>Cancel</SecondaryButton>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Modal>
         </AuthenticatedLayout>
