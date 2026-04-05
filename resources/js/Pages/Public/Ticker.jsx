@@ -37,13 +37,25 @@ export default function Ticker({ game, gameId }) {
     const homeTeam = liveData?.home_team ?? game?.data?.home_team ?? null;
     const awayTeam = liveData?.away_team ?? game?.data?.away_team ?? null;
 
+    const timerMode = liveData?.timer_mode ?? 'ASC';
+    const sessionDurationSeconds = (liveData?.session_duration_minutes ?? 0) * 60;
+
     const effectiveSeconds = useMemo(() => {
-        // Trust server timer_seconds as the single source of truth
+        // Server pre-converts timer_seconds for ASC/DESC — trust it directly
         if (liveData?.timer_seconds !== undefined && liveData?.timer_seconds !== null) {
             return liveData.timer_seconds;
         }
         return 0;
     }, [liveData?.timer_seconds]);
+
+    // Convert a stored elapsed value to display seconds based on timer mode
+    const toDisplaySeconds = (elapsedSeconds) => {
+        if (elapsedSeconds == null) return 0;
+        if (timerMode === 'DESC') {
+            return Math.max(sessionDurationSeconds - elapsedSeconds, 0);
+        }
+        return Math.max(elapsedSeconds, 0);
+    };
 
     const events = liveData?.events || [];
 
@@ -246,7 +258,7 @@ export default function Ticker({ game, gameId }) {
                                                     {teamName(e.team_id, homeTeam, awayTeam, liveData)}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    Session {e.session_number} · {formatSeconds(e.timer_value_seconds ?? 0)}
+                                                    Session {e.session_number} · {formatSeconds(toDisplaySeconds(e.timer_value_seconds))}
                                                 </p>
                                                 {(e.note || e.goal_type || e.card_type) && (
                                                     <p className="text-xs text-gray-500">
