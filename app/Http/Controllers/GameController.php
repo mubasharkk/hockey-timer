@@ -158,6 +158,29 @@ class GameController extends Controller
         ]);
     }
 
+    public function showMatchSheet(Game $game): Response
+    {
+        $game->load([
+            'homeTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'awayTeam.players' => fn ($q) => $q->orderBy('shirt_number')->orderBy('name'),
+            'tournament',
+            'tournamentPool',
+        ]);
+
+        $sessionCount = (int) ($game->getAttribute('sessions') ?? 2);
+
+        $sessionLabels = $sessionCount > 0
+            ? collect(range(1, $sessionCount))
+                ->mapWithKeys(fn ($n) => [$n => $this->sessionLabel($n, $sessionCount)])
+                ->all()
+            : [];
+
+        return Inertia::render('Game/MatchSheet', [
+            'game'          => GameResource::make($game),
+            'sessionLabels' => $sessionLabels,
+        ]);
+    }
+
     public function edit(Game $game): Response
     {
         $game->load(['homeTeam.players', 'awayTeam.players']);

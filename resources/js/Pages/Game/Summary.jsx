@@ -120,6 +120,12 @@ export default function Summary({ auth, game }) {
 
                         <div className="flex items-center gap-2">
                             <Link
+                                href={route('games.match_sheet', currentGame.id)}
+                                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-400"
+                            >
+                                Match Sheet
+                            </Link>
+                            <Link
                                 href={route('public.ticker.code', currentGame.code)}
                                 className="inline-flex items-center rounded-md border border-green-300 px-3 py-2 text-sm font-semibold text-green-700 shadow-sm transition hover:border-green-400"
                                 preserveScroll

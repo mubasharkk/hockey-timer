@@ -84,6 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/games/{game}/timer', [GameController::class, 'showTimer'])->name('games.timer');
     Route::get('/games/{game}/report', [GameController::class, 'showReport'])->name('games.report');
     Route::get('/games/{game}/official-report', [GameController::class, 'showOfficialHtml'])->name('games.official_report');
+    Route::get('/games/{game}/match-sheet', [GameController::class, 'showMatchSheet'])->name('games.match_sheet');
     Route::get('/games/{game}/edit', [GameController::class, 'edit'])->name('games.edit');
     Route::put('/games/{game}', [GameController::class, 'update'])->name('games.update');
     Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('games.destroy');
