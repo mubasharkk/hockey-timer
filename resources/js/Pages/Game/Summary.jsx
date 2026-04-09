@@ -2,7 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import DangerButton from '@/Components/DangerButton';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
-import { Head, Link, useForm } from '@inertiajs/react';
+import SquadManager from '@/Components/SquadManager';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import moment from 'moment';
 import GameTeamSquad from '@/Components/GameTeamSquad';
@@ -33,6 +34,8 @@ export default function Summary({ auth, game }) {
     const now = new Date();
     const canStart = !isFinished && (scheduledAt ? now >= scheduledAt : false);
     const [confirmDelete, setConfirmDelete] = useState(false);
+    const [squadOpen, setSquadOpen]         = useState(false);
+    const [squadTab, setSquadTab]           = useState('home');
     const { delete: destroy, processing } = useForm({});
 
     const resolveTeam = (team, fallbackName) => {
@@ -119,6 +122,12 @@ export default function Summary({ auth, game }) {
                         </Link>
 
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setSquadOpen(true)}
+                                className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-400"
+                            >
+                                Manage Squads
+                            </button>
                             <Link
                                 href={route('games.match_sheet', currentGame.id)}
                                 className="inline-flex items-center rounded-md border border-gray-300 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-400"
@@ -160,6 +169,46 @@ export default function Summary({ auth, game }) {
                     </div>
                 </div>
             </div>
+            <Modal show={squadOpen} onClose={() => setSquadOpen(false)} maxWidth="lg">
+                <div className="p-6">
+                    <div className="mb-4 flex items-center justify-between">
+                        <h2 className="text-base font-semibold text-gray-900">Manage Squads</h2>
+                        <button onClick={() => setSquadOpen(false)} className="text-sm text-gray-400 hover:text-gray-600">✕</button>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="mb-4 flex overflow-hidden rounded-md border border-gray-200 text-sm font-semibold">
+                        <button
+                            className={`flex-1 px-4 py-2 ${squadTab === 'home' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                            onClick={() => setSquadTab('home')}
+                        >
+                            {homeTeamResolved.name}
+                        </button>
+                        <button
+                            className={`flex-1 px-4 py-2 ${squadTab === 'away' ? 'bg-green-50 text-green-700' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                            onClick={() => setSquadTab('away')}
+                        >
+                            {awayTeamResolved.name}
+                        </button>
+                    </div>
+
+                    {squadTab === 'home' && currentGame.home_team_id && (
+                        <SquadManager
+                            key={`home-${currentGame.home_team_id}`}
+                            team={{ id: currentGame.home_team_id, name: homeTeamResolved.name }}
+                            onSaved={() => router.reload({ only: ['game'] })}
+                        />
+                    )}
+                    {squadTab === 'away' && currentGame.away_team_id && (
+                        <SquadManager
+                            key={`away-${currentGame.away_team_id}`}
+                            team={{ id: currentGame.away_team_id, name: awayTeamResolved.name }}
+                            onSaved={() => router.reload({ only: ['game'] })}
+                        />
+                    )}
+                </div>
+            </Modal>
+
             <Modal show={confirmDelete} onClose={() => setConfirmDelete(false)} maxWidth="sm">
                 <div className="p-6">
                     <h2 className="text-lg font-semibold text-gray-900">Delete Game?</h2>

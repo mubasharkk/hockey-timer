@@ -7,6 +7,7 @@ use App\Http\Controllers\GameController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TeamPlayerController;
+use App\Http\Controllers\TeamSquadController;
 use App\Http\Controllers\TournamentController;
 use App\Http\Controllers\TournamentPoolTeamController;
 use App\Http\Controllers\DashboardController;
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('games.destroy');
     Route::post('/games/{game}/prompt-parse', [GameController::class, 'parsePromptResult'])->name('games.prompt_parse');
     Route::post('/games/{game}/prompt-result', [GameController::class, 'applyPromptResult'])->name('games.prompt_result');
+
+    Route::get('/teams/{team}/squad', [TeamSquadController::class, 'index'])->name('teams.squad');
+    Route::put('/teams/{team}/squad', [TeamSquadController::class, 'update'])->name('teams.squad.update');
+    Route::post('/teams/{team}/squad/players', [TeamSquadController::class, 'store'])->name('teams.squad.player.store');
+    Route::post('/teams/{team}/squad/attach', [TeamSquadController::class, 'attach'])->name('teams.squad.player.attach');
 });
 
 Route::middleware('auth')->group(function () {
