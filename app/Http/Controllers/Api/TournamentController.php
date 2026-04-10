@@ -52,6 +52,7 @@ class TournamentController extends Controller
             ->where('tournament_pool_results.tournament_id', $tournament->id)
             ->orderBy('pool_id')
             ->orderByDesc('total_points')
+            ->orderByDesc('goal_diff')
             ->orderBy('team_name')
             ->select('tournament_pool_results.*', 'teams.uid as team_uid')
             ->get();
