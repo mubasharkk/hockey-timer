@@ -200,21 +200,28 @@ EXTRACTION RULES:
 1. Read the text naturally — it may be informal English like "Ali scored in the 12th minute of the first half".
 2. Extract EVERY event mentioned — do not skip session starts, session ends, penalty corners, cards or goals.
 3. For every session mentioned as started → emit a session_start event with timer_value_seconds: 0.
-4. For every session mentioned as ended → emit a session_end event with timer_value_seconds equal to the full session duration in seconds.
-5. For the final whistle / game end → emit a game_end event.
+4. For every session mentioned as ended → emit a session_end event with timer_value_seconds equal to the full session duration in seconds ({$totalSecs}).
+5. For the final whistle / game end → emit a game_end event with session_number equal to the last session ({$sessions}).
 6. session_start, session_end, game_end events must have team_id: null and player_id: null.
-7. Map player names and shirt numbers to entries in the rosters above.
-8. player_id MUST be the integer shown as (player_id: X) in the roster — it is a database ID, NOT the shirt number.
-9. player_shirt_number MUST be the #number shown at the start of the roster line — it is separate from player_id.
-10. note MUST be set to the player's full name (as shown in the roster) whenever the event involves a player. Leave null only for events with no player (e.g. penalty_corner, session_start).
-11. If a player is only mentioned by shirt number (e.g. "#7"), look up that number in the correct team's roster to get their player_id and name.
-12. If a name cannot be matched to any roster entry, add a description to the "unresolved" array and set player_id to null.
-13. Convert displayed times to timer_value_seconds using the Timer mode rule above. If no time is given, set null.
-14. Infer session_number from context: "first half" / "H1" / "Q1" = 1, "second half" / "H2" / "Q2" = 2, etc.
-15. For goals, always set goal_type; default to "FG" if unspecified.
-16. For cards, always set card_type.
-17. Preserve event order exactly as described in the text.
-18. Do NOT invent events not mentioned in the text.
+7. session_number is REQUIRED and MUST NEVER be null. Every event must have a valid session_number.
+8. session_number rules:
+   - "first half" / "H1" / "Q1" / "S1" / "first session"  = 1
+   - "second half" / "H2" / "Q2" / "S2" / "second session" = 2
+   - "third" / "H3" / "Q3" / "S3"                          = 3
+   - "fourth" / "H4" / "Q4" / "S4"                         = 4
+   - game_end always uses the final session number ({$sessions})
+   - If no session is mentioned for a game event, infer from the order of events in the text (default to 1 if impossible to infer).
+9. Map player names and shirt numbers to entries in the rosters above.
+10. player_id MUST be the integer shown as (player_id: X) in the roster — it is a database ID, NOT the shirt number.
+11. player_shirt_number MUST be the #number shown at the start of the roster line — it is separate from player_id.
+12. note MUST be set to the player's full name (as shown in the roster) whenever the event involves a player. Leave null only for events with no player (e.g. penalty_corner, session_start).
+13. If a player is only mentioned by shirt number (e.g. "#7"), look up that number in the correct team's roster to get their player_id and name.
+14. If a name cannot be matched to any roster entry, add a description to the "unresolved" array and set player_id to null.
+15. Convert displayed times to timer_value_seconds using the Timer mode rule above. If no time is given, set null.
+16. For goals, always set goal_type; default to "FG" if unspecified.
+17. For cards, always set card_type.
+18. Preserve event order exactly as described in the text.
+19. Do NOT invent events not mentioned in the text.
 
 RESPOND ONLY with valid JSON in this exact structure — no extra text:
 {
@@ -281,20 +288,27 @@ PROMPT;
         $allowed      = ['team_id', 'player_id', 'player_shirt_number', 'session_number',
                          'event_type', 'goal_type', 'card_type', 'timer_value_seconds', 'note'];
         $validTeamIds = array_filter([$game->home_team_id, $game->away_team_id]);
-
-        $noTeamTypes = ['session_start', 'session_end', 'game_end'];
+        $noTeamTypes  = ['session_start', 'session_end', 'game_end'];
+        $totalSessions = $game->relationLoaded('sessions')
+            ? $game->getRelation('sessions')->count()
+            : (int) ($game->getAttribute('sessions') ?? 2);
 
         $filtered = array_filter(
             array_map(fn ($e) => array_intersect_key($e, array_flip($allowed)), $events),
             fn ($e) => !empty($e['event_type'])
                 && (
-                    in_array($e['event_type'], $noTeamTypes)          // session/game boundary — no team needed
-                    || empty($e['team_id'])                           // team_id absent or null — allow through
-                    || in_array($e['team_id'], $validTeamIds)         // valid team
+                    in_array($e['event_type'], $noTeamTypes)
+                    || empty($e['team_id'])
+                    || in_array($e['team_id'], $validTeamIds)
                 )
         );
 
-        return array_values(array_map(function (array $e) use ($playerMap) {
+        return array_values(array_map(function (array $e) use ($playerMap, $totalSessions) {
+            // Enforce non-null session_number — game_end defaults to last session
+            if (empty($e['session_number'])) {
+                $e['session_number'] = $e['event_type'] === 'game_end' ? $totalSessions : 1;
+            }
+
             $playerId = isset($e['player_id']) ? (int) $e['player_id'] : null;
 
             if ($playerId && isset($playerMap[$playerId])) {
@@ -304,8 +318,7 @@ PROMPT;
             } else {
                 $e['player_id']           = null;
                 $e['player_shirt_number'] = null;
-                // keep note as-is if GPT set something, otherwise null
-                $e['note'] = $e['note'] ?? null;
+                $e['note']                = $e['note'] ?? null;
             }
 
             return $e;
